@@ -13,6 +13,33 @@ Aplicativo acessível para gestão de tarefas, focado em idosos e pessoas com ne
    npx expo start
    ```
 
+## Versão Web (build estático)
+
+Para gerar os arquivos da versão web:
+
+```bash
+npm run build:web
+```
+
+O resultado será exportado na pasta `dist/`.
+
+## Deploy no Vercel
+
+Este projeto já está preparado para deploy estático com o arquivo `vercel.json`.
+
+### Passo a passo
+
+1. Suba o projeto para um repositório no GitHub (se ainda não estiver).
+2. No Vercel, clique em **Add New... > Project**.
+3. Importe o repositório `SeniorEase`.
+4. Confirme as configurações do projeto:
+   - **Framework Preset**: Other
+   - **Build Command**: `npm run build:web`
+   - **Output Directory**: `dist`
+5. Clique em **Deploy**.
+
+Após o deploy, o Vercel gera uma URL pública para acessar a versão web.
+
 ## Estrutura do Projeto
 
 - **src/domain**: entidades, enums e interfaces de repositórios.
