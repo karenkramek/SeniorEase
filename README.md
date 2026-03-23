@@ -5,10 +5,13 @@ Aplicativo acessível para gestão de tarefas, focado em idosos e pessoas com ne
 ## Como rodar o projeto
 
 1. Instale as dependências:
+
    ```bash
    npm install
    ```
+
 2. Inicie o app:
+
    ```bash
    npx expo start
    ```
@@ -39,6 +42,87 @@ Este projeto já está preparado para deploy estático com o arquivo `vercel.jso
 5. Clique em **Deploy**.
 
 Após o deploy, o Vercel gera uma URL pública para acessar a versão web.
+
+## 🔒 Segurança
+
+O SeniorEase adota práticas de desenvolvimento seguro com foco em prevenção de
+vazamento de credenciais, proteção da camada web e monitoramento contínuo de
+dependências.
+
+### Proteção de Credenciais e Dados
+
+- **Gitleaks + Husky**: bloqueio de commits com secrets expostos.
+- **Gitignore para ambiente local**: `.env` e arquivos sensíveis fora do versionamento.
+- **Configuração customizada de detecção**: regras para chaves Firebase, API keys,
+  JWT, chaves AWS e private keys.
+
+Arquivos relacionados:
+
+- `.husky/pre-commit`
+- `.gitleaks.toml`
+- `.gitignore`
+
+### Segurança Web e Aplicação
+
+- **CSP (Content Security Policy)**: restrição de origens confiáveis para scripts,
+  conexões, imagens e fontes.
+- **Security Headers**: `X-Frame-Options`, `X-Content-Type-Options`,
+  `X-XSS-Protection` e `Strict-Transport-Security`.
+
+Arquivos relacionados:
+
+- `web/index.html` (template web com políticas de segurança)
+- `vercel.json` (headers aplicados no deploy)
+
+### NPM Audit (Dependências)
+
+- **Monitoramento contínuo de vulnerabilidades** nas dependências do projeto.
+- **Fluxo recomendado**: executar auditoria regularmente e corrigir com cautela,
+  principalmente quando houver updates com potencial breaking change.
+
+Comandos disponíveis:
+
+```bash
+npm run audit
+npm run audit:fix
+```
+
+### Como Validar Localmente
+
+Observacao: apos `npm install`, os hooks do Husky sao preparados automaticamente
+e o projeto executa uma checagem do Gitleaks no `postinstall`.
+
+1. Instale o Gitleaks:
+
+   macOS:
+
+   ```bash
+   brew install gitleaks
+   ```
+
+   Windows (PowerShell):
+
+   ```powershell
+   winget install gitleaks
+   ```
+
+   Alternativa no Windows (Chocolatey):
+
+   ```powershell
+   choco install gitleaks
+   ```
+
+2. Verifique se os hooks do Husky estao ativos (opcional):
+
+   ```bash
+   npm run prepare
+   ```
+
+3. Execute a auditoria de dependências:
+
+   ```bash
+   npm run audit
+   ```
 
 ## Estrutura do Projeto
 
