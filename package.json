@@ -9,7 +9,12 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:web": "expo export --platform web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "prepare": "husky",
+    "postinstall": "node ./scripts/check-gitleaks.js",
+    "check:gitleaks": "node ./scripts/check-gitleaks.js",
+    "audit": "npm audit",
+    "audit:fix": "npm audit fix"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
@@ -45,6 +50,7 @@
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "expo-module-scripts": "^55.0.2",
+    "husky": "^9.1.7",
     "typescript": "~5.9.2"
   },
   "private": true

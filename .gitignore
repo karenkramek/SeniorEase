@@ -1,5 +1,3 @@
-# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
-
 # dependencies
 node_modules/
 
@@ -7,7 +5,10 @@ node_modules/
 .expo/
 dist/
 web-build/
+
+# Environment variables
 expo-env.d.ts
+.env
 
 # Native
 .kotlin/
@@ -30,6 +31,10 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# IDE
+.idea/
+.vscode/
+
 # local env files
 .env*.local
 
@@ -41,3 +46,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# gitleaks reports
+gitleaks-report*.json

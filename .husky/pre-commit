@@ -1,0 +1,33 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Verificar se gitleaks esta instalado
+if ! command -v gitleaks &> /dev/null; then
+    echo "ERRO: Gitleaks nao esta instalado!"
+    echo "Instale com: brew install gitleaks"
+    exit 1
+fi
+
+# Rodar Gitleaks nos arquivos staged
+echo "Verificando secrets com Gitleaks..."
+gitleaks protect --staged --verbose
+
+if [ $? -eq 0 ]; then
+    echo "Nenhum secret detectado. Commit permitido!"
+    exit 0
+else
+    echo ""
+    echo "=========================================="
+    echo "COMMIT BLOQUEADO!"
+    echo "=========================================="
+    echo ""
+    echo "Gitleaks detectou possiveis secrets ou credenciais nos arquivos."
+    echo ""
+    echo "Proximos passos:"
+    echo "  1. Revise os arquivos listados acima"
+    echo "  2. Remova as credenciais expostas"
+    echo "  3. Use variaveis de ambiente (.env)"
+    echo "  4. Certifique-se de que .env esta no .gitignore"
+    echo ""
+    exit 1
+fi
