@@ -3,11 +3,13 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { HapticTab } from "@/presentation/components/HapticTab";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { Colors } from "@/presentation/theme/colors";
 import { getNavigationIcon } from "@/presentation/utils/navigationIcons";
 
 export default function TabLayout() {
+  const appTexts = useAppStrings();
   const { preferences } = usePreferences();
   const colorScheme = preferences.theme ?? "light";
   const themeColors = preferences.isHighContrast
@@ -30,9 +32,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="TaskListScreen"
         options={{
-          title: "Tarefas",
-          tabBarLabel: "Tarefas",
-          tabBarAccessibilityLabel: "Aba de tarefas",
+          title: appTexts.navigation.tasksTabTitle,
+          tabBarLabel: appTexts.navigation.tasksTabTitle,
+          tabBarAccessibilityLabel: appTexts.navigation.tasksTabA11y,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={getNavigationIcon("TaskListScreen", focused)}
@@ -45,8 +47,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="PreferencesScreen"
         options={{
-          tabBarLabel: "Preferências",
-          tabBarAccessibilityLabel: "Aba de preferências",
+          tabBarLabel: appTexts.navigation.preferencesTabTitle,
+          tabBarAccessibilityLabel: appTexts.navigation.preferencesTabA11y,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={getNavigationIcon("PreferencesScreen", focused)}
@@ -59,8 +61,8 @@ export default function TabLayout() {
       <Tabs.Screen
         name="HelpScreen"
         options={{
-          tabBarLabel: "Ajuda",
-          tabBarAccessibilityLabel: "Aba de ajuda e dicas",
+          tabBarLabel: appTexts.navigation.helpTabTitle,
+          tabBarAccessibilityLabel: appTexts.navigation.helpTabA11y,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={getNavigationIcon("HelpScreen", focused)}

@@ -3,6 +3,7 @@ import { UpdatePreferences } from "@/application/useCases/preferences/UpdatePref
 import { Preferences } from "@/domain/entities/Preferences";
 import { PreferencesRepository } from "@/infrastructure/repositories/PreferencesRepository";
 import { UniversalStorageAdapter } from "@/infrastructure/storage/UniversalStorageAdapter";
+import { getStrings } from "@/presentation/i18n/strings";
 import React, {
   createContext,
   ReactNode,
@@ -30,14 +31,18 @@ const updatePreferencesUseCase = new UpdatePreferences(preferencesRepository);
 interface PreferencesContextType {
   preferences: Preferences;
   isLoading: boolean;
+  errorMessage: string | null;
   updatePreferences: (prefs: Partial<Preferences>) => Promise<void>;
+  clearErrorMessage: () => void;
 }
 
 const PreferencesContext = createContext<PreferencesContextType>({
   preferences: defaultPreferences,
   isLoading: true,
+  errorMessage: null,
   updatePreferences: async () =>
     console.warn("PreferencesProvider não encontrado"),
+  clearErrorMessage: () => undefined,
 });
 
 export const usePreferences = () => useContext(PreferencesContext);
@@ -52,6 +57,7 @@ export const PreferencesProvider: React.FC<PreferencesProviderProps> = ({
   const [preferences, setPreferences] =
     useState<Preferences>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const loadPreferences = async () => {
@@ -61,8 +67,10 @@ export const PreferencesProvider: React.FC<PreferencesProviderProps> = ({
         if (savedPreferences) {
           setPreferences(savedPreferences);
         }
+        setErrorMessage(null);
       } catch (error) {
         console.error("Falha ao carregar as preferências", error);
+        setErrorMessage(getStrings("pt-BR").preferences.loadError);
       } finally {
         setIsLoading(false);
       }
@@ -75,19 +83,31 @@ export const PreferencesProvider: React.FC<PreferencesProviderProps> = ({
     async (newPrefs: Partial<Preferences>) => {
       const updated = { ...preferences, ...newPrefs };
       setPreferences(updated);
+      setErrorMessage(null);
+      const strings = getStrings("pt-BR").preferences;
       try {
         await updatePreferencesUseCase.execute(updated);
       } catch (error) {
         console.error("Falha ao salvar as preferências", error);
-        // Opcional: reverter o estado ou mostrar um erro para o usuário
+        setErrorMessage(strings.saveError);
       }
     },
     [preferences],
   );
 
+  const clearErrorMessage = useCallback(() => {
+    setErrorMessage(null);
+  }, []);
+
   return (
     <PreferencesContext.Provider
-      value={{ preferences, isLoading, updatePreferences }}
+      value={{
+        preferences,
+        isLoading,
+        errorMessage,
+        updatePreferences,
+        clearErrorMessage,
+      }}
     >
       {children}
     </PreferencesContext.Provider>

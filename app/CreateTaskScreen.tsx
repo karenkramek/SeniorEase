@@ -1,4 +1,7 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
+import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { useNotification } from "@/presentation/hooks/useNotification";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { Colors } from "@/presentation/theme/colors";
@@ -9,9 +12,14 @@ import React, { useState } from "react";
 import { KeyboardAvoidingView, Platform, TextInput, View } from "react-native";
 
 export default function CreateTaskScreen() {
+  const appTexts = useAppStrings();
+  const strings = appTexts.createTask;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [titleError, setTitleError] = useState<string | null>(null);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { createTask } = useTasks();
+  const { showNotification } = useNotification();
   const router = useRouter();
 
   const { preferences } = usePreferences();
@@ -21,14 +29,27 @@ export default function CreateTaskScreen() {
     : Colors[colorScheme as "light" | "dark"];
 
   const handleCreate = async () => {
-    if (title.trim()) {
+    setSubmissionError(null);
+
+    if (!title.trim()) {
+      setTitleError(strings.titleRequiredError);
+      return;
+    }
+
+    try {
       await createTask({
         title: title.trim(),
         description: description.trim(),
       });
+      setTitleError(null);
+      showNotification(strings.createSuccess, "success");
       if (router.canGoBack()) {
         router.back();
       }
+    } catch (error) {
+      console.error("Falha ao criar tarefa", error);
+      showNotification(strings.createError, "error");
+      setSubmissionError(strings.createErrorDetail);
     }
   };
 
@@ -39,25 +60,51 @@ export default function CreateTaskScreen() {
         sharedStyles.container,
         { backgroundColor: themeColors.background },
       ]}
-      accessibilityLabel="Tela de criação de tarefa"
+      accessibilityLabel={strings.screenLabel}
     >
+      <View style={{ marginBottom: 8 }}>
+        <AccessibleText style={{ fontWeight: "bold", color: themeColors.text }}>
+          {strings.titleLabel}
+        </AccessibleText>
+      </View>
       <TextInput
-        placeholder="Título da tarefa"
+        placeholder={strings.titlePlaceholder}
         placeholderTextColor={themeColors.icon}
         value={title}
-        onChangeText={setTitle}
+        onChangeText={(text) => {
+          setTitle(text);
+          if (titleError && text.trim()) {
+            setTitleError(null);
+          }
+        }}
         style={[
           sharedStyles.input,
           {
-            borderColor: themeColors.icon,
+            borderColor: titleError ? themeColors.error : themeColors.icon,
             color: themeColors.text,
             backgroundColor: themeColors.background,
           },
         ]}
-        accessibilityLabel="Campo para título da tarefa"
+        accessibilityLabel={strings.titleFieldLabel}
+        accessibilityHint={strings.titleRequiredHint}
       />
+      {titleError && (
+        <View
+          style={{ marginTop: -16, marginBottom: 16, flexDirection: "row", gap: 8 }}
+          accessibilityRole="alert"
+          accessibilityLabel={titleError}
+        >
+          <MaterialIcons name="error-outline" size={18} color={themeColors.error} />
+          <AccessibleText style={{ color: themeColors.error }}>{titleError}</AccessibleText>
+        </View>
+      )}
+      <View style={{ marginBottom: 8 }}>
+        <AccessibleText style={{ fontWeight: "bold", color: themeColors.text }}>
+          {strings.descriptionLabel}
+        </AccessibleText>
+      </View>
       <TextInput
-        placeholder="Descrição (opcional)"
+        placeholder={strings.descriptionPlaceholder}
         placeholderTextColor={themeColors.icon}
         value={description}
         onChangeText={setDescription}
@@ -72,23 +119,35 @@ export default function CreateTaskScreen() {
           },
         ]}
         multiline
-        accessibilityLabel="Campo para descrição da tarefa"
+        accessibilityLabel={strings.descriptionFieldLabel}
       />
+      {submissionError && (
+        <View
+          style={{ marginTop: -8, marginBottom: 8, flexDirection: "row", gap: 8 }}
+          accessibilityRole="alert"
+          accessibilityLabel={submissionError}
+        >
+          <MaterialIcons name="error-outline" size={18} color={themeColors.error} />
+          <AccessibleText style={{ color: themeColors.error }}>
+            {submissionError}
+          </AccessibleText>
+        </View>
+      )}
       {/* Espaço para separar os campos do botão */}
       <View style={{ flex: 1 }} />
       <View style={{ marginTop: 24, marginBottom: 8, alignItems: "center" }}>
         <AccessibleButton
-          title="Criar Tarefa"
+          title={strings.createButton}
           icon={
             <MaterialIcons
               name="add"
               size={32}
               color="#fff"
-              accessibilityLabel="Ícone de adicionar"
+              accessibilityLabel={appTexts.taskList.addIconA11y}
             />
           }
           onPress={handleCreate}
-          accessibilityLabel="Botão para criar tarefa"
+          accessibilityLabel={strings.createButtonA11y}
           style={sharedStyles.createButton}
         />
       </View>

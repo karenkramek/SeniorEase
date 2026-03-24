@@ -11,6 +11,10 @@ export const Colors = {
     error: "#C53030", // Vermelho forte porém confortável
     warning: "#E67E22", // Laranja (idosos distinguem melhor que amarelo)
     buttonText: "#FFFFFF", // Texto branco para botões
+    switchTrackOff: "#9AA5B1", // Trilha inativa visível no fundo claro
+    switchTrackOn: "#1F4E79", // Trilha ativa com contraste adequado
+    switchThumbOff: "#FFFFFF", // Thumb off claro
+    switchThumbOn: "#FFFFFF", // Thumb on claro
   },
 
   // Tema Escuro — confortável em baixa luz
@@ -25,6 +29,10 @@ export const Colors = {
     error: "#E57373",
     warning: "#FFB74D",
     buttonText: "#121417", // Texto preto para botões
+    switchTrackOff: "#5F6C7B", // Trilha inativa acima do fundo escuro
+    switchTrackOn: "#8CC8FF", // Trilha ativa mais luminosa
+    switchThumbOff: "#E4E7EB", // Thumb off claro para fundo escuro
+    switchThumbOn: "#0F1720", // Thumb on escuro para contraste com trilha ativa
   },
 
   // Alto contraste — acessibilidade máxima
@@ -39,5 +47,9 @@ export const Colors = {
     error: "#FF0000",
     warning: "#FFD400",
     buttonText: "#000000", // Texto preto para botões
+    switchTrackOff: "#666666", // Inativo em cinza para evitar ambiguidade com fundo
+    switchTrackOn: "#FFD400", // Ativo em amarelo de alto contraste
+    switchThumbOff: "#FFFFFF", // Thumb off branco para contraste com trilha cinza
+    switchThumbOn: "#000000", // Thumb on preto para contraste máximo com trilha amarela
   },
 };

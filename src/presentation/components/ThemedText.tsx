@@ -21,6 +21,7 @@ export function ThemedText({
   accessibilityRole?: string;
 }) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
+  const linkColor = useThemeColor({}, "tint");
 
   return (
     <Text
@@ -31,6 +32,13 @@ export function ThemedText({
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,
         type === "subtitle" ? styles.subtitle : undefined,
         type === "link" ? styles.link : undefined,
+        type === "link"
+          ? {
+              color: linkColor,
+              textDecorationLine: "underline",
+              textDecorationColor: linkColor,
+            }
+          : undefined,
         style,
       ]}
       accessibilityLabel={accessibilityLabel}
@@ -62,6 +70,5 @@ const styles = StyleSheet.create({
   link: {
     lineHeight: 30,
     fontSize: 16,
-    color: "#0a7ea4",
   },
 });

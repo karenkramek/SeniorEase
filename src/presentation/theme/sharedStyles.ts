@@ -1,6 +1,8 @@
 import { StyleSheet } from "react-native";
 import { Spacing } from "./spacing";
 
+export const MIN_TOUCH_TARGET_SIZE = 44;
+
 export const sharedStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -74,6 +76,10 @@ export const sharedStyles = StyleSheet.create({
   buttonLink: {
     marginTop: 15,
     paddingVertical: 15,
+  },
+  touchTargetMin: {
+    minWidth: MIN_TOUCH_TARGET_SIZE,
+    minHeight: MIN_TOUCH_TARGET_SIZE,
   },
   // Adicionar outros estilos reutilizáveis aqui
 });

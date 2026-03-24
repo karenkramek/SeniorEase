@@ -1,4 +1,5 @@
 import { Task } from "@/domain/entities/Task";
+import { getStrings } from "@/presentation/i18n/strings";
 import { getReminderMessage } from "@/presentation/utils/reminder";
 import * as Notifications from "expo-notifications";
 
@@ -8,6 +9,8 @@ export interface INotificationService {
 }
 
 export class NotificationService implements INotificationService {
+  private readonly strings = getStrings("pt-BR");
+
   constructor() {
     this.configure();
   }
@@ -48,7 +51,7 @@ export class NotificationService implements INotificationService {
       try {
         const notificationId = await Notifications.scheduleNotificationAsync({
           content: {
-            title: "Lembrete de Tarefa Próxima!",
+            title: this.strings.notifications.reminderTitle,
             body: getReminderMessage(task.title, task.dueDate),
             data: { taskId: task.id },
             sound: true,

@@ -1,6 +1,9 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { ConfirmModal } from "@/presentation/components/ConfirmModal";
 import { TaskCard } from "@/presentation/components/TaskCard";
+import { useNotification } from "@/presentation/hooks/useNotification";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { Colors } from "@/presentation/theme/colors";
@@ -9,9 +12,11 @@ import { Spacing } from "@/presentation/theme/spacing";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useState } from "react";
-import { ActivityIndicator, FlatList, Modal, View } from "react-native";
+import { ActivityIndicator, FlatList, View } from "react-native";
 
 export default function TaskListScreen() {
+  const appTexts = useAppStrings();
+  const strings = appTexts.taskList;
   const {
     tasks,
     isLoading,
@@ -25,14 +30,26 @@ export default function TaskListScreen() {
     string | null
   >(null);
   const [pendingComplete, setPendingComplete] = useState<boolean>(false);
+  const newTaskButtonRef = React.useRef<any>(null);
+  const { showNotification } = useNotification();
   const router = useRouter();
 
   const toggleTaskStatus = async (taskId: string, completed: boolean) => {
-    if (completed) {
-      await completeTask(taskId);
-    } else {
-      await uncompleteTask(taskId);
+    try {
+      if (completed) {
+        await completeTask(taskId);
+      } else {
+        await uncompleteTask(taskId);
+      }
+      showNotification(
+        completed ? strings.taskCompleted : strings.taskReopened,
+        "success",
+      );
+    } catch (error) {
+      console.error("Falha ao atualizar tarefa", error);
+      showNotification(strings.taskUpdateError, "error");
     }
+
     await refreshTasks();
   };
 
@@ -48,17 +65,29 @@ export default function TaskListScreen() {
     backgroundColor: themeColors.background,
   };
 
-  const handleDelete = (taskId: string) => {
+  const handleDelete = async (taskId: string) => {
     if (preferences.useExtraConfirmation) {
       setConfirmTaskId(taskId);
     } else {
-      deleteTask(taskId);
+      try {
+        await deleteTask(taskId);
+        showNotification(strings.taskDeleted, "success");
+      } catch (error) {
+        console.error("Falha ao excluir tarefa", error);
+        showNotification(strings.taskDeleteError, "error");
+      }
     }
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (confirmTaskId) {
-      deleteTask(confirmTaskId);
+      try {
+        await deleteTask(confirmTaskId);
+        showNotification(strings.taskDeleted, "success");
+      } catch (error) {
+        console.error("Falha ao excluir tarefa", error);
+        showNotification(strings.taskDeleteError, "error");
+      }
       setConfirmTaskId(null);
     }
   };
@@ -74,9 +103,9 @@ export default function TaskListScreen() {
     }
   };
 
-  const confirmComplete = () => {
+  const confirmComplete = async () => {
     if (confirmCompleteTaskId) {
-      toggleTaskStatus(confirmCompleteTaskId, true);
+      await toggleTaskStatus(confirmCompleteTaskId, true);
       setConfirmCompleteTaskId(null);
       setPendingComplete(false);
     }
@@ -105,7 +134,7 @@ export default function TaskListScreen() {
     <View style={containerStyle}>
       <View style={sharedStyles.titleContainer}>
         <AccessibleText type="h1" style={{ textAlign: "center" }}>
-          Tarefas
+          {strings.screenTitle}
         </AccessibleText>
       </View>
       {/* Espaço após o título */}
@@ -113,14 +142,11 @@ export default function TaskListScreen() {
       {/* Lista de tarefas */}
       {tasks.length === 0 ? (
         <View style={sharedStyles.emptyContainer}>
-          <AccessibleText accessibilityLabel="Nenhuma tarefa encontrada">
-            Nenhuma tarefa encontrada.
+          <AccessibleText accessibilityLabel={strings.noTasks}>
+            {strings.noTasks}
           </AccessibleText>
-          <AccessibleText
-            type="caption"
-            accessibilityLabel="Crie uma nova tarefa para começar"
-          >
-            Crie uma nova tarefa para começar!
+          <AccessibleText type="caption" accessibilityLabel={strings.noTasksHintA11y}>
+            {strings.noTasksHint}
           </AccessibleText>
         </View>
       ) : (
@@ -138,105 +164,49 @@ export default function TaskListScreen() {
           refreshing={isLoading}
           contentContainerStyle={sharedStyles.list}
           showsVerticalScrollIndicator={false}
-          accessibilityLabel="Lista de tarefas"
+          accessibilityLabel={strings.listLabel}
         />
       )}
       {/* Botão sempre no rodapé, com espaçamento */}
       <View style={{ marginTop: 24, marginBottom: 8, alignItems: "center" }}>
         <AccessibleButton
-          title="Nova Tarefa"
+          ref={newTaskButtonRef}
+          title={strings.newTaskButton}
           icon={
             <MaterialIcons
               name="add"
               size={32}
               color="#fff"
-              accessibilityLabel="Ícone de adicionar"
+              accessibilityLabel={strings.addIconA11y}
             />
           }
           style={sharedStyles.createButton}
-          accessibilityLabel="Botão para criar nova tarefa"
+          accessibilityLabel={strings.newTaskButtonA11y}
           onPress={() => router.push("/CreateTaskScreen")}
         />
       </View>
 
-      {/* Modal de confirmação de exclusão */}
-      <Modal
+      <ConfirmModal
         visible={!!confirmTaskId}
-        transparent
-        animationType="fade"
-        onRequestClose={cancelDelete}
-        accessibilityViewIsModal={true}
-      >
-        <View
-          style={[
-            sharedStyles.container,
-            { backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center" },
-          ]}
-        >
-          <View
-            style={{
-              backgroundColor: themeColors.background,
-              padding: 24,
-              borderRadius: 12,
-              alignItems: "center",
-            }}
-          >
-            <AccessibleText style={{ fontSize: 18, marginBottom: 16 }}>
-              Tem certeza que deseja excluir esta tarefa?
-            </AccessibleText>
-            <AccessibleButton
-              title="Excluir"
-              onPress={confirmDelete}
-              style={{ marginBottom: 8 }}
-              accessibilityLabel="Confirmar exclusão"
-            />
-            <AccessibleButton
-              title="Cancelar"
-              onPress={cancelDelete}
-              accessibilityLabel="Cancelar exclusão"
-            />
-          </View>
-        </View>
-      </Modal>
-      {/* Modal de confirmação ao completar */}
-      <Modal
+        title={strings.confirmDeleteTitle}
+        message={strings.confirmDeleteMessage}
+        confirmText={strings.confirmDeleteAction}
+        cancelText={appTexts.common.cancel}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        restoreFocusRef={newTaskButtonRef}
+      />
+
+      <ConfirmModal
         visible={!!confirmCompleteTaskId && pendingComplete}
-        transparent
-        animationType="fade"
-        onRequestClose={cancelComplete}
-        accessibilityViewIsModal={true}
-      >
-        <View
-          style={[
-            sharedStyles.container,
-            { backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center" },
-          ]}
-        >
-          <View
-            style={{
-              backgroundColor: themeColors.background,
-              padding: 24,
-              borderRadius: 12,
-              alignItems: "center",
-            }}
-          >
-            <AccessibleText style={{ fontSize: 18, marginBottom: 16 }}>
-              Tem certeza que deseja marcar esta tarefa como concluída?
-            </AccessibleText>
-            <AccessibleButton
-              title="Concluir"
-              onPress={confirmComplete}
-              style={{ marginBottom: 8 }}
-              accessibilityLabel="Confirmar conclusão"
-            />
-            <AccessibleButton
-              title="Cancelar"
-              onPress={cancelComplete}
-              accessibilityLabel="Cancelar conclusão"
-            />
-          </View>
-        </View>
-      </Modal>
+        title={strings.confirmCompleteTitle}
+        message={strings.confirmCompleteMessage}
+        confirmText={strings.confirmCompleteAction}
+        cancelText={appTexts.common.cancel}
+        onConfirm={confirmComplete}
+        onCancel={cancelComplete}
+        restoreFocusRef={newTaskButtonRef}
+      />
     </View>
   );
 }

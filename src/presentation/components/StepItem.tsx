@@ -1,11 +1,13 @@
 import { Step } from "@/domain/entities/Step";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { usePreferences } from "@/presentation/contexts/PreferencesContext";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { Colors } from "@/presentation/theme/colors";
+import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 interface StepItemProps {
   step: Step;
@@ -13,6 +15,8 @@ interface StepItemProps {
 }
 
 export function StepItem({ step, onToggleComplete }: StepItemProps) {
+  const appTexts = useAppStrings();
+  const stepTexts = appTexts.stepItem;
   const { preferences } = usePreferences();
   const colorScheme = preferences.theme ?? "light";
   const themeColors = preferences.isHighContrast
@@ -30,20 +34,31 @@ export function StepItem({ step, onToggleComplete }: StepItemProps) {
   return (
     <TouchableOpacity
       onPress={() => onToggleComplete(step.id)}
-      accessibilityLabel={`Marcar passo ${step.title} como ${step.isCompleted ? "não concluído" : "concluído"}`}
+      accessibilityLabel={`${stepTexts.toggleLabelPrefix} ${step.title} ${step.isCompleted ? stepTexts.asNotCompleted : stepTexts.asCompleted}`}
       accessibilityRole="button"
+      style={[
+        sharedStyles.touchTargetMin,
+        {
+          flexDirection: "row",
+          alignItems: "center",
+        },
+      ]}
     >
-      <Ionicons
-        name={step.isCompleted ? "checkmark-circle" : "ellipse-outline"}
-        size={24}
-        color={themeColors.icon}
-        accessibilityLabel={
-          step.isCompleted ? "Passo concluído" : "Passo não concluído"
-        }
-      />
+      <View
+        style={[
+          sharedStyles.touchTargetMin,
+          { alignItems: "center", justifyContent: "center" },
+        ]}
+      >
+        <Ionicons
+          name={step.isCompleted ? "checkmark-circle" : "ellipse-outline"}
+          size={24}
+          color={themeColors.icon}
+        />
+      </View>
       <AccessibleText
         style={textStyle}
-        accessibilityLabel={`Título do passo: ${step.title}`}
+        accessibilityLabel={`${stepTexts.titleLabelPrefix}: ${step.title}`}
       >
         {step.title}
       </AccessibleText>
