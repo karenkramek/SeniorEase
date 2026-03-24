@@ -1,11 +1,10 @@
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { ThemedView } from "@/presentation/components/ThemedView";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { Colors } from "@/presentation/theme/colors";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import React from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 export default function HelpScreen() {
   const strings = useAppStrings().help;
@@ -28,11 +27,9 @@ export default function HelpScreen() {
       : themeColors.text;
 
   return (
-    <ThemedView
-      style={[
-        sharedStyles.container,
-        { backgroundColor: themeColors.background },
-      ]}
+    <ScrollView
+      style={{ backgroundColor: themeColors.background }}
+      contentContainerStyle={[sharedStyles.container, { paddingBottom: 32 }]}
       accessibilityLabel={strings.screenLabel}
     >
       <View
@@ -146,6 +143,6 @@ export default function HelpScreen() {
       >
         {strings.footer}
       </AccessibleText>
-    </ThemedView>
+    </ScrollView>
   );
 }
