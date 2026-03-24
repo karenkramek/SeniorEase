@@ -1,3 +1,6 @@
+import { GlobalNotification } from "@/presentation/components/GlobalNotification";
+import { NotificationProvider } from "@/presentation/contexts/NotificationContext";
+import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
 import { Slot, useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -38,7 +41,12 @@ function InitialLayout() {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <InitialLayout />
+      <PreferencesProvider>
+        <NotificationProvider>
+          <InitialLayout />
+          <GlobalNotification />
+        </NotificationProvider>
+      </PreferencesProvider>
     </AuthProvider>
   );
 }

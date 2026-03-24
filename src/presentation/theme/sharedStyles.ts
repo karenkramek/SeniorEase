@@ -93,4 +93,8 @@ export const sharedStyles = StyleSheet.create({
     alignItems: "center",
     width: "90%",
   },
+  touchTargetMin: {
+    minWidth: MIN_TOUCH_TARGET_SIZE,
+    minHeight: MIN_TOUCH_TARGET_SIZE,
+  },
 });

@@ -83,7 +83,7 @@ export const PreferencesProvider: React.FC<PreferencesProviderProps> = ({
     };
 
     loadPreferences();
-  }, [user?.id]);
+  }, [user]);
 
   const updatePreferences = useCallback(
     async (newPrefs: Partial<Preferences>) => {
