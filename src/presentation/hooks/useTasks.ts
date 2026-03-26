@@ -1,33 +1,47 @@
-import { AddStepToTask } from "@/application/useCases/task/AddStepToTask";
-import { CompleteStep } from "@/application/useCases/task/CompleteStep";
 import { CompleteTask } from "@/application/useCases/task/CompleteTask";
 import { CreateTask } from "@/application/useCases/task/CreateTask";
+import { DeleteTask } from "@/application/useCases/task/DeleteTask";
 import { ListTasks } from "@/application/useCases/task/ListTasks";
 import { UncompleteTask } from "@/application/useCases/task/UncompleteTask";
 import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
-import { ITaskRepository } from "@/domain/repositories/ITaskRepository";
-import { TaskRepository } from "@/infrastructure/repositories/TaskRepository";
-import { UniversalStorageAdapter } from "@/infrastructure/storage/UniversalStorageAdapter";
-import { useCallback, useEffect, useState } from "react";
-
-// Injeção de dependência manual
-const storage = new UniversalStorageAdapter();
-const taskRepository: ITaskRepository = new TaskRepository(storage);
-
-const createTaskUseCase = new CreateTask(taskRepository);
-const listTasksUseCase = new ListTasks(taskRepository);
-const completeTaskUseCase = new CompleteTask(taskRepository);
-const addStepToTaskUseCase = new AddStepToTask(taskRepository);
-const completeStepUseCase = new CompleteStep(taskRepository);
-const uncompleteTaskUseCase = new UncompleteTask(taskRepository);
-const deleteTaskUseCase = taskRepository.delete.bind(taskRepository);
+import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
+import { useAuth } from "@/presentation/hooks/useAuth";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export function useTasks() {
+  const { user, loading: authLoading } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const taskRepository = useTaskRepository();
+  const createTaskUseCase = useMemo(
+    () => new CreateTask(taskRepository),
+    [taskRepository],
+  );
+  const listTasksUseCase = useMemo(
+    () => new ListTasks(taskRepository),
+    [taskRepository],
+  );
+  const completeTaskUseCase = useMemo(
+    () => new CompleteTask(taskRepository),
+    [taskRepository],
+  );
+  const uncompleteTaskUseCase = useMemo(
+    () => new UncompleteTask(taskRepository),
+    [taskRepository],
+  );
+  const deleteTaskUseCase = useMemo(
+    () => new DeleteTask(taskRepository),
+    [taskRepository],
+  );
 
   const refreshTasks = useCallback(async () => {
+    if (!user) {
+      setTasks([]);
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     try {
       const allTasks = await listTasksUseCase.execute();
@@ -42,18 +56,19 @@ export function useTasks() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [user, listTasksUseCase]);
 
   useEffect(() => {
-    refreshTasks();
-  }, [refreshTasks]);
+    if (!authLoading) refreshTasks();
+  }, [authLoading, refreshTasks]);
 
   const createTask = useCallback(
     async (data: { title: string; description?: string; dueDate?: Date }) => {
-      await createTaskUseCase.execute(data);
+      if (!user) throw new Error("Usuário não autenticado.");
+      await createTaskUseCase.execute({ ...data, userId: user.id });
       await refreshTasks();
     },
-    [refreshTasks],
+    [user, createTaskUseCase, refreshTasks],
   );
 
   const completeTask = useCallback(
@@ -61,7 +76,7 @@ export function useTasks() {
       await completeTaskUseCase.execute(taskId);
       await refreshTasks();
     },
-    [refreshTasks],
+    [completeTaskUseCase, refreshTasks],
   );
 
   const uncompleteTask = useCallback(
@@ -69,36 +84,23 @@ export function useTasks() {
       await uncompleteTaskUseCase.execute(taskId);
       await refreshTasks();
     },
-    [refreshTasks],
-  );
-
-  const addStepToTask = useCallback(
-    async (taskId: string, stepDescription: string) => {
-      await addStepToTaskUseCase.execute(taskId, stepDescription);
-      await refreshTasks();
-    },
-    [refreshTasks],
-  );
-
-  const completeStep = useCallback(
-    async (taskId: string, stepId: string) => {
-      await completeStepUseCase.execute(taskId, stepId);
-      await refreshTasks();
-    },
-    [refreshTasks],
+    [uncompleteTaskUseCase, refreshTasks],
   );
 
   const deleteTask = useCallback(
     async (taskId: string) => {
-      await deleteTaskUseCase(taskId);
+      await deleteTaskUseCase.execute(taskId);
       await refreshTasks();
     },
-    [refreshTasks],
+    [deleteTaskUseCase, refreshTasks],
   );
 
-  const getFilteredTasks = (status: TaskStatus) => {
-    return tasks.filter((t) => t.status === status);
-  };
+  const getFilteredTasks = useCallback(
+    (status: TaskStatus) => {
+      return tasks.filter((t) => t.status === status);
+    },
+    [tasks],
+  );
 
   return {
     tasks,
@@ -108,8 +110,6 @@ export function useTasks() {
     completeTask,
     uncompleteTask,
     deleteTask,
-    addStepToTask,
-    completeStep,
     getFilteredTasks,
   };
 }

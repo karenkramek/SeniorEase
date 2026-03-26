@@ -1,9 +1,7 @@
 import { TaskRepository } from "@/infrastructure/repositories/TaskRepository";
-import { UniversalStorageAdapter } from "@/infrastructure/storage/UniversalStorageAdapter";
 import React, { createContext, useContext } from "react";
 
-const storage = new UniversalStorageAdapter();
-const taskRepository = new TaskRepository(storage);
+const taskRepository = new TaskRepository();
 
 const TaskRepositoryContext = createContext(taskRepository);
 

@@ -1,38 +1,48 @@
+import { Slot, useRouter, useSegments } from "expo-router";
+import React, { useEffect } from "react";
+import { ActivityIndicator, View } from "react-native";
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "react-native";
-import "react-native-reanimated";
+    AuthProvider,
+    useAuth,
+} from "../src/presentation/contexts/AuthContext";
 
-import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
+const InitialLayout = () => {
+  const { isAuthenticated, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
 
-export const unstable_settings = {
-  initialRouteName: "(tabs)",
+  useEffect(() => {
+    if (loading) return; // Não faz nada enquanto o estado de auth está carregando
+
+    const inAuthGroup = segments[0] === "(auth)";
+
+    // Se o usuário está autenticado e está no grupo de autenticação,
+    // redireciona para a home do app.
+    if (isAuthenticated && inAuthGroup) {
+      router.replace("/(app)/(tabs)/tasks");
+    }
+    // Se o usuário não está autenticado e não está no grupo de autenticação,
+    // redireciona para a tela de login.
+    else if (!isAuthenticated && !inAuthGroup) {
+      router.replace("/(auth)/login");
+    }
+  }, [isAuthenticated, loading, segments, router]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  return <Slot />;
 };
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-
   return (
-    <PreferencesProvider>
-      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="ModalScreen"
-            options={{ presentation: "modal", title: "Modal" }}
-          />
-          <Stack.Screen
-            name="CreateTaskScreen"
-            options={{ presentation: "modal", title: "Nova Tarefa" }}
-          />
-        </Stack>
-        <StatusBar style="auto" />
-      </ThemeProvider>
-    </PreferencesProvider>
+    <AuthProvider>
+      <InitialLayout />
+    </AuthProvider>
   );
 }

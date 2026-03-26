@@ -42,23 +42,49 @@ Após o deploy, o Vercel gera uma URL pública para acessar a versão web.
 
 ## Estrutura do Projeto
 
-- **src/domain**: entidades, enums e interfaces de repositórios.
-- **src/application**: casos de uso (useCases) para tarefas, preferências e usuário.
-- **src/infrastructure**: repositórios, serviços e storage.
-- **src/presentation**: componentes, contextos, hooks, navegação, telas, tema e utilitários.
-- **assets**: imagens e ícones.
-- **app**: roteamento e telas principais.
+```
+app/                        # Roteamento Expo Router
+├── (auth)/                 # Telas públicas: login e cadastro
+└── (app)/
+    ├── (tabs)/             # Tarefas, Preferências, Ajuda, Perfil
+    ├── create-task.tsx     # Criação de tarefa
+    └── task-details.tsx    # Detalhes de uma tarefa
+
+src/
+├── domain/                 # Regras de negócio puras
+│   ├── entities/           # Task, User, Preferences
+│   ├── enums/              # TaskStatus, TaskFilter
+│   └── repositories/       # Interfaces IAuthRepository, ITaskRepository, IPreferencesRepository
+├── application/
+│   └── useCases/           # Casos de uso: tarefas (criar, concluir, excluir...) e preferências
+├── infrastructure/
+│   ├── mappers/            # TaskMapper, UserMapper
+│   └── repositories/       # Implementações Firebase: Auth, Task, Preferences
+├── lib/
+│   └── firebase.ts         # Configuração Firebase (Auth + Firestore)
+└── presentation/
+    ├── components/         # AccessibleButton, AccessibleText, TaskCard, ConfirmModal, AuthGuard...
+    ├── contexts/           # AuthContext, PreferencesContext, TaskRepositoryContext
+    ├── hooks/              # useAuth, useTasks, useTheme, usePreferences...
+    ├── theme/              # colors.ts, sharedStyles.ts, spacing.ts, typography.ts
+    └── utils/              # alert, format, helpers, icons, filterLabels, taskFilters
+
+docs/firebase/              # firestore.rules e firestore.indexes.json
+assets/images/              # Ícones e imagens do app
+```
 
 ## Acessibilidade
 
 - Propriedades de acessibilidade em botões, textos, switches e navegação.
-- Feedback visual, tátil e sonoro para ações importantes.
-- Fontes grandes, alto contraste e espaçamento amplo.
+- Feedback visual e tátil para ações importantes.
+- Suporte a fonte grande, alto contraste e espaçamento amplo via preferências do usuário.
+- Componentes `AccessibleButton` e `AccessibleText` com ajuste automático de escala e contraste.
 
 ## Estilos Compartilhados
 
 - Estilos centralizados em `src/presentation/theme/sharedStyles.ts`.
 - Temas, cores e espaçamentos em `colors.ts`, `spacing.ts`, `typography.ts`.
+- Três paletas: `light`, `dark` e `highContrast`.
 
 ## Boas Práticas
 
@@ -72,6 +98,7 @@ Após o deploy, o Vercel gera uma URL pública para acessar a versão web.
 
 - Utilize os estilos compartilhados para containers, botões, listas e inputs.
 - Garanta acessibilidade em todos os componentes interativos.
+- Prefira `AccessibleText` a `ThemedText` nas telas do app (dentro de `(app)/`).
 
 ## Comunidade e Recursos
 

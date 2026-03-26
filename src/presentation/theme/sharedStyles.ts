@@ -75,5 +75,16 @@ export const sharedStyles = StyleSheet.create({
     marginTop: 15,
     paddingVertical: 15,
   },
-  // Adicionar outros estilos reutilizáveis aqui
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalCard: {
+    padding: Spacing.large,
+    borderRadius: 12,
+    alignItems: "center",
+    width: "90%",
+  },
 });
