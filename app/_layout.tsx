@@ -1,57 +1,44 @@
+import { Slot, useRouter, useSegments } from "expo-router";
+import React, { useEffect } from "react";
+import { ActivityIndicator, View } from "react-native";
+
 import {
-  DarkTheme,
-  DefaultTheme,
-  ThemeProvider,
-} from "@react-navigation/native";
-import { Stack } from "expo-router";
-import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "react-native";
-import "react-native-reanimated";
+  AuthProvider,
+  useAuth,
+} from "../src/presentation/contexts/AuthContext";
 
-import { GlobalNotification } from "@/presentation/components/GlobalNotification";
-import { NotificationProvider } from "@/presentation/contexts/NotificationContext";
-import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
-import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+function InitialLayout() {
+  const { isAuthenticated, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
 
-export const unstable_settings = {
-  initialRouteName: "(tabs)",
-};
+  useEffect(() => {
+    if (loading) return;
 
-function RootNavigator() {
-  const appTexts = useAppStrings();
-  const colorScheme = useColorScheme();
+    const inAuthGroup = segments[0] === "(auth)";
 
-  return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="ModalScreen"
-          options={{
-            presentation: "modal",
-            title: appTexts.navigation.modalHeaderTitle,
-          }}
-        />
-        <Stack.Screen
-          name="CreateTaskScreen"
-          options={{
-            presentation: "modal",
-            title: appTexts.navigation.createTaskHeaderTitle,
-          }}
-        />
-      </Stack>
-      <GlobalNotification />
-      <StatusBar style="auto" />
-    </ThemeProvider>
-  );
+    if (isAuthenticated && inAuthGroup) {
+      router.replace("/(app)/(tabs)/tasks");
+    } else if (!isAuthenticated && !inAuthGroup) {
+      router.replace("/(auth)/login");
+    }
+  }, [isAuthenticated, loading, segments, router]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  return <Slot />;
 }
 
 export default function RootLayout() {
   return (
-    <PreferencesProvider>
-      <NotificationProvider>
-        <RootNavigator />
-      </NotificationProvider>
-    </PreferencesProvider>
+    <AuthProvider>
+      <InitialLayout />
+    </AuthProvider>
   );
 }

@@ -1,6 +1,6 @@
-import { useColorScheme } from "@/presentation/hooks/useColorScheme";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { Colors } from "@/presentation/theme/colors";
+import { useColorScheme } from "react-native";
 
 type ThemeColorName = keyof typeof Colors.light;
 

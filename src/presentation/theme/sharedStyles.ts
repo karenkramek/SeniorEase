@@ -65,13 +65,13 @@ export const sharedStyles = StyleSheet.create({
   },
   input: {
     borderWidth: 2,
-    borderRadius: 24, // Arredondado, mas não exagerado
+    borderRadius: 24,
     paddingVertical: 18,
     paddingHorizontal: 24,
     marginBottom: Spacing.large,
     fontSize: 20,
-    backgroundColor: "#FFF", // Fundo claro
-    borderColor: "#1A237E", // Borda azul escuro (alto contraste)
+    backgroundColor: "#FFF",
+    borderColor: "#1A237E",
   },
   buttonLink: {
     marginTop: 15,
@@ -81,5 +81,16 @@ export const sharedStyles = StyleSheet.create({
     minWidth: MIN_TOUCH_TARGET_SIZE,
     minHeight: MIN_TOUCH_TARGET_SIZE,
   },
-  // Adicionar outros estilos reutilizáveis aqui
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalCard: {
+    padding: Spacing.large,
+    borderRadius: 12,
+    alignItems: "center",
+    width: "90%",
+  },
 });

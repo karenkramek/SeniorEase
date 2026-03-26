@@ -1,22 +1,36 @@
 import { Preferences } from "@/domain/entities/Preferences";
 import { IPreferencesRepository } from "@/domain/repositories/IPreferencesRepository";
-import { IStorage } from "@/infrastructure/storage/IStorage";
+import { auth, db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
-const PREFERENCES_STORAGE_KEY = "preferences";
+function getCurrentUserId(): string {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Usuário não autenticado.");
+  return uid;
+}
 
 export class PreferencesRepository implements IPreferencesRepository {
-  constructor(private storage: IStorage) {}
-
   async get(): Promise<Preferences | null> {
-    const preferencesJson = await this.storage.getItem(PREFERENCES_STORAGE_KEY);
-    return preferencesJson ? JSON.parse(preferencesJson) : null;
+    try {
+      const uid = getCurrentUserId();
+      const prefDoc = await getDoc(doc(db, "preferences", uid));
+      return prefDoc.exists() ? (prefDoc.data() as Preferences) : null;
+    } catch (error) {
+      console.error("Erro ao buscar preferências:", error);
+      return null;
+    }
   }
 
   async update(preferences: Preferences): Promise<Preferences> {
-    await this.storage.setItem(
-      PREFERENCES_STORAGE_KEY,
-      JSON.stringify(preferences),
-    );
-    return preferences;
+    try {
+      const uid = getCurrentUserId();
+      await setDoc(doc(db, "preferences", uid), preferences);
+      return preferences;
+    } catch (error) {
+      console.error("Erro ao salvar preferências:", error);
+      throw new Error("Erro ao salvar preferências no Firestore", {
+        cause: error,
+      });
+    }
   }
 }

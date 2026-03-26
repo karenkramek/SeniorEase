@@ -1,7 +1,6 @@
-import { usePreferences } from "@/presentation/contexts/PreferencesContext";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { Text, TextProps } from "react-native";
 
-import { Colors } from "@/presentation/theme/colors";
 import { Typography } from "@/presentation/theme/typography";
 
 type AccessibleTextProps = TextProps & {
@@ -18,11 +17,7 @@ export function AccessibleText({
   accessibilityLabel?: string;
   accessibilityRole?: string;
 }) {
-  const { preferences } = usePreferences();
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
+  const { themeColors, preferences } = useTheme();
 
   const textStyle = {
     color: themeColors.text,

@@ -9,11 +9,12 @@ export class CompleteTask {
     const task = await this.taskRepository.findById(taskId);
 
     if (!task) {
-      throw new Error("Task not found");
+      throw new Error("Tarefa não encontrada.");
     }
 
-    task.status = TaskStatus.COMPLETED;
-
-    return this.taskRepository.update(task);
+    return this.taskRepository.update({
+      ...task,
+      status: TaskStatus.COMPLETED,
+    });
   }
 }

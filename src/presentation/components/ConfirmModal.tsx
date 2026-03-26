@@ -1,8 +1,6 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { useAppStrings } from "@/presentation/hooks/useAppStrings";
-import { usePreferences } from "@/presentation/hooks/usePreferences";
-import { Colors } from "@/presentation/theme/colors";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import React from "react";
 import { Modal, Platform, TouchableOpacity, View } from "react-native";
 
@@ -29,18 +27,13 @@ export function ConfirmModal({
   onCancel,
   restoreFocusRef,
 }: ConfirmModalProps) {
-  const appTexts = useAppStrings();
-  const { preferences } = usePreferences();
+  const { themeColors } = useTheme();
+  const effectiveConfirmText = confirmText ?? "Confirmar";
+  const effectiveCancelText = cancelText ?? "Cancelar";
+
   const confirmButtonRef =
     React.useRef<React.ElementRef<typeof TouchableOpacity> | null>(null);
   const wasVisibleRef = React.useRef(false);
-
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
-  const effectiveConfirmText = confirmText ?? appTexts.common.confirm;
-  const effectiveCancelText = cancelText ?? appTexts.common.cancel;
 
   React.useEffect(() => {
     if (visible) {

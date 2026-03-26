@@ -2,7 +2,7 @@ import { GetPreferences } from "@/application/useCases/preferences/GetPreference
 import { UpdatePreferences } from "@/application/useCases/preferences/UpdatePreferences";
 import { Preferences } from "@/domain/entities/Preferences";
 import { PreferencesRepository } from "@/infrastructure/repositories/PreferencesRepository";
-import { UniversalStorageAdapter } from "@/infrastructure/storage/UniversalStorageAdapter";
+import { useAuth } from "@/presentation/hooks/useAuth";
 import { getStrings } from "@/presentation/i18n/strings";
 import React, {
   createContext,
@@ -13,7 +13,6 @@ import React, {
   useState,
 } from "react";
 
-// Valores padrão para as preferências, caso nenhum seja salvo
 export const defaultPreferences: Preferences = {
   fontSizeMultiplier: 1,
   isHighContrast: false,
@@ -22,9 +21,7 @@ export const defaultPreferences: Preferences = {
   useExtraConfirmation: false,
 };
 
-// Em um setup com Injeção de Dependência, isto seria injetado.
-const storage = new UniversalStorageAdapter();
-const preferencesRepository = new PreferencesRepository(storage);
+const preferencesRepository = new PreferencesRepository();
 const getPreferencesUseCase = new GetPreferences(preferencesRepository);
 const updatePreferencesUseCase = new UpdatePreferences(preferencesRepository);
 
@@ -54,18 +51,27 @@ interface PreferencesProviderProps {
 export const PreferencesProvider: React.FC<PreferencesProviderProps> = ({
   children,
 }) => {
+  const { user } = useAuth();
   const [preferences, setPreferences] =
     useState<Preferences>(defaultPreferences);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!user) {
+      setPreferences(defaultPreferences);
+      setIsLoading(false);
+      return;
+    }
+
     const loadPreferences = async () => {
       setIsLoading(true);
       try {
         const savedPreferences = await getPreferencesUseCase.execute();
         if (savedPreferences) {
           setPreferences(savedPreferences);
+        } else {
+          setPreferences(defaultPreferences);
         }
         setErrorMessage(null);
       } catch (error) {
@@ -77,7 +83,7 @@ export const PreferencesProvider: React.FC<PreferencesProviderProps> = ({
     };
 
     loadPreferences();
-  }, []);
+  }, [user?.id]);
 
   const updatePreferences = useCallback(
     async (newPrefs: Partial<Preferences>) => {

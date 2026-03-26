@@ -1,11 +1,12 @@
 import { Task } from "@/domain/entities/Task";
+import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { usePreferences } from "@/presentation/contexts/PreferencesContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
-import { Colors } from "@/presentation/theme/colors";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { formatDate } from "@/presentation/utils/date";
+import { formatDateRelative } from "@/presentation/utils/format";
+import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
@@ -14,16 +15,18 @@ interface TaskCardProps {
   task: Task;
   onDelete?: (taskId: string) => void;
   onToggleComplete?: (taskId: string, completed: boolean) => void;
+  onPress?: (taskId: string) => void;
 }
 
-export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
+export function TaskCard({
+  task,
+  onDelete,
+  onToggleComplete,
+  onPress,
+}: TaskCardProps) {
   const appTexts = useAppStrings();
   const taskCardTexts = appTexts.taskCard;
-  const { preferences } = usePreferences();
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
+  const { themeColors, preferences } = useTheme();
 
   const cardStyle = {
     backgroundColor: themeColors.background,
@@ -58,7 +61,7 @@ export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
       }),
     ]).start();
     if (onToggleComplete) {
-      onToggleComplete(task.id, task.status !== "COMPLETED");
+      onToggleComplete(task.id, task.status !== TaskStatus.COMPLETED);
     }
   };
 
@@ -67,16 +70,15 @@ export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
       style={cardStyle}
       accessibilityLabel={`${taskCardTexts.cardLabelPrefix}: ${task.title}`}
     >
-      {/* Ícone de check selecionável à esquerda */}
       <TouchableOpacity
         onPress={handleToggleComplete}
         accessibilityLabel={
-          task.status === "COMPLETED"
+          task.status === TaskStatus.COMPLETED
             ? taskCardTexts.completedA11y
             : taskCardTexts.markCompletedA11y
         }
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: task.status === "COMPLETED" }}
+        accessibilityState={{ checked: task.status === TaskStatus.COMPLETED }}
         style={[
           sharedStyles.touchTargetMin,
           {
@@ -89,21 +91,27 @@ export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
         <Animated.View style={{ transform: [{ scale }] }}>
           <Ionicons
             name={
-              task.status === "COMPLETED"
+              task.status === TaskStatus.COMPLETED
                 ? "checkmark-circle"
                 : "ellipse-outline"
             }
             size={28}
             color={
-              task.status === "COMPLETED"
+              task.status === TaskStatus.COMPLETED
                 ? themeColors.success
                 : themeColors.icon
             }
           />
         </Animated.View>
       </TouchableOpacity>
-      {/* Título e vencimento */}
-      <View style={{ flex: 1 }}>
+
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        onPress={() => onPress && onPress(task.id)}
+        accessibilityLabel={`Ver detalhes da tarefa: ${task.title}`}
+        accessibilityRole="button"
+        disabled={!onPress}
+      >
         <AccessibleText
           type="h2"
           style={{
@@ -114,19 +122,19 @@ export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
           }}
           accessibilityLabel={`${taskCardTexts.titleLabelPrefix}: ${task.title}`}
         >
-          {task.title}
+          {truncateText(task.title, 45)}
         </AccessibleText>
         {task.dueDate && (
           <AccessibleText
             type="caption"
             style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
-            accessibilityLabel={`${taskCardTexts.dueDateLabelPrefix}: ${formatDate(task.dueDate)}`}
+            accessibilityLabel={`${taskCardTexts.dueDateLabelPrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
           >
-            {taskCardTexts.dueDatePrefix}: {formatDate(task.dueDate)}
+            {taskCardTexts.dueDatePrefix}: {formatDateRelative(new Date(task.dueDate))}
           </AccessibleText>
         )}
-      </View>
-      {/* Botão de excluir à direita */}
+      </TouchableOpacity>
+
       <TouchableOpacity
         onPress={() => onDelete && onDelete(task.id)}
         style={[

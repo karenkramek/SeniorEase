@@ -1,11 +1,12 @@
-import { Step } from "./Step";
+import { TaskStatus } from "@/domain/enums/TaskStatus";
 
 export interface Task {
   id: string;
+  userId: string;
   title: string;
+  description?: string;
   dueDate?: string;
-  status: "PENDING" | "COMPLETED";
-  steps: Step[];
+  status: TaskStatus;
   createdAt: string;
   updatedAt: string;
 }
