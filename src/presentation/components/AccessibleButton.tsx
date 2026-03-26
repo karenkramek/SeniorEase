@@ -1,16 +1,14 @@
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { usePreferences } from "@/presentation/contexts/PreferencesContext";
-import { Colors } from "@/presentation/theme/colors";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import {
-  GestureResponderEvent,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View
+    GestureResponderEvent,
+    TouchableOpacity,
+    TouchableOpacityProps,
+    View,
 } from "react-native";
-
 
 interface AccessibleButtonProps extends TouchableOpacityProps {
   title: string;
@@ -29,19 +27,11 @@ export function AccessibleButton({
   accessibilityLabel?: string;
   accessibilityRole?: string;
 }) {
-  const { preferences } = usePreferences();
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
+  const { themeColors, preferences } = useTheme();
 
   const handlePress = (event: GestureResponderEvent) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     if (onPress) {
-      if (preferences.useExtraConfirmation) {
-        // A real implementation would show a confirmation modal here.
-        console.log("Triggering confirmation logic...");
-      }
       onPress(event);
     }
   };
@@ -49,7 +39,7 @@ export function AccessibleButton({
   const buttonStyle = {
     backgroundColor: themeColors.tint,
     padding: Spacing.medium * preferences.spacingMultiplier,
-    borderRadius: Spacing.small,
+    borderRadius: 40,
     alignItems: "center" as "center",
   };
 

@@ -1,12 +1,14 @@
-import { useColorScheme } from "@/presentation/hooks/useColorScheme";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
+import { Colors } from "@/presentation/theme/colors";
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: string,
+  colorName: keyof typeof Colors.light,
 ): string {
   const { preferences } = usePreferences();
-  const systemScheme = useColorScheme() ?? "light";
-  const colorScheme = preferences.theme ?? "light";
-  return props[colorScheme] || colorName;
+  const colorScheme = (preferences.theme ?? "light") as "light" | "dark";
+  const themeColors = preferences.isHighContrast
+    ? Colors.highContrast
+    : Colors[colorScheme];
+  return props[colorScheme] ?? themeColors[colorName];
 }

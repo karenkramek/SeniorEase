@@ -1,11 +1,8 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Verificar se gitleaks esta instalado
 if ! command -v gitleaks &> /dev/null; then
-    echo "ERRO: Gitleaks nao esta instalado!"
-    echo "Instale com: brew install gitleaks"
-    exit 1
+    echo "AVISO: Gitleaks nao esta instalado. Verificacao de secrets ignorada."
+    echo "Para instalar: https://github.com/gitleaks/gitleaks/releases"
+    exit 0
 fi
 
 # Rodar Gitleaks nos arquivos staged

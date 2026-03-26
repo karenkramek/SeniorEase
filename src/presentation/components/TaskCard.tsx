@@ -1,9 +1,10 @@
 import { Task } from "@/domain/entities/Task";
+import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { usePreferences } from "@/presentation/contexts/PreferencesContext";
-import { Colors } from "@/presentation/theme/colors";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
-import { formatDate } from "@/presentation/utils/date";
+import { formatDateRelative } from "@/presentation/utils/format";
+import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
@@ -12,14 +13,16 @@ interface TaskCardProps {
   task: Task;
   onDelete?: (taskId: string) => void;
   onToggleComplete?: (taskId: string, completed: boolean) => void;
+  onPress?: (taskId: string) => void;
 }
 
-export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
-  const { preferences } = usePreferences();
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
+export function TaskCard({
+  task,
+  onDelete,
+  onToggleComplete,
+  onPress,
+}: TaskCardProps) {
+  const { themeColors, preferences } = useTheme();
 
   const cardStyle = {
     backgroundColor: themeColors.background,
@@ -54,7 +57,7 @@ export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
       }),
     ]).start();
     if (onToggleComplete) {
-      onToggleComplete(task.id, task.status !== "COMPLETED");
+      onToggleComplete(task.id, task.status !== TaskStatus.COMPLETED);
     }
   };
 
@@ -67,32 +70,38 @@ export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
       <TouchableOpacity
         onPress={handleToggleComplete}
         accessibilityLabel={
-          task.status === "COMPLETED"
+          task.status === TaskStatus.COMPLETED
             ? "Tarefa concluída"
             : "Marcar como concluída"
         }
         accessibilityRole="checkbox"
-        accessibilityState={{ checked: task.status === "COMPLETED" }}
+        accessibilityState={{ checked: task.status === TaskStatus.COMPLETED }}
         style={{ marginRight: Spacing.medium }}
       >
         <Animated.View style={{ transform: [{ scale }] }}>
           <Ionicons
             name={
-              task.status === "COMPLETED"
+              task.status === TaskStatus.COMPLETED
                 ? "checkmark-circle"
                 : "ellipse-outline"
             }
             size={28}
             color={
-              task.status === "COMPLETED"
+              task.status === TaskStatus.COMPLETED
                 ? themeColors.success
                 : themeColors.icon
             }
           />
         </Animated.View>
       </TouchableOpacity>
-      {/* Título e vencimento */}
-      <View style={{ flex: 1 }}>
+      {/* Título e vencimento — tocável para abrir detalhes */}
+      <TouchableOpacity
+        style={{ flex: 1 }}
+        onPress={() => onPress && onPress(task.id)}
+        accessibilityLabel={`Ver detalhes da tarefa: ${task.title}`}
+        accessibilityRole="button"
+        disabled={!onPress}
+      >
         <AccessibleText
           type="h2"
           style={{
@@ -103,18 +112,18 @@ export function TaskCard({ task, onDelete, onToggleComplete }: TaskCardProps) {
           }}
           accessibilityLabel={`Título da tarefa: ${task.title}`}
         >
-          {task.title}
+          {truncateText(task.title, 45)}
         </AccessibleText>
         {task.dueDate && (
           <AccessibleText
             type="caption"
             style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
-            accessibilityLabel={`Vencimento: ${formatDate(task.dueDate)}`}
+            accessibilityLabel={`Vencimento: ${formatDateRelative(new Date(task.dueDate!))}`}
           >
-            Vencimento: {formatDate(task.dueDate)}
+            Vencimento: {formatDateRelative(new Date(task.dueDate!))}
           </AccessibleText>
         )}
-      </View>
+      </TouchableOpacity>
       {/* Botão de excluir à direita */}
       <TouchableOpacity
         onPress={() => onDelete && onDelete(task.id)}

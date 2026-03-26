@@ -1,85 +1,164 @@
 import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { ITaskRepository } from "@/domain/repositories/ITaskRepository";
-import { IStorage } from "@/infrastructure/storage/IStorage";
+import { TaskMapper } from "@/infrastructure/mappers/TaskMapper";
+import { auth, db } from "@/lib/firebase";
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    getDocs,
+    orderBy,
+    query,
+    serverTimestamp,
+    updateDoc,
+    where,
+} from "firebase/firestore";
 
-const TASKS_STORAGE_KEY = "tasks";
+const TASKS_COLLECTION = "tasks";
 
-// Simple ID generation for now.
-const generateId = () => Math.random().toString(36).substr(2, 9);
+function getCurrentUserId(): string {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Usuário não autenticado.");
+  return uid;
+}
 
 export class TaskRepository implements ITaskRepository {
-  constructor(private storage: IStorage) {}
-
-  private async getTasks(): Promise<Task[]> {
-    const tasksJson = await this.storage.getItem(TASKS_STORAGE_KEY);
-    if (!tasksJson) {
-      return [];
-    }
-    // Retorna as tarefas como estão no JSON, sem conversão de datas.
-    return JSON.parse(tasksJson);
-  }
-
-  private async saveTasks(tasks: Task[]): Promise<void> {
-    await this.storage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
-  }
-
   async create(
     taskData: Omit<Task, "id" | "createdAt" | "updatedAt">,
   ): Promise<Task> {
-    const tasks = await this.getTasks();
-    const now = new Date().toISOString();
-    const newTask: Task = {
-      ...taskData,
-      id: generateId(),
-      createdAt: now,
-      updatedAt: now,
-    };
-    tasks.push(newTask);
-    await this.saveTasks(tasks);
-    return newTask;
+    try {
+      const uid = getCurrentUserId();
+      const tasksRef = collection(db, TASKS_COLLECTION);
+      const taskToSave = TaskMapper.toFirestore({ ...taskData, userId: uid });
+      const docRef = await addDoc(tasksRef, {
+        ...taskToSave,
+        userId: uid,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+
+      return {
+        id: docRef.id,
+        ...taskData,
+        userId: uid,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    } catch (error) {
+      console.error("Erro ao criar tarefa:", error);
+      throw new Error("Erro ao criar tarefa no Firestore", { cause: error });
+    }
   }
 
   async findAll(): Promise<Task[]> {
-    return this.getTasks();
+    try {
+      const uid = getCurrentUserId();
+      const tasksRef = collection(db, TASKS_COLLECTION);
+      const q = query(
+        tasksRef,
+        where("userId", "==", uid),
+        orderBy("createdAt", "desc"),
+      );
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map((doc) =>
+        TaskMapper.toDomain(doc.id, doc.data()),
+      );
+    } catch (error) {
+      console.error("Erro ao buscar tarefas:", error);
+      throw new Error("Erro ao buscar tarefas do Firestore");
+    }
   }
 
   async findById(id: string): Promise<Task | null> {
-    const tasks = await this.getTasks();
-    return tasks.find((task) => task.id === id) || null;
+    try {
+      const uid = getCurrentUserId();
+      const taskRef = doc(db, TASKS_COLLECTION, id);
+      const docSnap = await getDoc(taskRef);
+      if (docSnap.exists() && docSnap.data().userId === uid) {
+        return TaskMapper.toDomain(docSnap.id, docSnap.data());
+      }
+      return null;
+    } catch (error) {
+      console.error("Erro ao buscar tarefa por ID:", error);
+      throw new Error("Erro ao buscar tarefa do Firestore", { cause: error });
+    }
   }
 
   async findByStatus(status: TaskStatus): Promise<Task[]> {
-    const tasks = await this.getTasks();
-    return tasks.filter((task) => task.status === status);
+    try {
+      const uid = getCurrentUserId();
+      const tasksRef = collection(db, TASKS_COLLECTION);
+      const q = query(
+        tasksRef,
+        where("userId", "==", uid),
+        where("status", "==", status),
+      );
+      const querySnapshot = await getDocs(q);
+      return querySnapshot.docs.map((doc) =>
+        TaskMapper.toDomain(doc.id, doc.data()),
+      );
+    } catch (error) {
+      console.error("Erro ao buscar tarefas por status:", error);
+      throw new Error("Erro ao buscar tarefas do Firestore", { cause: error });
+    }
   }
 
-  async update(updatedTask: Task): Promise<Task> {
-    const tasks = await this.getTasks();
-    const taskIndex = tasks.findIndex((task) => task.id === updatedTask.id);
-    if (taskIndex === -1) {
-      throw new Error("Task to update not found.");
+  async update(task: Task): Promise<Task> {
+    try {
+      getCurrentUserId(); // garante autenticação
+      const taskRef = doc(db, TASKS_COLLECTION, task.id);
+      const taskToSave = TaskMapper.toFirestore(task);
+      await updateDoc(taskRef, {
+        ...taskToSave,
+        updatedAt: serverTimestamp(),
+      });
+      return task;
+    } catch (error) {
+      console.error("Erro ao atualizar tarefa:", error);
+      throw new Error("Erro ao atualizar tarefa no Firestore", {
+        cause: error,
+      });
     }
-    tasks[taskIndex] = updatedTask;
-    await this.saveTasks(tasks);
-    return updatedTask;
   }
 
-  async updateStatus(taskId: string, status: TaskStatus): Promise<Task> {
-    const tasks = await this.getTasks();
-    const taskIndex = tasks.findIndex((task) => task.id === taskId);
-    if (taskIndex === -1) {
-      throw new Error("Task to update not found.");
+  async updateStatus(taskId: string, status: TaskStatus): Promise<void> {
+    try {
+      getCurrentUserId();
+      const taskRef = doc(db, TASKS_COLLECTION, taskId);
+      await updateDoc(taskRef, {
+        status,
+        updatedAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error("Erro ao atualizar status da tarefa:", error);
+      throw new Error("Erro ao atualizar status da tarefa no Firestore", {
+        cause: error,
+      });
     }
-    tasks[taskIndex].status = status;
-    tasks[taskIndex].updatedAt = new Date().toISOString();
-    await this.saveTasks(tasks);
-    return tasks[taskIndex];
   }
 
   async delete(id: string): Promise<void> {
-    const tasks = await this.getTasks();
-    const filteredTasks = tasks.filter((task) => task.id !== id);
-    await this.saveTasks(filteredTasks);
+    try {
+      const uid = getCurrentUserId();
+      const taskRef = doc(db, TASKS_COLLECTION, id);
+      // Verifica ownership antes de deletar
+      const docSnap = await getDoc(taskRef);
+      if (!docSnap.exists() || docSnap.data().userId !== uid) {
+        throw new Error("Tarefa não encontrada ou sem permissão.");
+      }
+      await deleteDoc(taskRef);
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === "Tarefa não encontrada ou sem permissão."
+      ) {
+        throw error;
+      }
+      console.error("Erro ao deletar tarefa:", error);
+      throw new Error("Erro ao deletar tarefa no Firestore", { cause: error });
+    }
   }
 }
