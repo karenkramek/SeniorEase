@@ -1,4 +1,4 @@
-﻿import { TaskFilter } from "@/domain/enums/TaskFilter";
+import { TaskFilter } from "@/domain/enums/TaskFilter";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
@@ -56,12 +56,11 @@ export default function TaskListScreen() {
     backgroundColor: themeColors.background,
   };
 
-  const today = new Date();
-  const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-
   const filteredTasks = useMemo(() => {
     if (activeFilter === "ALL") return sortTasks(tasks, "date-desc");
     if (activeFilter === TaskFilter.UPCOMING) {
+      const today = new Date();
+      const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
       today.setHours(0, 0, 0, 0);
       const filtered = filterTasks({
         tasks,
@@ -93,11 +92,11 @@ export default function TaskListScreen() {
     );
   }, [tasks, activeFilter]);
 
-  const FILTERS: Array<{
+  const FILTERS: {
     key: TaskFilter | "ALL";
     label: string;
     icon: keyof typeof Ionicons.glyphMap;
-  }> = [
+  }[] = [
     { key: "ALL", label: strings.allFilterLabel, icon: "list-outline" },
     {
       key: TaskFilter.PENDING,
