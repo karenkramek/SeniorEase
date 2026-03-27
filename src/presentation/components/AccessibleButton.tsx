@@ -4,10 +4,10 @@ import { Spacing } from "@/presentation/theme/spacing";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import {
-    GestureResponderEvent,
-    TouchableOpacity,
-    TouchableOpacityProps,
-    View,
+  GestureResponderEvent,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
 } from "react-native";
 
 interface AccessibleButtonProps extends TouchableOpacityProps {
@@ -15,18 +15,24 @@ interface AccessibleButtonProps extends TouchableOpacityProps {
   icon?: React.ReactNode;
 }
 
-export function AccessibleButton({
-  title,
-  icon,
-  onPress,
-  style,
-  accessibilityLabel,
-  accessibilityRole = "button",
-  ...rest
-}: AccessibleButtonProps & {
-  accessibilityLabel?: string;
-  accessibilityRole?: string;
-}) {
+export const AccessibleButton = React.forwardRef<
+  React.ElementRef<typeof TouchableOpacity>,
+  AccessibleButtonProps & {
+    accessibilityLabel?: string;
+    accessibilityRole?: string;
+  }
+>(function AccessibleButton(
+  {
+    title,
+    icon,
+    onPress,
+    style,
+    accessibilityLabel,
+    accessibilityRole = "button",
+    ...rest
+  },
+  ref,
+) {
   const { themeColors, preferences } = useTheme();
 
   const handlePress = (event: GestureResponderEvent) => {
@@ -50,6 +56,7 @@ export function AccessibleButton({
 
   return (
     <TouchableOpacity
+      ref={ref}
       onPress={handlePress}
       style={[buttonStyle, style]}
       accessibilityLabel={accessibilityLabel || title}
@@ -67,4 +74,4 @@ export function AccessibleButton({
       </View>
     </TouchableOpacity>
   );
-}
+});

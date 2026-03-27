@@ -3,11 +3,18 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { HapticTab } from "@/presentation/components/HapticTab";
-import { useTheme } from "@/presentation/hooks/useTheme";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { usePreferences } from "@/presentation/hooks/usePreferences";
+import { Colors } from "@/presentation/theme/colors";
 import { getNavigationIcon } from "@/presentation/utils/icons";
 
 export default function TabLayout() {
-  const { themeColors } = useTheme();
+  const appTexts = useAppStrings();
+  const { preferences } = usePreferences();
+  const colorScheme = preferences.theme ?? "light";
+  const themeColors = preferences.isHighContrast
+    ? Colors.highContrast
+    : Colors[colorScheme as "light" | "dark"];
 
   return (
     <Tabs
@@ -25,9 +32,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="tasks"
         options={{
-          title: "Tarefas",
-          tabBarLabel: "Tarefas",
-          tabBarAccessibilityLabel: "Aba de tarefas",
+          title: appTexts.navigation.tasksTabTitle,
+          tabBarLabel: appTexts.navigation.tasksTabTitle,
+          tabBarAccessibilityLabel: appTexts.navigation.tasksTabA11y,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={getNavigationIcon("tasks", focused)}
@@ -40,9 +47,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="preferences"
         options={{
-          title: "Preferências",
-          tabBarLabel: "Preferências",
-          tabBarAccessibilityLabel: "Aba de preferências",
+          title: appTexts.navigation.preferencesTabTitle,
+          tabBarLabel: appTexts.navigation.preferencesTabTitle,
+          tabBarAccessibilityLabel: appTexts.navigation.preferencesTabA11y,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={getNavigationIcon("preferences", focused)}
@@ -55,9 +62,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="help"
         options={{
-          title: "Ajuda",
-          tabBarLabel: "Ajuda",
-          tabBarAccessibilityLabel: "Aba de ajuda e dicas",
+          title: appTexts.navigation.helpTabTitle,
+          tabBarLabel: appTexts.navigation.helpTabTitle,
+          tabBarAccessibilityLabel: appTexts.navigation.helpTabA11y,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={getNavigationIcon("help", focused)}
@@ -70,9 +77,9 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Perfil",
-          tabBarLabel: "Perfil",
-          tabBarAccessibilityLabel: "Aba de perfil do usuário",
+          title: appTexts.navigation.profileTabTitle,
+          tabBarLabel: appTexts.navigation.profileTabTitle,
+          tabBarAccessibilityLabel: appTexts.navigation.profileTabA11y,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={getNavigationIcon("profile", focused)}

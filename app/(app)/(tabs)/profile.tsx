@@ -1,6 +1,7 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useAuth } from "@/presentation/hooks/useAuth";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -9,6 +10,7 @@ import React from "react";
 import { View } from "react-native";
 
 export default function ProfileScreen() {
+  const strings = useAppStrings().profile;
   const { user, signOut } = useAuth();
   const { themeColors } = useTheme();
 
@@ -28,9 +30,9 @@ export default function ProfileScreen() {
         <AccessibleText
           type="h1"
           style={{ textAlign: "center" }}
-          accessibilityLabel="Título: Perfil"
+          accessibilityLabel={strings.titleA11y}
         >
-          Perfil
+          {strings.title}
         </AccessibleText>
       </View>
 
@@ -43,14 +45,14 @@ export default function ProfileScreen() {
         <AccessibleText
           type="h2"
           style={{ marginTop: Spacing.small, color: themeColors.text }}
-          accessibilityLabel={`Nome: ${user?.name ?? "Usuário"}`}
+          accessibilityLabel={`${strings.nameA11yPrefix}: ${user?.name ?? strings.fallbackUserName}`}
         >
-          {user?.name ?? "Usuário"}
+          {user?.name ?? strings.fallbackUserName}
         </AccessibleText>
         <AccessibleText
           type="caption"
           style={{ color: themeColors.icon, marginTop: 4 }}
-          accessibilityLabel={`E-mail: ${user?.email ?? ""}`}
+          accessibilityLabel={`${strings.emailA11yPrefix}: ${user?.email ?? ""}`}
         >
           {user?.email ?? ""}
         </AccessibleText>
@@ -58,15 +60,15 @@ export default function ProfileScreen() {
 
       <View style={{ marginTop: 24, marginBottom: 8, alignItems: "center" }}>
         <AccessibleButton
-          title="Sair"
+          title={strings.logoutButton}
           onPress={signOut}
-          accessibilityLabel="Botão para sair da conta"
+          accessibilityLabel={strings.logoutButtonA11y}
           icon={
             <Ionicons
               name="log-out-outline"
               size={32}
               color="#fff"
-              accessibilityLabel="Ícone de sair"
+              accessibilityLabel={strings.logoutIconA11y}
             />
           }
           style={sharedStyles.createButton}

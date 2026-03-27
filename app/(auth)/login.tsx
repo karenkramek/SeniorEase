@@ -18,24 +18,33 @@ import { z } from "zod";
 
 import { ThemedText } from "@/presentation/components/ThemedText";
 import { useAuth } from "@/presentation/hooks/useAuth";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { showAlert } from "@/presentation/utils/alert";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 
-const loginSchema = z.object({
-  email: z.string().email("Por favor, insira um e-mail válido."),
-  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
 export default function LoginScreen() {
+  const strings = useAppStrings().authLogin;
   const { signIn } = useAuth();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const passwordRef = React.useRef<TextInput>(null);
   const windowWidth = Dimensions.get("window").width;
   const isDesktop = windowWidth >= 768;
+
+  const loginSchema = React.useMemo(
+    () =>
+      z.object({
+        email: z.string().email(strings.emailInvalidError),
+        password: z.string().min(6, strings.passwordMinError),
+      }),
+    [strings.emailInvalidError, strings.passwordMinError],
+  );
 
   const {
     control,
@@ -54,7 +63,7 @@ export default function LoginScreen() {
     try {
       await signIn(data.email, data.password);
     } catch (error: any) {
-      showAlert("Erro no Login", error.message);
+      showAlert(strings.loginErrorTitle, error.message);
     } finally {
       setLoading(false);
     }
@@ -78,11 +87,11 @@ export default function LoginScreen() {
         >
           <View style={styles.header}>
             <Ionicons name="finger-print" size={60} color="#FFFFFF" />
-            <Text style={styles.title}>SeniorEase</Text>
+            <Text style={styles.title}>{strings.appTitle}</Text>
           </View>
 
           <View style={styles.form}>
-            <Text style={styles.formTitle}>Entrar na conta</Text>
+            <Text style={styles.formTitle}>{strings.formTitle}</Text>
 
             <View style={styles.inputContainer}>
               <Ionicons
@@ -97,7 +106,7 @@ export default function LoginScreen() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <TextInput
                     style={styles.input}
-                    placeholder="E-mail"
+                    placeholder={strings.emailPlaceholder}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -132,7 +141,7 @@ export default function LoginScreen() {
                   <TextInput
                     ref={passwordRef}
                     style={styles.input}
-                    placeholder="Senha"
+                    placeholder={strings.passwordPlaceholder}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -169,16 +178,14 @@ export default function LoginScreen() {
                 style={styles.loginButton}
                 onPress={handleSubmit(onSubmit)}
               >
-                <Text style={styles.loginButtonText}>Entrar</Text>
+                <Text style={styles.loginButtonText}>{strings.submitButton}</Text>
               </TouchableOpacity>
             )}
           </View>
 
           <View style={styles.footer}>
             <Link href="/(auth)/register" style={styles.link}>
-              <ThemedText type="link">
-                Não tem uma conta? Cadastre-se
-              </ThemedText>
+              <ThemedText type="link">{strings.registerLink}</ThemedText>
             </Link>
           </View>
         </View>

@@ -2,7 +2,7 @@ import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import React from "react";
-import { View } from "react-native";
+import { ScrollView, View } from "react-native";
 
 export default function HelpScreen() {
   const { themeColors, colorScheme, preferences } = useTheme();
@@ -17,11 +17,9 @@ export default function HelpScreen() {
     : themeColors.text;
 
   return (
-    <View
-      style={[
-        sharedStyles.container,
-        { backgroundColor: themeColors.background },
-      ]}
+    <ScrollView
+      style={{ backgroundColor: themeColors.background }}
+      contentContainerStyle={[sharedStyles.container, { paddingBottom: 32 }]}
       accessibilityLabel="Tela de ajuda"
     >
       <View
@@ -71,33 +69,20 @@ export default function HelpScreen() {
         >
           Como usar o SeniorEase
         </AccessibleText>
-        <AccessibleText
-          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
-        >
-          • Adicione tarefas com o botão{" "}
-          <AccessibleText
-            style={{ color: themeColors.tint, fontWeight: "bold" }}
-          >
-            Nova Tarefa
-          </AccessibleText>
-          .
+        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
+          • Adicione tarefas com o botão Nova Tarefa.
         </AccessibleText>
-        <AccessibleText
-          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
-        >
+        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
           • Complete tarefas marcando etapas ou finalizando.
         </AccessibleText>
-        <AccessibleText
-          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
-        >
+        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
           • Filtre tarefas para ver as mais importantes ou pendentes.
         </AccessibleText>
-        <AccessibleText
-          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
-        >
+        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
           • Personalize o app nas preferências: fonte, contraste, espaçamento.
         </AccessibleText>
       </View>
+
       <AccessibleText
         style={{
           marginTop: 16,
@@ -108,6 +93,6 @@ export default function HelpScreen() {
       >
         Qualquer dúvida, estamos aqui para ajudar!
       </AccessibleText>
-    </View>
+    </ScrollView>
   );
 }

@@ -19,7 +19,6 @@ export class CreateTask {
       description: input.description,
       dueDate: input.dueDate ? input.dueDate.toISOString() : undefined,
       status: TaskStatus.PENDING,
-      steps: [],
     };
 
     return this.taskRepository.create(taskToCreate);

@@ -2,7 +2,6 @@ import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
 import { getApps, initializeApp } from "firebase/app";
 import {
     getAuth,
-    getReactNativePersistence,
     initializeAuth,
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -24,18 +23,13 @@ if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
   );
 }
 
-// isNewApp é true apenas quando o app está sendo inicializado pela primeira vez.
-// Em hot reloads, getApps() já tem o app → isNewApp é false → evita dupla inicialização.
 const isNewApp = getApps().length === 0;
 const app = isNewApp ? initializeApp(firebaseConfig) : getApps()[0];
 
-// initializeAuth só pode ser chamado uma vez por app.
-// Em React Native, usa AsyncStorage para persistir sessão entre aberturas.
-// Na web, getAuth usa localStorage automaticamente.
 export const auth =
   isNewApp && Platform.OS !== "web"
     ? initializeAuth(app, {
-        persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+        persistence: [ReactNativeAsyncStorage as any],
       })
     : getAuth(app);
 
