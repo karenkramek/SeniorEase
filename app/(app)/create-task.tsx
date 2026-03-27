@@ -1,5 +1,6 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useNotification } from "@/presentation/hooks/useNotification";
 import { useTasks } from "@/presentation/hooks/useTasks";
@@ -12,7 +13,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  TextInput,
   View,
 } from "react-native";
 
@@ -68,7 +68,11 @@ export default function CreateTaskScreen() {
             {strings.titleLabel}
           </AccessibleText>
         </View>
-        <TextInput
+        <AccessibleFormField
+          fieldId="taskTitle"
+          accessibilityLabel={strings.titleFieldA11yLabel}
+          accessibilityHint={strings.titleFieldA11yHint}
+          required
           placeholder={strings.titlePlaceholder}
           placeholderTextColor={themeColors.icon}
           value={title}
@@ -78,62 +82,43 @@ export default function CreateTaskScreen() {
               setTitleError(null);
             }
           }}
-          style={[
-            sharedStyles.input,
-            {
-              borderColor: titleError ? themeColors.error : themeColors.icon,
-              color: themeColors.text,
-              backgroundColor: themeColors.background,
-            },
-          ]}
-          accessibilityLabel={strings.titleFieldLabel}
-          accessibilityHint={strings.titleRequiredHint}
+          error={titleError || undefined}
+          style={{
+            color: themeColors.text,
+          }}
+          inputContainerStyle={{
+            borderColor: titleError ? themeColors.error : themeColors.tint,
+            backgroundColor: themeColors.background,
+          }}
         />
-        {titleError && (
-          <View
-            style={{ marginTop: -16, marginBottom: 16, flexDirection: "row", gap: 8 }}
-            accessibilityRole="alert"
-            accessibilityLabel={titleError}
-          >
-            <MaterialIcons name="error-outline" size={18} color={themeColors.error} />
-            <AccessibleText style={{ color: themeColors.error }}>{titleError}</AccessibleText>
-          </View>
-        )}
-        <View style={{ marginBottom: 8 }}>
+
+        <View style={{ marginBottom: 8, marginTop: 16 }}>
           <AccessibleText style={{ fontWeight: "bold", color: themeColors.text }}>
             {strings.descriptionLabel}
           </AccessibleText>
         </View>
-        <TextInput
+        <AccessibleFormField
+          fieldId="taskDescription"
+          accessibilityLabel={strings.descriptionFieldA11yLabel}
+          accessibilityHint={strings.descriptionFieldA11yHint}
           placeholder={strings.descriptionPlaceholder}
           placeholderTextColor={themeColors.icon}
           value={description}
           onChangeText={setDescription}
-          style={[
-            sharedStyles.input,
-            {
-              borderColor: themeColors.icon,
-              color: themeColors.text,
-              backgroundColor: themeColors.background,
-              height: 120,
-              textAlignVertical: "top" as "top",
-            },
-          ]}
-          multiline
-          accessibilityLabel={strings.descriptionFieldLabel}
+          error={submissionError || undefined}
+          style={{
+            color: themeColors.text,
+            height: 100,
+            textAlignVertical: "top" as "top",
+          }}
+          inputContainerStyle={{
+            borderColor: themeColors.tint,
+            backgroundColor: themeColors.background,
+            minHeight: 120,
+            paddingVertical: 8,
+            alignItems: "flex-start",
+          }}
         />
-        {submissionError && (
-          <View
-            style={{ marginTop: -8, marginBottom: 8, flexDirection: "row", gap: 8 }}
-            accessibilityRole="alert"
-            accessibilityLabel={submissionError}
-          >
-            <MaterialIcons name="error-outline" size={18} color={themeColors.error} />
-            <AccessibleText style={{ color: themeColors.error }}>
-              {submissionError}
-            </AccessibleText>
-          </View>
-        )}
         <View style={{ marginTop: 24, marginBottom: 8, alignItems: "center" }}>
           <AccessibleButton
             title={strings.createButton}

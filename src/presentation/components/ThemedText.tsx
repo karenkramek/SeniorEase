@@ -36,7 +36,6 @@ export function ThemedText({
           ? {
               color: linkColor,
               textDecorationLine: "underline",
-              textDecorationColor: linkColor,
             }
           : undefined,
         style,

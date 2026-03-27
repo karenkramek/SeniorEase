@@ -12,15 +12,16 @@ import {
     ScrollView,
     StyleSheet,
     Text,
-    TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
 import { z } from "zod";
 
 import { ThemedText } from "@/presentation/components/ThemedText";
+import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { showAlert } from "@/presentation/utils/alert";
 
 interface RegisterFormData {
@@ -34,6 +35,7 @@ export default function RegisterScreen() {
   const strings = useAppStrings().authRegister;
   const commonStrings = useAppStrings().common;
   const { signUp } = useAuth();
+  const { themeColors } = useTheme();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -117,83 +119,65 @@ export default function RegisterScreen() {
           <View style={styles.form}>
             <Text style={styles.formTitle}>{strings.formTitle}</Text>
 
-            {/* Nome */}
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <Controller
-                control={control}
-                name="name"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder={strings.namePlaceholder}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    autoCapitalize="words"
-                    placeholderTextColor="#999"
-                    editable={!loading}
-                  />
-                )}
-              />
-            </View>
-            {errors.name && (
-              <ThemedText style={styles.errorText}>
-                {errors.name.message}
-              </ThemedText>
-            )}
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <AccessibleFormField
+                  fieldId="registerName"
+                  accessibilityLabel={strings.nameFieldLabel}
+                  accessibilityHint={strings.nameFieldHint}
+                  required
+                  placeholder={strings.namePlaceholder}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  autoCapitalize="words"
+                  placeholderTextColor="#999"
+                  editable={!loading}
+                  error={errors.name?.message}
+                  iconComponent={
+                    <Ionicons name="person-outline" size={20} color={themeColors.icon} />
+                  }
+                />
+              )}
+            />
 
-            {/* E-mail */}
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="mail-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder={strings.emailPlaceholder}
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    placeholderTextColor="#999"
-                    editable={!loading}
-                  />
-                )}
-              />
-            </View>
-            {errors.email && (
-              <ThemedText style={styles.errorText}>
-                {errors.email.message}
-              </ThemedText>
-            )}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <AccessibleFormField
+                  fieldId="registerEmail"
+                  accessibilityLabel={strings.emailFieldLabel}
+                  accessibilityHint={strings.emailFieldHint}
+                  required
+                  placeholder={strings.emailPlaceholder}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor="#999"
+                  editable={!loading}
+                  error={errors.email?.message}
+                  iconComponent={
+                    <Ionicons name="mail-outline" size={20} color={themeColors.icon} />
+                  }
+                />
+              )}
+            />
 
-            {/* Senha */}
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.passwordFieldWrapper}>
+                  <AccessibleFormField
+                    fieldId="registerPassword"
+                    accessibilityLabel={strings.passwordFieldLabel}
+                    accessibilityHint={strings.passwordFieldHint}
+                    required
                     placeholder={strings.passwordPlaceholder}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -201,40 +185,39 @@ export default function RegisterScreen() {
                     secureTextEntry={!showPassword}
                     placeholderTextColor="#999"
                     editable={!loading}
+                    error={errors.password?.message}
+                    iconComponent={
+                      <Ionicons name="lock-closed-outline" size={20} color={themeColors.icon} />
+                    }
                   />
-                )}
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeIcon}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-outline" : "eye-off-outline"}
-                  size={20}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
-            {errors.password && (
-              <ThemedText style={styles.errorText}>
-                {errors.password.message}
-              </ThemedText>
-            )}
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.eyeIcon}
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel={showPassword ? strings.hidePasswordA11y : strings.showPasswordA11y}
+                    accessibilityHint="Alternar visibilidade da senha"
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-outline" : "eye-off-outline"}
+                      size={20}
+                      color={themeColors.icon}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
 
-            {/* Confirmar senha */}
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="shield-checkmark-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <Controller
-                control={control}
-                name="confirmPassword"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.passwordFieldWrapper}>
+                  <AccessibleFormField
+                    fieldId="registerConfirmPassword"
+                    accessibilityLabel={strings.confirmPasswordFieldLabel}
+                    accessibilityHint={strings.confirmPasswordFieldHint}
+                    required
                     placeholder={strings.confirmPasswordPlaceholder}
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -242,25 +225,28 @@ export default function RegisterScreen() {
                     secureTextEntry={!showConfirmPassword}
                     placeholderTextColor="#999"
                     editable={!loading}
+                    error={errors.confirmPassword?.message}
+                    iconComponent={
+                      <Ionicons name="shield-checkmark-outline" size={20} color={themeColors.icon} />
+                    }
                   />
-                )}
-              />
-              <TouchableOpacity
-                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                style={styles.eyeIcon}
-              >
-                <Ionicons
-                  name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
-                  size={20}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
-            {errors.confirmPassword && (
-              <ThemedText style={styles.errorText}>
-                {errors.confirmPassword.message}
-              </ThemedText>
-            )}
+                  <TouchableOpacity
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    style={styles.eyeIcon}
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel={showConfirmPassword ? strings.hidePasswordA11y : strings.showPasswordA11y}
+                    accessibilityHint="Alternar visibilidade da confirmação de senha"
+                  >
+                    <Ionicons
+                      name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                      size={20}
+                      color={themeColors.icon}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
 
             {loading ? (
               <ActivityIndicator size="large" style={styles.registerButton} />
@@ -276,7 +262,15 @@ export default function RegisterScreen() {
 
           <View style={styles.footer}>
             <Link href="/(auth)/login" style={styles.link}>
-              <ThemedText type="link">{strings.loginLink}</ThemedText>
+              <ThemedText
+                type="link"
+                style={{
+                  color: themeColors.buttonText,
+                  fontWeight: "600",
+                }}
+              >
+                {strings.loginLink}
+              </ThemedText>
             </Link>
           </View>
         </View>
@@ -326,27 +320,22 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
   },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#1F4E79",
-    borderRadius: 40,
+  passwordInput: {
+    marginBottom: 24,
+  },
+  passwordFieldWrapper: {
+    position: 'relative' as const,
     marginBottom: 16,
-    paddingHorizontal: 16,
-    backgroundColor: "#F8F9FA",
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: "#333",
   },
   eyeIcon: {
-    padding: 4,
+    position: 'absolute' as const,
+    right: 16,
+    top: 0,
+    height: 48,
+    padding: 8,
+    minWidth: 44,
+    justifyContent: "center",
+    alignItems: "center",
   },
   registerButton: {
     backgroundColor: "#1F4E79",
@@ -367,15 +356,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  errorText: {
-    color: "#ff4444",
-    marginBottom: 10,
-    marginLeft: 5,
-    fontSize: 14,
-  },
   link: {
     marginTop: 20,
     textAlign: "center",
-    color: "white",
   },
 });
