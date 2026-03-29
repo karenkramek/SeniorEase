@@ -2,15 +2,23 @@ import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { getColorWithOpacity } from "@/presentation/theme/colors";
+import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { getSwitchColors } from "@/presentation/theme/switchColors";
 import React from "react";
-import { ActivityIndicator, ScrollView, Switch, View } from "react-native";
+import {
+  ActivityIndicator,
+  Platform,
+  ScrollView,
+  Switch,
+  View,
+} from "react-native";
 
 export default function PreferencesScreen() {
   const strings = useAppStrings().preferences;
   const { preferences, isLoading, updatePreferences } = usePreferences();
-  const { themeColors } = useTheme();
+  const { themeColors, isWeb } = useTheme();
 
   if (isLoading) {
     return (
@@ -46,10 +54,32 @@ export default function PreferencesScreen() {
     preferences.confirmOnComplete ?? false,
   );
 
+  const switchColumnStyle = {
+    alignSelf: "flex-start" as const,
+    paddingTop: Platform.OS === "ios" ? 2 : 3,
+  };
+
+  const webPreferenceRow = isWeb
+    ? {
+        borderBottomWidth: 0,
+        marginBottom: 10,
+        borderRadius: 14,
+        paddingVertical: 20,
+        backgroundColor: getColorWithOpacity(themeColors.tint, 0.07),
+        borderWidth: 1,
+        borderColor: getColorWithOpacity(themeColors.icon, 0.25),
+      }
+    : undefined;
+
   return (
+    <View style={{ flex: 1, backgroundColor: themeColors.background }}>
     <ScrollView
-      style={{ backgroundColor: themeColors.background }}
-      contentContainerStyle={sharedStyles.container}
+      style={{ flex: 1 }}
+      contentContainerStyle={[
+        sharedStyles.container,
+        getWebContentShellStyle(),
+        isWeb && { paddingHorizontal: 28, paddingBottom: 32 },
+      ]}
       accessibilityLabel={strings.screenLabel}
     >
       <View
@@ -68,11 +98,21 @@ export default function PreferencesScreen() {
       </View>
 
       <View
-        style={[sharedStyles.itemRow, { borderBottomColor: themeColors.icon }]}
+        style={[
+          sharedStyles.itemRow,
+          { borderBottomColor: themeColors.icon },
+          webPreferenceRow,
+        ]}
       >
-        <AccessibleText accessibilityLabel={strings.darkThemeLabel}>
-          {strings.darkThemeLabel}
-        </AccessibleText>
+        <View style={sharedStyles.preferenceLabelColumn}>
+          <AccessibleText
+            type="bodyCompact"
+            accessibilityLabel={strings.darkThemeLabel}
+          >
+            {strings.darkThemeLabel}
+          </AccessibleText>
+        </View>
+        <View style={switchColumnStyle}>
         <Switch
           value={preferences.theme === "dark"}
           onValueChange={(value: boolean) =>
@@ -85,14 +125,25 @@ export default function PreferencesScreen() {
           accessibilityRole="switch"
           disabled={preferences.isHighContrast}
         />
+        </View>
       </View>
 
       <View
-        style={[sharedStyles.itemRow, { borderBottomColor: themeColors.icon }]}
+        style={[
+          sharedStyles.itemRow,
+          { borderBottomColor: themeColors.icon },
+          webPreferenceRow,
+        ]}
       >
-        <AccessibleText accessibilityLabel={strings.largeFontLabel}>
-          {strings.largeFontLabel}
-        </AccessibleText>
+        <View style={sharedStyles.preferenceLabelColumn}>
+          <AccessibleText
+            type="bodyCompact"
+            accessibilityLabel={strings.largeFontLabel}
+          >
+            {strings.largeFontLabel}
+          </AccessibleText>
+        </View>
+        <View style={switchColumnStyle}>
         <Switch
           value={preferences.fontSizeMultiplier > 1}
           onValueChange={(value) =>
@@ -104,14 +155,25 @@ export default function PreferencesScreen() {
           accessibilityLabel={strings.largeFontSwitchA11y}
           accessibilityRole="switch"
         />
+        </View>
       </View>
 
       <View
-        style={[sharedStyles.itemRow, { borderBottomColor: themeColors.icon }]}
+        style={[
+          sharedStyles.itemRow,
+          { borderBottomColor: themeColors.icon },
+          webPreferenceRow,
+        ]}
       >
-        <AccessibleText accessibilityLabel={strings.highContrastLabel}>
-          {strings.highContrastLabel}
-        </AccessibleText>
+        <View style={sharedStyles.preferenceLabelColumn}>
+          <AccessibleText
+            type="bodyCompact"
+            accessibilityLabel={strings.highContrastLabel}
+          >
+            {strings.highContrastLabel}
+          </AccessibleText>
+        </View>
+        <View style={switchColumnStyle}>
         <Switch
           value={preferences.isHighContrast}
           onValueChange={(value) => {
@@ -127,14 +189,25 @@ export default function PreferencesScreen() {
           accessibilityLabel={strings.highContrastSwitchA11y}
           accessibilityRole="switch"
         />
+        </View>
       </View>
 
       <View
-        style={[sharedStyles.itemRow, { borderBottomColor: themeColors.icon }]}
+        style={[
+          sharedStyles.itemRow,
+          { borderBottomColor: themeColors.icon },
+          webPreferenceRow,
+        ]}
       >
-        <AccessibleText accessibilityLabel={strings.deleteConfirmationLabel}>
-          {strings.deleteConfirmationLabel}
-        </AccessibleText>
+        <View style={sharedStyles.preferenceLabelColumn}>
+          <AccessibleText
+            type="bodyCompact"
+            accessibilityLabel={strings.deleteConfirmationLabel}
+          >
+            {strings.deleteConfirmationLabel}
+          </AccessibleText>
+        </View>
+        <View style={switchColumnStyle}>
         <Switch
           value={preferences.useExtraConfirmation}
           onValueChange={(value) => updatePreferences({ useExtraConfirmation: value })}
@@ -144,14 +217,25 @@ export default function PreferencesScreen() {
           accessibilityLabel={strings.deleteConfirmationSwitchA11y}
           accessibilityRole="switch"
         />
+        </View>
       </View>
 
       <View
-        style={[sharedStyles.itemRow, { borderBottomColor: themeColors.icon }]}
+        style={[
+          sharedStyles.itemRow,
+          { borderBottomColor: themeColors.icon },
+          webPreferenceRow,
+        ]}
       >
-        <AccessibleText accessibilityLabel={strings.completeConfirmationLabel}>
-          {strings.completeConfirmationLabel}
-        </AccessibleText>
+        <View style={sharedStyles.preferenceLabelColumn}>
+          <AccessibleText
+            type="bodyCompact"
+            accessibilityLabel={strings.completeConfirmationLabel}
+          >
+            {strings.completeConfirmationLabel}
+          </AccessibleText>
+        </View>
+        <View style={switchColumnStyle}>
         <Switch
           value={preferences.confirmOnComplete ?? false}
           onValueChange={(value) => updatePreferences({ confirmOnComplete: value })}
@@ -161,7 +245,9 @@ export default function PreferencesScreen() {
           accessibilityLabel={strings.completeConfirmationSwitchA11y}
           accessibilityRole="switch"
         />
+        </View>
       </View>
     </ScrollView>
+    </View>
   );
 }

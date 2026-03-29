@@ -1,5 +1,8 @@
 import { usePreferences } from "@/presentation/contexts/PreferencesContext";
-import { Colors } from "@/presentation/theme/colors";
+import {
+  isWebPlatform,
+  resolveThemeColors,
+} from "@/presentation/theme/colors";
 
 /**
  * Hook centralizado para resolução do tema.
@@ -8,9 +11,12 @@ import { Colors } from "@/presentation/theme/colors";
 export function useTheme() {
   const { preferences } = usePreferences();
   const colorScheme = (preferences.theme ?? "light") as "light" | "dark";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme];
+  const isWeb = isWebPlatform();
+  const themeColors = resolveThemeColors(
+    preferences.theme,
+    preferences.isHighContrast,
+    isWeb,
+  );
 
-  return { themeColors, colorScheme, preferences };
+  return { themeColors, colorScheme, preferences, isWeb };
 }

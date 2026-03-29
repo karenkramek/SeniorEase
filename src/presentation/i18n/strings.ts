@@ -8,6 +8,7 @@ export const ptBRStrings = {
     notPossibleNow: "Não foi possível concluir a operação agora. Tente novamente.",
   },
   navigation: {
+    mainNavigationA11y: "Navegação principal do aplicativo",
     tasksTabTitle: "Tarefas",
     tasksTabA11y: "Aba de tarefas",
     preferencesTabTitle: "Preferências",

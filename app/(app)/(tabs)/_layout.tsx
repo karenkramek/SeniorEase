@@ -1,23 +1,36 @@
+import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
 import React from "react";
+import { Platform, View } from "react-native";
 
 import { HapticTab } from "@/presentation/components/HapticTab";
+import { WebSidebar } from "@/presentation/components/WebSidebar";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
-import { Colors } from "@/presentation/theme/colors";
+import { isWebPlatform, resolveThemeColors } from "@/presentation/theme/colors";
 import { getNavigationIcon } from "@/presentation/utils/icons";
+
+function TabBarForPlatform(props: BottomTabBarProps) {
+  if (Platform.OS === "web") {
+    return null;
+  }
+  return <BottomTabBar {...props} />;
+}
 
 export default function TabLayout() {
   const appTexts = useAppStrings();
   const { preferences } = usePreferences();
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
+  const isWeb = isWebPlatform();
+  const themeColors = resolveThemeColors(
+    preferences.theme,
+    preferences.isHighContrast,
+    isWeb,
+  );
 
-  return (
+  const tabs = (
     <Tabs
+      tabBar={TabBarForPlatform}
       screenOptions={{
         tabBarActiveTintColor: themeColors.tabIconSelected,
         tabBarInactiveTintColor: themeColors.tabIconDefault,
@@ -91,4 +104,15 @@ export default function TabLayout() {
       />
     </Tabs>
   );
+
+  if (isWeb) {
+    return (
+      <View style={{ flex: 1, flexDirection: "row" }}>
+        <WebSidebar />
+        <View style={{ flex: 1, minWidth: 0 }}>{tabs}</View>
+      </View>
+    );
+  }
+
+  return tabs;
 }

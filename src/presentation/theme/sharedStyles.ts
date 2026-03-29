@@ -54,10 +54,16 @@ export const sharedStyles = StyleSheet.create({
   itemRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingVertical: Spacing.medium,
     paddingHorizontal: Spacing.large,
     borderBottomWidth: 1,
+  },
+  /** Coluna do texto à esquerda de switches: ocupa espaço livre e permite quebra de linha. */
+  preferenceLabelColumn: {
+    flex: 1,
+    marginRight: 14,
+    minWidth: 0,
   },
   titleContainer: {
     paddingVertical: Spacing.large,

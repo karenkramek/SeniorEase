@@ -1,6 +1,7 @@
 import { StyleSheet, Text, type TextProps } from "react-native";
 
 import { useThemeColor } from "@/presentation/hooks/useThemeColor";
+import { getUiFontFamily } from "@/presentation/theme/typography";
 
 export type ThemedTextProps = TextProps & {
   lightColor?: string;
@@ -22,11 +23,13 @@ export function ThemedText({
 }) {
   const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
   const linkColor = useThemeColor({}, "tint");
+  const fontFamily = getUiFontFamily();
 
   return (
     <Text
       style={[
         { color },
+        fontFamily ? { fontFamily } : undefined,
         type === "default" ? styles.default : undefined,
         type === "title" ? styles.title : undefined,
         type === "defaultSemiBold" ? styles.defaultSemiBold : undefined,

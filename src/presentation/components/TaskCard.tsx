@@ -26,23 +26,23 @@ export function TaskCard({
 }: TaskCardProps) {
   const appTexts = useAppStrings();
   const taskCardTexts = appTexts.taskCard;
-  const { themeColors, preferences } = useTheme();
+  const { themeColors, preferences, isWeb } = useTheme();
 
   const cardStyle = {
     backgroundColor: themeColors.background,
     padding: Spacing.medium * preferences.spacingMultiplier,
-    borderRadius: Spacing.small,
+    borderRadius: isWeb ? 16 : Spacing.small,
     marginBottom: Spacing.medium,
-    borderWidth: 1,
+    borderWidth: isWeb ? 1.5 : 1,
     borderColor: themeColors.icon,
     flexDirection: "row" as "row",
     alignItems: "center" as "center",
     justifyContent: "space-between" as "space-between",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowColor: isWeb ? themeColors.tint : "#000",
+    shadowOffset: { width: 0, height: isWeb ? 1 : 2 },
+    shadowOpacity: isWeb ? 0.08 : 0.1,
+    shadowRadius: isWeb ? 12 : 4,
+    elevation: isWeb ? 0 : 3,
   };
 
   const [scale] = React.useState(new Animated.Value(1));

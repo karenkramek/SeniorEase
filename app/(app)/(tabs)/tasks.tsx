@@ -7,6 +7,7 @@ import { TaskCard } from "@/presentation/components/TaskCard";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import { filterTasks, sortTasks } from "@/presentation/utils/taskFilters";
@@ -48,12 +49,17 @@ export default function TaskListScreen() {
     }
   };
 
-  const { themeColors, preferences } = useTheme();
+  const { themeColors, preferences, isWeb } = useTheme();
 
-  const containerStyle = {
+  const outerScreenStyle = {
+    flex: 1,
+    width: "100%" as const,
+    backgroundColor: themeColors.background,
+  };
+  const contentColumnStyle = {
     flex: 1,
     padding: Spacing.medium,
-    backgroundColor: themeColors.background,
+    ...getWebContentShellStyle(),
   };
 
   const filteredTasks = useMemo(() => {
@@ -163,14 +169,17 @@ export default function TaskListScreen() {
 
   if (isLoading && tasks.length === 0) {
     return (
-      <View style={[containerStyle, sharedStyles.loader]}>
-        <ActivityIndicator size="large" color={themeColors.tint} />
+      <View style={outerScreenStyle}>
+        <View style={[contentColumnStyle, sharedStyles.loader]}>
+          <ActivityIndicator size="large" color={themeColors.tint} />
+        </View>
       </View>
     );
   }
 
   return (
-    <View style={containerStyle}>
+    <View style={outerScreenStyle}>
+      <View style={contentColumnStyle}>
       <View style={sharedStyles.titleContainer}>
         <AccessibleText type="h1" style={{ textAlign: "center" }}>
           {strings.screenTitle}
@@ -189,7 +198,7 @@ export default function TaskListScreen() {
         >
           <Ionicons
             name="funnel-outline"
-            size={15}
+            size={isWeb ? 18 : 15}
             color={themeColors.icon}
             accessibilityElementsHidden
           />
@@ -299,7 +308,7 @@ export default function TaskListScreen() {
             <MaterialIcons
               name="add"
               size={32}
-              color="#fff"
+              color={themeColors.buttonText}
               accessibilityLabel={strings.addIconA11y}
             />
           }
@@ -328,6 +337,7 @@ export default function TaskListScreen() {
         onConfirm={confirmComplete}
         onCancel={cancelComplete}
       />
+      </View>
     </View>
   );
 }
