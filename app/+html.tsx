@@ -1,5 +1,7 @@
 import { ScrollViewStyleReset } from "expo-router/html";
 import type { PropsWithChildren } from "react";
+// Importar Tailwind CSS apenas para web
+import "../src/presentation/theme/globals.css";
 
 /**
  * Documento HTML da build web: Atkinson Hyperlegible (legibilidade / dislexia).
