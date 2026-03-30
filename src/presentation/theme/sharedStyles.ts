@@ -54,7 +54,7 @@ export const sharedStyles = StyleSheet.create({
   itemRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-start",
+    alignItems: "center",
     paddingVertical: Spacing.medium,
     paddingHorizontal: Spacing.large,
     borderBottomWidth: 1,
@@ -67,7 +67,6 @@ export const sharedStyles = StyleSheet.create({
   },
   titleContainer: {
     paddingVertical: Spacing.large,
-    borderBottomWidth: 1,
   },
   input: {
     borderWidth: 2,

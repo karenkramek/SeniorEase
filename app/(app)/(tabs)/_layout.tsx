@@ -1,9 +1,10 @@
-import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
+import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
 import React from "react";
 import { Platform, View } from "react-native";
 
+import { AppHeader } from "@/presentation/components/AppHeader";
 import { HapticTab } from "@/presentation/components/HapticTab";
 import { WebSidebar } from "@/presentation/components/WebSidebar";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
@@ -107,9 +108,21 @@ export default function TabLayout() {
 
   if (isWeb) {
     return (
-      <View style={{ flex: 1, flexDirection: "row" }}>
-        <WebSidebar />
-        <View style={{ flex: 1, minWidth: 0 }}>{tabs}</View>
+      <View style={{ flex: 1, width: "100%", alignItems: "center", backgroundColor: "#F1F5F9" }}>
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            maxWidth: 1200,
+            flexDirection: "column",
+          }}
+        >
+          <AppHeader />
+          <View style={{ flex: 1, flexDirection: "row" }}>
+            <WebSidebar />
+            <View style={{ flex: 1, minWidth: 0 }}>{tabs}</View>
+          </View>
+        </View>
       </View>
     );
   }

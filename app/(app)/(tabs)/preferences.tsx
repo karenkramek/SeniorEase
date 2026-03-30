@@ -8,11 +8,10 @@ import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { getSwitchColors } from "@/presentation/theme/switchColors";
 import React from "react";
 import {
-  ActivityIndicator,
-  Platform,
-  ScrollView,
-  Switch,
-  View,
+    ActivityIndicator,
+    ScrollView,
+    Switch,
+    View
 } from "react-native";
 
 export default function PreferencesScreen() {
@@ -55,8 +54,7 @@ export default function PreferencesScreen() {
   );
 
   const switchColumnStyle = {
-    alignSelf: "flex-start" as const,
-    paddingTop: Platform.OS === "ios" ? 2 : 3,
+    // Centralizado verticalmente pelo itemRow
   };
 
   const webPreferenceRow = isWeb
@@ -85,7 +83,6 @@ export default function PreferencesScreen() {
       <View
         style={[
           sharedStyles.titleContainer,
-          { borderBottomColor: themeColors.icon },
         ]}
       >
         <AccessibleText

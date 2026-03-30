@@ -18,16 +18,15 @@ export default function HelpScreen() {
 
   return (
     <ScrollView
-      style={{ backgroundColor: themeColors.background }}
-      contentContainerStyle={[sharedStyles.container, { paddingBottom: 32 }]}
-      accessibilityLabel="Tela de ajuda"
-    >
-      <View
-        style={[
-          sharedStyles.titleContainer,
-          { borderBottomColor: themeColors.icon },
-        ]}
+        style={{ backgroundColor: themeColors.background }}
+        contentContainerStyle={[sharedStyles.container, { paddingBottom: 32 }]}
+        accessibilityLabel="Tela de ajuda"
       >
+        <View
+          style={[
+            sharedStyles.titleContainer,
+          ]}
+        >
         <AccessibleText
           type="h1"
           accessibilityLabel="Título: Ajuda e Dicas"

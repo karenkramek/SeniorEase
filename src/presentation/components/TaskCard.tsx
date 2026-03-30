@@ -9,7 +9,7 @@ import { formatDateRelative } from "@/presentation/utils/format";
 import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Animated, TouchableOpacity, View } from "react-native";
+import { Animated, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 interface TaskCardProps {
   task: Task;
@@ -27,6 +27,10 @@ export function TaskCard({
   const appTexts = useAppStrings();
   const taskCardTexts = appTexts.taskCard;
   const { themeColors, preferences, isWeb } = useTheme();
+  const { width: windowWidth } = useWindowDimensions();
+
+  // Responsive breakpoint: md = 768px
+  const isSmallScreen = windowWidth < 768;
 
   const cardStyle = {
     backgroundColor: themeColors.background,
@@ -35,8 +39,8 @@ export function TaskCard({
     marginBottom: Spacing.medium,
     borderWidth: isWeb ? 1.5 : 1,
     borderColor: themeColors.icon,
-    flexDirection: "row" as "row",
-    alignItems: "center" as "center",
+    flexDirection: (isSmallScreen ? "column" : "row") as "row" | "column",
+    alignItems: isSmallScreen ? ("flex-start" as const) : ("center" as const),
     justifyContent: "space-between" as "space-between",
     shadowColor: isWeb ? themeColors.tint : "#000",
     shadowOffset: { width: 0, height: isWeb ? 1 : 2 },
@@ -82,7 +86,8 @@ export function TaskCard({
         style={[
           sharedStyles.touchTargetMin,
           {
-            marginRight: Spacing.medium,
+            marginRight: isSmallScreen ? 0 : Spacing.medium,
+            marginBottom: isSmallScreen ? Spacing.small : 0,
             alignItems: "center",
             justifyContent: "center",
           },
@@ -105,63 +110,75 @@ export function TaskCard({
         </Animated.View>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={{ flex: 1 }}
-        onPress={() => onPress && onPress(task.id)}
-        accessibilityLabel={`Ver detalhes da tarefa: ${task.title}`}
-        accessibilityRole="button"
-        disabled={!onPress}
+      {/* Content wrapper (title and delete button stacked on sm) */}
+      <View
+        style={{
+          flex: 1,
+          flexDirection: isSmallScreen ? ("column" as const) : ("row" as const),
+          alignItems: isSmallScreen ? ("flex-start" as const) : ("center" as const),
+          justifyContent: "space-between" as const,
+          width: "100%",
+          gap: isSmallScreen ? Spacing.small : 0,
+        }}
       >
-        <AccessibleText
-          type="h2"
-          style={{
-            fontWeight: "bold",
-            fontSize: 18,
-            marginBottom: 4,
-            color: themeColors.text,
-          }}
-          accessibilityLabel={`${taskCardTexts.titleLabelPrefix}: ${task.title}`}
+        <TouchableOpacity
+          style={{ flex: isSmallScreen ? 0 : 1 }}
+          onPress={() => onPress && onPress(task.id)}
+          accessibilityLabel={`Ver detalhes da tarefa: ${task.title}`}
+          accessibilityRole="button"
+          disabled={!onPress}
         >
-          {truncateText(task.title, 45)}
-        </AccessibleText>
-        {task.dueDate && (
           <AccessibleText
-            type="caption"
-            style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
-            accessibilityLabel={`${taskCardTexts.dueDateLabelPrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
+            type="h2"
+            style={{
+              fontWeight: "bold",
+              fontSize: 18,
+              marginBottom: 4,
+              color: themeColors.text,
+            }}
+            accessibilityLabel={`${taskCardTexts.titleLabelPrefix}: ${task.title}`}
           >
-            {taskCardTexts.dueDatePrefix}: {formatDateRelative(new Date(task.dueDate))}
+            {truncateText(task.title, 45)}
           </AccessibleText>
-        )}
-      </TouchableOpacity>
+          {task.dueDate && (
+            <AccessibleText
+              type="caption"
+              style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
+              accessibilityLabel={`${taskCardTexts.dueDateLabelPrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
+            >
+              {taskCardTexts.dueDatePrefix}: {formatDateRelative(new Date(task.dueDate))}
+            </AccessibleText>
+          )}
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => onDelete && onDelete(task.id)}
-        style={[
-          sharedStyles.touchTargetMin,
-          {
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            paddingHorizontal: 10,
-            paddingVertical: 10,
-          },
-        ]}
-        accessibilityLabel={`${taskCardTexts.deleteTaskA11yPrefix}: ${task.title}`}
-        accessibilityRole="button"
-      >
-        <Ionicons
-          name="trash"
-          size={22}
-          color={themeColors.error}
-          style={{ marginRight: 4 }}
-        />
-        <AccessibleText
-          style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
+        <TouchableOpacity
+          onPress={() => onDelete && onDelete(task.id)}
+          style={[
+            sharedStyles.touchTargetMin,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+            },
+          ]}
+          accessibilityLabel={`${taskCardTexts.deleteTaskA11yPrefix}: ${task.title}`}
+          accessibilityRole="button"
         >
-          {taskCardTexts.deleteAction}
-        </AccessibleText>
-      </TouchableOpacity>
+          <Ionicons
+            name="trash"
+            size={22}
+            color={themeColors.error}
+            style={{ marginRight: 4 }}
+          />
+          <AccessibleText
+            style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
+          >
+            {taskCardTexts.deleteAction}
+          </AccessibleText>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

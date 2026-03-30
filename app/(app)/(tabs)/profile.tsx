@@ -1,7 +1,7 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { useAuth } from "@/presentation/hooks/useAuth";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -21,13 +21,12 @@ export default function ProfileScreen() {
         { backgroundColor: themeColors.background },
       ]}
     >
-      <View
-        style={[
-          sharedStyles.titleContainer,
-          { borderBottomColor: themeColors.icon },
-        ]}
-      >
-        <AccessibleText
+        <View
+          style={[
+            sharedStyles.titleContainer,
+          ]}
+        >
+          <AccessibleText
           type="h1"
           style={{ textAlign: "center" }}
           accessibilityLabel={strings.titleA11y}
@@ -67,7 +66,7 @@ export default function ProfileScreen() {
             <Ionicons
               name="log-out-outline"
               size={32}
-              color="#fff"
+              color={themeColors.buttonText}
               accessibilityLabel={strings.logoutIconA11y}
             />
           }
