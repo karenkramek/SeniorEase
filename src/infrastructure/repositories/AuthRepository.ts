@@ -109,7 +109,7 @@ export class AuthRepository implements IAuthRepository {
       });
 
       return user;
-    } catch (error: any) {
+    } catch {
       // Rollback: remove a conta do Auth para liberar o e-mail
       await deleteUser(userCredential.user).catch(() => {});
       throw new Error(

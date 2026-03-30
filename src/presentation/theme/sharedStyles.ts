@@ -1,6 +1,8 @@
 import { StyleSheet } from "react-native";
 import { Spacing } from "./spacing";
 
+export const MIN_TOUCH_TARGET_SIZE = 44;
+
 export const sharedStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -63,17 +65,21 @@ export const sharedStyles = StyleSheet.create({
   },
   input: {
     borderWidth: 2,
-    borderRadius: 24, // Arredondado, mas não exagerado
+    borderRadius: 24,
     paddingVertical: 18,
     paddingHorizontal: 24,
     marginBottom: Spacing.large,
     fontSize: 20,
-    backgroundColor: "#FFF", // Fundo claro
-    borderColor: "#1A237E", // Borda azul escuro (alto contraste)
+    backgroundColor: "#FFF",
+    borderColor: "#1A237E",
   },
   buttonLink: {
     marginTop: 15,
     paddingVertical: 15,
+  },
+  touchTargetMin: {
+    minWidth: MIN_TOUCH_TARGET_SIZE,
+    minHeight: MIN_TOUCH_TARGET_SIZE,
   },
   modalOverlay: {
     flex: 1,

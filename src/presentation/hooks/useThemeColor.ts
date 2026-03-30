@@ -1,14 +1,20 @@
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { Colors } from "@/presentation/theme/colors";
+import { useColorScheme } from "react-native";
+
+type ThemeColorName = keyof typeof Colors.light;
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
-  colorName: keyof typeof Colors.light,
+  colorName: ThemeColorName,
 ): string {
   const { preferences } = usePreferences();
-  const colorScheme = (preferences.theme ?? "light") as "light" | "dark";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme];
-  return props[colorScheme] ?? themeColors[colorName];
+  const systemScheme = useColorScheme() ?? "light";
+
+  if (preferences.isHighContrast) {
+    return Colors.highContrast[colorName];
+  }
+
+  const colorScheme = (preferences.theme ?? systemScheme) as "light" | "dark";
+  return props[colorScheme] ?? Colors[colorScheme][colorName];
 }

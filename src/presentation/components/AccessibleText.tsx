@@ -22,6 +22,8 @@ export function AccessibleText({
   const textStyle = {
     color: themeColors.text,
     fontSize: Typography[type].fontSize * preferences.fontSizeMultiplier,
+    lineHeight: (Typography[type].lineHeight ?? Typography[type].fontSize * 1.5)
+      * preferences.fontSizeMultiplier,
     fontWeight: (Typography[type] as any).fontWeight
       ? ((Typography[type] as any).fontWeight as "bold" | "normal" | undefined)
       : undefined,

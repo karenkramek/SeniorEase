@@ -1,29 +1,54 @@
-import React from "react";
-import { Modal, View } from "react-native";
-
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useTheme } from "@/presentation/hooks/useTheme";
-import { sharedStyles } from "@/presentation/theme/sharedStyles";
+import React from "react";
+import { Modal, Platform, TouchableOpacity, View } from "react-native";
 
 interface ConfirmModalProps {
   visible: boolean;
+  title: string;
   message: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
+  confirmText?: string;
+  cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  restoreFocusRef?: React.RefObject<
+    React.ElementRef<typeof TouchableOpacity> | null
+  >;
 }
 
 export function ConfirmModal({
   visible,
+  title,
   message,
-  confirmLabel = "Confirmar",
-  cancelLabel = "Cancelar",
+  confirmText,
+  cancelText,
   onConfirm,
   onCancel,
+  restoreFocusRef,
 }: ConfirmModalProps) {
   const { themeColors } = useTheme();
+  const effectiveConfirmText = confirmText ?? "Confirmar";
+  const effectiveCancelText = cancelText ?? "Cancelar";
+
+  const confirmButtonRef =
+    React.useRef<React.ElementRef<typeof TouchableOpacity> | null>(null);
+  const wasVisibleRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (visible) {
+      wasVisibleRef.current = true;
+      return;
+    }
+
+    if (Platform.OS === "web" && wasVisibleRef.current) {
+      const timer = setTimeout(() => {
+        restoreFocusRef?.current?.focus?.();
+      }, 0);
+      wasVisibleRef.current = false;
+      return () => clearTimeout(timer);
+    }
+  }, [restoreFocusRef, visible]);
 
   return (
     <Modal
@@ -32,32 +57,54 @@ export function ConfirmModal({
       animationType="fade"
       onRequestClose={onCancel}
       accessibilityViewIsModal
+      onShow={() => {
+        if (Platform.OS === "web") {
+          setTimeout(() => {
+            confirmButtonRef.current?.focus?.();
+          }, 0);
+        }
+      }}
     >
-      <View style={sharedStyles.modalOverlay}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 20,
+          backgroundColor: "rgba(0,0,0,0.5)",
+        }}
+      >
         <View
-          style={[
-            sharedStyles.modalCard,
-            { backgroundColor: themeColors.background },
-          ]}
+          style={{
+            width: "100%",
+            maxWidth: 420,
+            borderRadius: 12,
+            padding: 24,
+            backgroundColor: themeColors.background,
+            borderWidth: 1,
+            borderColor: themeColors.icon,
+            gap: 12,
+          }}
         >
-          <AccessibleText
-            style={{ fontSize: 18, marginBottom: 16, textAlign: "center" }}
-            accessibilityLabel={message}
-          >
-            {message}
+          <AccessibleText type="h2" accessibilityLabel={title}>
+            {title}
           </AccessibleText>
-          <AccessibleButton
-            title={confirmLabel}
-            onPress={onConfirm}
-            style={{ marginBottom: 8, width: "100%" }}
-            accessibilityLabel={confirmLabel}
-          />
-          <AccessibleButton
-            title={cancelLabel}
-            onPress={onCancel}
-            style={{ width: "100%" }}
-            accessibilityLabel={cancelLabel}
-          />
+          <AccessibleText accessibilityLabel={message}>{message}</AccessibleText>
+
+          <View style={{ marginTop: 8, gap: 8 }}>
+            <AccessibleButton
+              ref={confirmButtonRef}
+              title={effectiveConfirmText}
+              onPress={onConfirm}
+              accessibilityLabel={effectiveConfirmText}
+            />
+            <AccessibleButton
+              title={effectiveCancelText}
+              onPress={onCancel}
+              accessibilityLabel={effectiveCancelText}
+              style={{ backgroundColor: themeColors.icon }}
+            />
+          </View>
         </View>
       </View>
     </Modal>

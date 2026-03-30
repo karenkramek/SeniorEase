@@ -34,6 +34,7 @@ yarn-error.*
 # IDE
 .idea/
 .vscode/
+.plans/
 
 # local env files
 .env

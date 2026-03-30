@@ -10,6 +10,8 @@
     "web": "expo start --web",
     "build:web": "expo export --platform web",
     "lint": "expo lint",
+    "test": "jest",
+    "test:a11y": "jest --runInBand app/__tests__ src/presentation/components/__tests__",
     "prepare": "husky",
     "postinstall": "node ./scripts/check-gitleaks.js",
     "check:gitleaks": "node ./scripts/check-gitleaks.js",
@@ -51,13 +53,22 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@testing-library/jest-native": "^5.4.3",
+    "@testing-library/react-native": "^13.3.3",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.1.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "expo-module-scripts": "^55.0.2",
     "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "jest-expo": "~54.0.12",
+    "react-test-renderer": "19.1.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "overrides": {
+    "undici": "^6.24.0"
+  }
 }

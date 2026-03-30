@@ -8,6 +8,7 @@ import { StatusBar } from "expo-status-bar";
 
 import { AuthGuard } from "@/presentation/components/auth/AuthGuard";
 import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { TaskRepositoryProvider } from "@/presentation/contexts/TaskRepositoryContext";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 
@@ -16,6 +17,7 @@ export const unstable_settings = {
 };
 
 function AppLayout() {
+  const appTexts = useAppStrings();
   const { preferences } = usePreferences();
   const colorScheme = preferences.theme ?? "light";
 
@@ -27,15 +29,21 @@ function AppLayout() {
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
               name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
+              options={{
+                presentation: "modal",
+                title: appTexts.navigation.modalHeaderTitle,
+              }}
             />
             <Stack.Screen
               name="create-task"
-              options={{ presentation: "modal", title: "Nova Tarefa" }}
+              options={{
+                presentation: "modal",
+                title: appTexts.navigation.createTaskHeaderTitle,
+              }}
             />
             <Stack.Screen
               name="task-details"
-              options={{ title: "Detalhes da Tarefa" }}
+              options={{ title: appTexts.navigation.taskDetailsHeaderTitle }}
             />
           </Stack>
         </TaskRepositoryProvider>

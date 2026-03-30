@@ -1,29 +1,28 @@
+import { GlobalNotification } from "@/presentation/components/GlobalNotification";
+import { NotificationProvider } from "@/presentation/contexts/NotificationContext";
+import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
 import { Slot, useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
+
 import {
-    AuthProvider,
-    useAuth,
+  AuthProvider,
+  useAuth,
 } from "../src/presentation/contexts/AuthContext";
 
-const InitialLayout = () => {
+function InitialLayout() {
   const { isAuthenticated, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return; // Não faz nada enquanto o estado de auth está carregando
+    if (loading) return;
 
     const inAuthGroup = segments[0] === "(auth)";
 
-    // Se o usuário está autenticado e está no grupo de autenticação,
-    // redireciona para a home do app.
     if (isAuthenticated && inAuthGroup) {
       router.replace("/(app)/(tabs)/tasks");
-    }
-    // Se o usuário não está autenticado e não está no grupo de autenticação,
-    // redireciona para a tela de login.
-    else if (!isAuthenticated && !inAuthGroup) {
+    } else if (!isAuthenticated && !inAuthGroup) {
       router.replace("/(auth)/login");
     }
   }, [isAuthenticated, loading, segments, router]);
@@ -37,12 +36,17 @@ const InitialLayout = () => {
   }
 
   return <Slot />;
-};
+}
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <InitialLayout />
+      <PreferencesProvider>
+        <NotificationProvider>
+          <InitialLayout />
+          <GlobalNotification />
+        </NotificationProvider>
+      </PreferencesProvider>
     </AuthProvider>
   );
 }

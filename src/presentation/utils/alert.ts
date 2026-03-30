@@ -8,11 +8,11 @@ import { Platform, Alert as RNAlert } from "react-native";
 export const showAlert = (
   title: string,
   message?: string,
-  buttons?: Array<{
+  buttons?: {
     text: string;
     onPress?: () => void;
     style?: "default" | "cancel" | "destructive";
-  }>,
+  }[],
 ) => {
   if (Platform.OS === "web") {
     const fullMessage = message ? `${title}\n\n${message}` : title;

@@ -1,14 +1,14 @@
-﻿import { TaskFilter } from "@/domain/enums/TaskFilter";
+import { TaskFilter } from "@/domain/enums/TaskFilter";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
 import { TaskCard } from "@/presentation/components/TaskCard";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { FILTER_LABELS } from "@/presentation/utils/filterLabels";
 import { filterTasks, sortTasks } from "@/presentation/utils/taskFilters";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
@@ -22,6 +22,8 @@ import {
 } from "react-native";
 
 export default function TaskListScreen() {
+  const appTexts = useAppStrings();
+  const strings = appTexts.taskList;
   const {
     tasks,
     isLoading,
@@ -54,12 +56,11 @@ export default function TaskListScreen() {
     backgroundColor: themeColors.background,
   };
 
-  const today = new Date();
-  const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
-
   const filteredTasks = useMemo(() => {
     if (activeFilter === "ALL") return sortTasks(tasks, "date-desc");
     if (activeFilter === TaskFilter.UPCOMING) {
+      const today = new Date();
+      const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
       today.setHours(0, 0, 0, 0);
       const filtered = filterTasks({
         tasks,
@@ -91,23 +92,27 @@ export default function TaskListScreen() {
     );
   }, [tasks, activeFilter]);
 
-  const FILTERS: Array<{
+  const FILTERS: {
     key: TaskFilter | "ALL";
     label: string;
     icon: keyof typeof Ionicons.glyphMap;
-  }> = [
-    { key: "ALL", label: "Todas", icon: "list-outline" },
+  }[] = [
+    { key: "ALL", label: strings.allFilterLabel, icon: "list-outline" },
     {
       key: TaskFilter.PENDING,
-      label: FILTER_LABELS[TaskFilter.PENDING],
+      label: strings.pendingFilterLabel,
       icon: "time-outline",
     },
     {
       key: TaskFilter.COMPLETED,
-      label: FILTER_LABELS[TaskFilter.COMPLETED],
+      label: strings.completedFilterLabel,
       icon: "checkmark-circle-outline",
     },
-    { key: TaskFilter.UPCOMING, label: "Próximas", icon: "calendar-outline" },
+    {
+      key: TaskFilter.UPCOMING,
+      label: strings.upcomingFilterLabel,
+      icon: "calendar-outline",
+    },
   ];
 
   const handleDelete = (taskId: string) => {
@@ -168,7 +173,7 @@ export default function TaskListScreen() {
     <View style={containerStyle}>
       <View style={sharedStyles.titleContainer}>
         <AccessibleText type="h1" style={{ textAlign: "center" }}>
-          Tarefas
+          {strings.screenTitle}
         </AccessibleText>
       </View>
 
@@ -192,7 +197,7 @@ export default function TaskListScreen() {
             type="caption"
             style={{ color: themeColors.icon, letterSpacing: 0.4 }}
           >
-            Filtrar por
+            {strings.filterByLabel}
           </AccessibleText>
         </View>
 
@@ -200,7 +205,7 @@ export default function TaskListScreen() {
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: Spacing.small, paddingBottom: 4 }}
-          accessibilityLabel="Filtros de tarefas"
+          accessibilityLabel={strings.filtersA11y}
         >
           {FILTERS.map((f) => {
             const isActive = activeFilter === f.key;
@@ -228,7 +233,7 @@ export default function TaskListScreen() {
                   shadowOffset: { width: 0, height: 2 },
                   elevation: isActive ? 3 : 0,
                 }}
-                accessibilityLabel={`Filtrar por: ${f.label}`}
+                accessibilityLabel={`${strings.filterByPrefixA11y}: ${f.label}`}
                 accessibilityRole="button"
                 accessibilityState={{ selected: isActive }}
               >
@@ -256,14 +261,11 @@ export default function TaskListScreen() {
       <View style={{ height: 16 }} />
       {filteredTasks.length === 0 ? (
         <View style={sharedStyles.emptyContainer}>
-          <AccessibleText accessibilityLabel="Nenhuma tarefa encontrada">
-            Nenhuma tarefa encontrada.
+          <AccessibleText accessibilityLabel={strings.noTasks}>
+            {strings.noTasks}
           </AccessibleText>
-          <AccessibleText
-            type="caption"
-            accessibilityLabel="Crie uma nova tarefa para começar"
-          >
-            Crie uma nova tarefa para começar!
+          <AccessibleText type="caption" accessibilityLabel={strings.noTasksHintA11y}>
+            {strings.noTasksHint}
           </AccessibleText>
         </View>
       ) : (
@@ -287,40 +289,42 @@ export default function TaskListScreen() {
           refreshing={isLoading}
           contentContainerStyle={sharedStyles.list}
           showsVerticalScrollIndicator={false}
-          accessibilityLabel="Lista de tarefas"
+          accessibilityLabel={strings.listLabel}
         />
       )}
       <View style={{ marginTop: 24, marginBottom: 8, alignItems: "center" }}>
         <AccessibleButton
-          title="Nova Tarefa"
+          title={strings.newTaskButton}
           icon={
             <MaterialIcons
               name="add"
               size={32}
               color="#fff"
-              accessibilityLabel="Ícone de adicionar"
+              accessibilityLabel={strings.addIconA11y}
             />
           }
           style={sharedStyles.createButton}
-          accessibilityLabel="Botão para criar nova tarefa"
+          accessibilityLabel={strings.newTaskButtonA11y}
           onPress={() => router.push("/create-task")}
         />
       </View>
 
       <ConfirmModal
         visible={!!confirmTaskId}
-        message="Tem certeza que deseja excluir esta tarefa?"
-        confirmLabel="Excluir"
-        cancelLabel="Cancelar"
+        title={strings.confirmDeleteTitle}
+        message={strings.confirmDeleteMessage}
+        confirmText={strings.confirmDeleteAction}
+        cancelText={appTexts.common.cancel}
         onConfirm={confirmDelete}
         onCancel={cancelDelete}
       />
 
       <ConfirmModal
         visible={!!confirmCompleteTaskId && pendingComplete}
-        message="Tem certeza que deseja marcar esta tarefa como concluída?"
-        confirmLabel="Concluir"
-        cancelLabel="Cancelar"
+        title={strings.confirmCompleteTitle}
+        message={strings.confirmCompleteMessage}
+        confirmText={strings.confirmCompleteAction}
+        cancelText={appTexts.common.cancel}
         onConfirm={confirmComplete}
         onCancel={cancelComplete}
       />

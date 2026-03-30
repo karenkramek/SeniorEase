@@ -12,6 +12,10 @@ export const Colors = {
     error: "#C53030",
     warning: "#E67E22",
     buttonText: "#FFFFFF",
+    switchTrackOff: "#9AA5B1",
+    switchTrackOn: "#1F4E79",
+    switchThumbOff: "#FFFFFF",
+    switchThumbOn: "#FFFFFF",
   },
 
   dark: {
@@ -25,6 +29,10 @@ export const Colors = {
     error: "#E57373",
     warning: "#FFB74D",
     buttonText: "#121417",
+    switchTrackOff: "#5F6C7B",
+    switchTrackOn: "#8CC8FF",
+    switchThumbOff: "#E4E7EB",
+    switchThumbOn: "#0F1720",
   },
 
   highContrast: {
@@ -38,12 +46,16 @@ export const Colors = {
     error: "#FF0000",
     warning: "#FFD400",
     buttonText: "#000000",
+    switchTrackOff: "#666666",
+    switchTrackOn: "#FFD400",
+    switchThumbOff: "#FFFFFF",
+    switchThumbOn: "#000000",
   },
 };
 
 export const TaskStatusColors: Record<TaskStatus, string> = {
-  [TaskStatus.PENDING]: "#FF8C42", // Laranja
-  [TaskStatus.COMPLETED]: "#00D4AA", // Verde
+  [TaskStatus.PENDING]: "#FF8C42",
+  [TaskStatus.COMPLETED]: "#00D4AA",
 };
 
 // Retorna a cor correspondente ao status da tarefa

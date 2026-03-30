@@ -17,25 +17,37 @@ import {
 import { z } from "zod";
 
 import { ThemedText } from "@/presentation/components/ThemedText";
+import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
 import { useAuth } from "@/presentation/hooks/useAuth";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { showAlert } from "@/presentation/utils/alert";
 import { Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 
-const loginSchema = z.object({
-  email: z.string().email("Por favor, insira um e-mail válido."),
-  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres."),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
+interface LoginFormData {
+  email: string;
+  password: string;
+}
 
 export default function LoginScreen() {
+  const strings = useAppStrings().authLogin;
   const { signIn } = useAuth();
+  const { themeColors } = useTheme();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const passwordRef = React.useRef<TextInput>(null);
   const windowWidth = Dimensions.get("window").width;
   const isDesktop = windowWidth >= 768;
+
+  const loginSchema = React.useMemo(
+    () =>
+      z.object({
+        email: z.string().email(strings.emailInvalidError),
+        password: z.string().min(6, strings.passwordMinError),
+      }),
+    [strings.emailInvalidError, strings.passwordMinError],
+  );
 
   const {
     control,
@@ -54,7 +66,7 @@ export default function LoginScreen() {
     try {
       await signIn(data.email, data.password);
     } catch (error: any) {
-      showAlert("Erro no Login", error.message);
+      showAlert(strings.loginErrorTitle, error.message);
     } finally {
       setLoading(false);
     }
@@ -78,61 +90,52 @@ export default function LoginScreen() {
         >
           <View style={styles.header}>
             <Ionicons name="finger-print" size={60} color="#FFFFFF" />
-            <Text style={styles.title}>SeniorEase</Text>
+            <Text style={styles.title}>{strings.appTitle}</Text>
           </View>
 
           <View style={styles.form}>
-            <Text style={styles.formTitle}>Entrar na conta</Text>
+            <Text style={styles.formTitle}>{strings.formTitle}</Text>
 
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="mail-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <Controller
-                control={control}
-                name="email"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
-                    style={styles.input}
-                    placeholder="E-mail"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    placeholderTextColor="#999"
-                    editable={!loading}
-                    returnKeyType="next"
-                    onSubmitEditing={() => passwordRef.current?.focus()}
-                    blurOnSubmit={false}
-                  />
-                )}
-              />
-            </View>
-            {errors.email && (
-              <ThemedText style={styles.errorText}>
-                {errors.email.message}
-              </ThemedText>
-            )}
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <AccessibleFormField
+                  fieldId="loginEmail"
+                  accessibilityLabel={strings.emailFieldLabel}
+                  accessibilityHint={strings.emailFieldHint}
+                  required
+                  placeholder={strings.emailPlaceholder}
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  placeholderTextColor="#999"
+                  editable={!loading}
+                  returnKeyType="next"
+                  onSubmitEditing={() => passwordRef.current?.focus()}
+                  blurOnSubmit={false}
+                  error={errors.email?.message}
+                  iconComponent={
+                    <Ionicons name="mail-outline" size={20} color={themeColors.icon} />
+                  }
+                />
+              )}
+            />
 
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color="#666"
-                style={styles.inputIcon}
-              />
-              <Controller
-                control={control}
-                name="password"
-                render={({ field: { onChange, onBlur, value } }) => (
-                  <TextInput
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, onBlur, value } }) => (
+                <View style={styles.passwordFieldWrapper}>
+                  <AccessibleFormField
                     ref={passwordRef}
-                    style={styles.input}
-                    placeholder="Senha"
+                    fieldId="loginPassword"
+                    accessibilityLabel={strings.passwordFieldLabel}
+                    accessibilityHint={strings.passwordFieldHint}
+                    required
+                    placeholder={strings.passwordPlaceholder}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -142,25 +145,28 @@ export default function LoginScreen() {
                     returnKeyType="go"
                     onSubmitEditing={handleSubmit(onSubmit)}
                     blurOnSubmit
+                    error={errors.password?.message}
+                    iconComponent={
+                      <Ionicons name="lock-closed-outline" size={20} color={themeColors.icon} />
+                    }
                   />
-                )}
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                style={styles.eyeIcon}
-              >
-                <Ionicons
-                  name={showPassword ? "eye-outline" : "eye-off-outline"}
-                  size={20}
-                  color="#666"
-                />
-              </TouchableOpacity>
-            </View>
-            {errors.password && (
-              <ThemedText style={styles.errorText}>
-                {errors.password.message}
-              </ThemedText>
-            )}
+                  <TouchableOpacity
+                    onPress={() => setShowPassword(!showPassword)}
+                    style={styles.eyeIcon}
+                    accessible
+                    accessibilityRole="button"
+                    accessibilityLabel={showPassword ? strings.hidePasswordA11y : strings.showPasswordA11y}
+                    accessibilityHint="Alternar visibilidade da senha"
+                  >
+                    <Ionicons
+                      name={showPassword ? "eye-outline" : "eye-off-outline"}
+                      size={20}
+                      color={themeColors.icon}
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
 
             {loading ? (
               <ActivityIndicator size="large" style={styles.loginButton} />
@@ -169,15 +175,21 @@ export default function LoginScreen() {
                 style={styles.loginButton}
                 onPress={handleSubmit(onSubmit)}
               >
-                <Text style={styles.loginButtonText}>Entrar</Text>
+                <Text style={styles.loginButtonText}>{strings.submitButton}</Text>
               </TouchableOpacity>
             )}
           </View>
 
           <View style={styles.footer}>
             <Link href="/(auth)/register" style={styles.link}>
-              <ThemedText type="link">
-                Não tem uma conta? Cadastre-se
+              <ThemedText
+                type="link"
+                style={{
+                  color: themeColors.buttonText,
+                  fontWeight: "600",
+                }}
+              >
+                {strings.registerLink}
               </ThemedText>
             </Link>
           </View>
@@ -228,27 +240,22 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     textAlign: "center",
   },
-  inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#1F4E79",
-    borderRadius: 40,
+  passwordInput: {
+    marginBottom: 24,
+  },
+  passwordFieldWrapper: {
+    position: 'relative',
     marginBottom: 16,
-    paddingHorizontal: 16,
-    backgroundColor: "#F8F9FA",
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: "#333",
   },
   eyeIcon: {
-    padding: 4,
+    position: 'absolute',
+    right: 16,
+    top: 0,
+    height: 48,
+    padding: 8,
+    minWidth: 44,
+    justifyContent: "center",
+    alignItems: "center",
   },
   loginButton: {
     backgroundColor: "#1F4E79",
@@ -269,14 +276,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  errorText: {
-    color: "red",
-    marginBottom: 10,
-    marginLeft: 5,
-  },
   link: {
     marginTop: 20,
     textAlign: "center",
-    color: "white",
   },
 });

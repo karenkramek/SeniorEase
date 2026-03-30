@@ -4,6 +4,7 @@ import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -14,6 +15,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
 export default function TaskDetailsScreen() {
+  const strings = useAppStrings().taskDetails;
+  const commonStrings = useAppStrings().common;
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
   const router = useRouter();
   const { themeColors } = useTheme();
@@ -40,8 +43,8 @@ export default function TaskDetailsScreen() {
   const handleCompleteTask = async () => {
     if (!task) return;
     await completeTaskUseCase.execute(task.id);
-    showAlert("Parabéns!", "Você concluiu sua tarefa com sucesso.", [
-      { text: "OK", onPress: () => router.back() },
+    showAlert(strings.congratsTitle, strings.completeSuccess, [
+      { text: commonStrings.ok, onPress: () => router.back() },
     ]);
   };
 
@@ -58,8 +61,8 @@ export default function TaskDetailsScreen() {
   if (!task) {
     return (
       <View style={[containerStyle, sharedStyles.loader]}>
-        <AccessibleText accessibilityLabel="Tarefa não encontrada">
-          Tarefa não encontrada.
+        <AccessibleText accessibilityLabel={strings.notFoundA11y}>
+          {strings.notFound}
         </AccessibleText>
       </View>
     );
@@ -84,16 +87,16 @@ export default function TaskDetailsScreen() {
           style={{ color: themeColors.icon, marginBottom: Spacing.medium }}
           accessibilityLabel={`Prazo: ${formatDateLong(new Date(task.dueDate!))}`}
         >
-          Prazo: {formatDateLong(new Date(task.dueDate!))}
+          {strings.dueDateLabel}: {formatDateLong(new Date(task.dueDate!))}
         </AccessibleText>
       )}
 
       {task.status !== TaskStatus.COMPLETED ? (
         <View style={{ alignItems: "center", marginTop: Spacing.medium }}>
           <AccessibleButton
-            title="Marcar como Concluída"
+            title={strings.completeButton}
             onPress={handleCompleteTask}
-            accessibilityLabel="Botão para marcar tarefa como concluída"
+            accessibilityLabel={strings.completeButtonA11y}
             style={sharedStyles.createButton}
           />
         </View>
@@ -104,9 +107,9 @@ export default function TaskDetailsScreen() {
             textAlign: "center",
             marginTop: Spacing.medium,
           }}
-          accessibilityLabel="Tarefa concluída"
+          accessibilityLabel={strings.completedTagA11y}
         >
-          ✔ Tarefa concluída!
+          ✔ {strings.completedTag}
         </AccessibleText>
       )}
     </ScrollView>
