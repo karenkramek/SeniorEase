@@ -316,6 +316,7 @@ export default function TaskListScreen() {
           }
           style={sharedStyles.createButton}
           accessibilityLabel={strings.newTaskButtonA11y}
+          transparent={true}
           onPress={() => {
             if (isWeb) {
               setIsCreateModalOpen(true);
