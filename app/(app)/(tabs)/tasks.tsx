@@ -3,6 +3,7 @@ import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
+import { CreateTaskModal } from "@/presentation/components/CreateTaskModal";
 import { TaskCard } from "@/presentation/components/TaskCard";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTasks } from "@/presentation/hooks/useTasks";
@@ -39,6 +40,7 @@ export default function TaskListScreen() {
   >(null);
   const [pendingComplete, setPendingComplete] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<TaskFilter | "ALL">("ALL");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const router = useRouter();
 
   const toggleTaskStatus = async (taskId: string, completed: boolean) => {
@@ -314,7 +316,13 @@ export default function TaskListScreen() {
           }
           style={sharedStyles.createButton}
           accessibilityLabel={strings.newTaskButtonA11y}
-          onPress={() => router.push("/create-task")}
+          onPress={() => {
+            if (isWeb) {
+              setIsCreateModalOpen(true);
+            } else {
+              router.push("/create-task");
+            }
+          }}
         />
       </View>
 
@@ -336,6 +344,11 @@ export default function TaskListScreen() {
         cancelText={appTexts.common.cancel}
         onConfirm={confirmComplete}
         onCancel={cancelComplete}
+      />
+
+      <CreateTaskModal
+        visible={isCreateModalOpen && isWeb}
+        onClose={() => setIsCreateModalOpen(false)}
       />
       </View>
     </View>
