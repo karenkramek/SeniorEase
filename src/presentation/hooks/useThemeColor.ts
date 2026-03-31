@@ -1,8 +1,12 @@
 import { usePreferences } from "@/presentation/hooks/usePreferences";
-import { Colors } from "@/presentation/theme/colors";
+import {
+  isWebPlatform,
+  resolveThemeColors,
+  type ThemeColorName,
+} from "@/presentation/theme/colors";
 import { useColorScheme } from "react-native";
 
-type ThemeColorName = keyof typeof Colors.light;
+export type { ThemeColorName };
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -12,9 +16,18 @@ export function useThemeColor(
   const systemScheme = useColorScheme() ?? "light";
 
   if (preferences.isHighContrast) {
-    return Colors.highContrast[colorName];
+    return resolveThemeColors(
+      preferences.theme,
+      true,
+      isWebPlatform(),
+    )[colorName];
   }
 
   const colorScheme = (preferences.theme ?? systemScheme) as "light" | "dark";
-  return props[colorScheme] ?? Colors[colorScheme][colorName];
+  const palette = resolveThemeColors(
+    colorScheme,
+    false,
+    isWebPlatform(),
+  );
+  return props[colorScheme] ?? palette[colorName];
 }

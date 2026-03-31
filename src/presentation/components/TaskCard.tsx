@@ -9,7 +9,7 @@ import { formatDateRelative } from "@/presentation/utils/format";
 import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Animated, TouchableOpacity, View } from "react-native";
+import { Animated, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 interface TaskCardProps {
   task: Task;
@@ -26,23 +26,27 @@ export function TaskCard({
 }: TaskCardProps) {
   const appTexts = useAppStrings();
   const taskCardTexts = appTexts.taskCard;
-  const { themeColors, preferences } = useTheme();
+  const { themeColors, preferences, isWeb } = useTheme();
+  const { width: windowWidth } = useWindowDimensions();
+
+  // Web mobile: < 640px (sm breakpoint)
+  const isWebMobile = isWeb && windowWidth < 640;
 
   const cardStyle = {
     backgroundColor: themeColors.background,
     padding: Spacing.medium * preferences.spacingMultiplier,
-    borderRadius: Spacing.small,
+    borderRadius: 4,
     marginBottom: Spacing.medium,
-    borderWidth: 1,
+    borderWidth: isWeb ? 1.5 : 1,
     borderColor: themeColors.icon,
-    flexDirection: "row" as "row",
-    alignItems: "center" as "center",
+    flexDirection: "row" as const,
+    alignItems: "center" as const,
     justifyContent: "space-between" as "space-between",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowColor: isWeb ? themeColors.tint : "#000",
+    shadowOffset: { width: 0, height: isWeb ? 1 : 2 },
+    shadowOpacity: isWeb ? 0.08 : 0.1,
+    shadowRadius: isWeb ? 12 : 4,
+    elevation: isWeb ? 0 : 3,
   };
 
   const [scale] = React.useState(new Animated.Value(1));
@@ -83,6 +87,7 @@ export function TaskCard({
           sharedStyles.touchTargetMin,
           {
             marginRight: Spacing.medium,
+            marginBottom: 0,
             alignItems: "center",
             justifyContent: "center",
           },
@@ -105,63 +110,77 @@ export function TaskCard({
         </Animated.View>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={{ flex: 1 }}
-        onPress={() => onPress && onPress(task.id)}
-        accessibilityLabel={`Ver detalhes da tarefa: ${task.title}`}
-        accessibilityRole="button"
-        disabled={!onPress}
+      {/* Content wrapper (title and delete button in a row) */}
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "row" as const,
+          alignItems: "center" as const,
+          justifyContent: "space-between" as const,
+          width: "100%",
+          gap: 0,
+        }}
       >
-        <AccessibleText
-          type="h2"
-          style={{
-            fontWeight: "bold",
-            fontSize: 18,
-            marginBottom: 4,
-            color: themeColors.text,
-          }}
-          accessibilityLabel={`${taskCardTexts.titleLabelPrefix}: ${task.title}`}
+        <TouchableOpacity
+          style={{ flex: 1 }}
+          onPress={() => onPress && onPress(task.id)}
+          accessibilityLabel={`Ver detalhes da tarefa: ${task.title}`}
+          accessibilityRole="button"
+          disabled={!onPress}
         >
-          {truncateText(task.title, 45)}
-        </AccessibleText>
-        {task.dueDate && (
           <AccessibleText
-            type="caption"
-            style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
-            accessibilityLabel={`${taskCardTexts.dueDateLabelPrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
+            type="h2"
+            style={{
+              fontWeight: "bold",
+              fontSize: 16 * preferences.fontSizeMultiplier,
+              marginBottom: 4,
+              color: themeColors.text,
+            }}
+            accessibilityLabel={`${taskCardTexts.titleLabelPrefix}: ${task.title}`}
           >
-            {taskCardTexts.dueDatePrefix}: {formatDateRelative(new Date(task.dueDate))}
+            {truncateText(task.title, 45)}
           </AccessibleText>
-        )}
-      </TouchableOpacity>
+          {task.dueDate && (
+            <AccessibleText
+              type="caption"
+              style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
+              accessibilityLabel={`${taskCardTexts.dueDateLabelPrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
+            >
+              {taskCardTexts.dueDatePrefix}: {formatDateRelative(new Date(task.dueDate))}
+            </AccessibleText>
+          )}
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => onDelete && onDelete(task.id)}
-        style={[
-          sharedStyles.touchTargetMin,
-          {
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            paddingHorizontal: 10,
-            paddingVertical: 10,
-          },
-        ]}
-        accessibilityLabel={`${taskCardTexts.deleteTaskA11yPrefix}: ${task.title}`}
-        accessibilityRole="button"
-      >
-        <Ionicons
-          name="trash"
-          size={22}
-          color={themeColors.error}
-          style={{ marginRight: 4 }}
-        />
-        <AccessibleText
-          style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
+        <TouchableOpacity
+          onPress={() => onDelete && onDelete(task.id)}
+          style={[
+            sharedStyles.touchTargetMin,
+            {
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingHorizontal: 10,
+              paddingVertical: 10,
+            },
+          ]}
+          accessibilityLabel={`${taskCardTexts.deleteTaskA11yPrefix}: ${task.title}`}
+          accessibilityRole="button"
         >
-          {taskCardTexts.deleteAction}
-        </AccessibleText>
-      </TouchableOpacity>
+          <Ionicons
+            name="trash"
+            size={22}
+            color={themeColors.error}
+            style={{ marginRight: isWebMobile ? 0 : 4 }}
+          />
+          {!isWebMobile && (
+            <AccessibleText
+              style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
+            >
+              {taskCardTexts.deleteAction}
+            </AccessibleText>
+          )}
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }

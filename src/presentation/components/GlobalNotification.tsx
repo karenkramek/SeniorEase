@@ -1,8 +1,7 @@
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useNotification } from "@/presentation/contexts/NotificationContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
-import { usePreferences } from "@/presentation/hooks/usePreferences";
-import { Colors } from "@/presentation/theme/colors";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
 import { Animated, TouchableOpacity, View } from "react-native";
@@ -10,13 +9,9 @@ import { Animated, TouchableOpacity, View } from "react-native";
 export function GlobalNotification() {
   const strings = useAppStrings().notifications;
   const { notification, clearNotification } = useNotification();
-  const { preferences } = usePreferences();
   const slideAnim = React.useRef(new Animated.Value(-120)).current;
 
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
+  const { themeColors } = useTheme();
 
   const handleClose = React.useCallback(() => {
     Animated.timing(slideAnim, {

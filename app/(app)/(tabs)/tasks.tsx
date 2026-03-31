@@ -3,10 +3,13 @@ import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
+import { CreateTaskModal } from "@/presentation/components/CreateTaskModal";
 import { TaskCard } from "@/presentation/components/TaskCard";
+import { TaskDetailsModal } from "@/presentation/components/TaskDetailsModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import { filterTasks, sortTasks } from "@/presentation/utils/taskFilters";
@@ -20,10 +23,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TaskListScreen() {
   const appTexts = useAppStrings();
   const strings = appTexts.taskList;
+  const insets = useSafeAreaInsets();
   const {
     tasks,
     isLoading,
@@ -38,6 +43,8 @@ export default function TaskListScreen() {
   >(null);
   const [pendingComplete, setPendingComplete] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<TaskFilter | "ALL">("ALL");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [taskDetailsModalId, setTaskDetailsModalId] = useState<string | null>(null);
   const router = useRouter();
 
   const toggleTaskStatus = async (taskId: string, completed: boolean) => {
@@ -48,12 +55,18 @@ export default function TaskListScreen() {
     }
   };
 
-  const { themeColors, preferences } = useTheme();
+  const { themeColors, preferences, isWeb } = useTheme();
 
-  const containerStyle = {
+  const outerScreenStyle = {
+    flex: 1,
+    width: "100%" as const,
+    backgroundColor: themeColors.background,
+  };
+  const contentColumnStyle = {
     flex: 1,
     padding: Spacing.medium,
-    backgroundColor: themeColors.background,
+    paddingTop: insets.top + Spacing.medium,
+    ...getWebContentShellStyle(),
   };
 
   const filteredTasks = useMemo(() => {
@@ -163,16 +176,19 @@ export default function TaskListScreen() {
 
   if (isLoading && tasks.length === 0) {
     return (
-      <View style={[containerStyle, sharedStyles.loader]}>
-        <ActivityIndicator size="large" color={themeColors.tint} />
+      <View style={outerScreenStyle}>
+        <View style={[contentColumnStyle, sharedStyles.loader]}>
+          <ActivityIndicator size="large" color={themeColors.tint} />
+        </View>
       </View>
     );
   }
 
   return (
-    <View style={containerStyle}>
+    <View style={outerScreenStyle}>
+      <View style={contentColumnStyle}>
       <View style={sharedStyles.titleContainer}>
-        <AccessibleText type="h1" style={{ textAlign: "center" }}>
+        <AccessibleText type="h1" style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 0, paddingBottom: 0 }}>
           {strings.screenTitle}
         </AccessibleText>
       </View>
@@ -189,7 +205,7 @@ export default function TaskListScreen() {
         >
           <Ionicons
             name="funnel-outline"
-            size={15}
+            size={isWeb ? 18 : 15}
             color={themeColors.icon}
             accessibilityElementsHidden
           />
@@ -206,6 +222,7 @@ export default function TaskListScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: Spacing.small, paddingBottom: 4 }}
           accessibilityLabel={strings.filtersA11y}
+          style={{ backgroundColor: "transparent" }}
         >
           {FILTERS.map((f) => {
             const isActive = activeFilter === f.key;
@@ -219,7 +236,7 @@ export default function TaskListScreen() {
                   gap: 7,
                   paddingVertical: 10,
                   paddingHorizontal: 18,
-                  borderRadius: 28,
+                  borderRadius: 4,
                   borderWidth: 1.5,
                   borderColor: isActive
                     ? themeColors.tint
@@ -247,6 +264,7 @@ export default function TaskListScreen() {
                   style={{
                     color: isActive ? themeColors.buttonText : themeColors.text,
                     fontWeight: isActive ? "700" : "400",
+                    fontSize: 14 * preferences.fontSizeMultiplier,
                   }}
                   accessibilityLabel={f.label}
                 >
@@ -277,12 +295,16 @@ export default function TaskListScreen() {
               task={item}
               onToggleComplete={handleToggleComplete}
               onDelete={handleDelete}
-              onPress={(taskId) =>
-                router.push({
-                  pathname: "/task-details",
-                  params: { taskId },
-                })
-              }
+              onPress={(taskId) => {
+                if (isWeb) {
+                  setTaskDetailsModalId(taskId);
+                } else {
+                  router.push({
+                    pathname: "/task-details",
+                    params: { taskId },
+                  });
+                }
+              }}
             />
           )}
           onRefresh={refreshTasks}
@@ -292,20 +314,26 @@ export default function TaskListScreen() {
           accessibilityLabel={strings.listLabel}
         />
       )}
-      <View style={{ marginTop: 24, marginBottom: 8, alignItems: "center" }}>
+      <View style={{ marginTop: 5, marginBottom: 5, alignItems: "center" }}>
         <AccessibleButton
           title={strings.newTaskButton}
           icon={
             <MaterialIcons
               name="add"
               size={32}
-              color="#fff"
+              color={themeColors.buttonText}
               accessibilityLabel={strings.addIconA11y}
             />
           }
           style={sharedStyles.createButton}
           accessibilityLabel={strings.newTaskButtonA11y}
-          onPress={() => router.push("/create-task")}
+          onPress={() => {
+            if (isWeb) {
+              setIsCreateModalOpen(true);
+            } else {
+              router.push("/create-task");
+            }
+          }}
         />
       </View>
 
@@ -328,6 +356,19 @@ export default function TaskListScreen() {
         onConfirm={confirmComplete}
         onCancel={cancelComplete}
       />
+
+      <CreateTaskModal
+        visible={isCreateModalOpen && isWeb}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
+
+      <TaskDetailsModal
+        visible={isWeb && !!taskDetailsModalId}
+        taskId={taskDetailsModalId}
+        onClose={() => setTaskDetailsModalId(null)}
+        onTaskCompleted={() => refreshTasks()}
+      />
+      </View>
     </View>
   );
 }

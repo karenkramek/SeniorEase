@@ -27,11 +27,10 @@ export const sharedStyles = StyleSheet.create({
     gap: Spacing.small,
   },
   createButton: {
-    marginBottom: Spacing.medium,
-    borderRadius: 40,
+    borderRadius: 4,
     paddingVertical: 22,
     paddingHorizontal: 40,
-    minWidth: 260,
+    minWidth: 160,
     alignSelf: "center",
     flexDirection: "row",
     justifyContent: "center",
@@ -59,15 +58,20 @@ export const sharedStyles = StyleSheet.create({
     paddingHorizontal: Spacing.large,
     borderBottomWidth: 1,
   },
+  /** Coluna do texto à esquerda de switches: ocupa espaço livre e permite quebra de linha. */
+  preferenceLabelColumn: {
+    flex: 1,
+    marginRight: 14,
+    minWidth: 0,
+  },
   titleContainer: {
-    paddingVertical: Spacing.large,
-    borderBottomWidth: 1,
+    paddingVertical: 0,
   },
   input: {
     borderWidth: 2,
-    borderRadius: 24,
+    borderRadius: 4,
     paddingVertical: 18,
-    paddingHorizontal: 24,
+    paddingHorizontal: 5,
     marginBottom: Spacing.large,
     fontSize: 20,
     backgroundColor: "#FFF",
@@ -89,7 +93,7 @@ export const sharedStyles = StyleSheet.create({
   },
   modalCard: {
     padding: Spacing.large,
-    borderRadius: 12,
+    borderRadius: 4,
     alignItems: "center",
     width: "90%",
   },

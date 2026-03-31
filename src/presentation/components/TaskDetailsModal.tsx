@@ -1,0 +1,311 @@
+import { CompleteTask } from "@/application/useCases/task/CompleteTask";
+import { Task } from "@/domain/entities/Task";
+import { TaskStatus } from "@/domain/enums/TaskStatus";
+import { AccessibleButton } from "@/presentation/components/AccessibleButton";
+import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useTheme } from "@/presentation/hooks/useTheme";
+import { sharedStyles } from "@/presentation/theme/sharedStyles";
+import { Spacing } from "@/presentation/theme/spacing";
+import { showAlert } from "@/presentation/utils/alert";
+import { formatDateLong } from "@/presentation/utils/format";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+    ActivityIndicator,
+    Modal,
+    ScrollView,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
+} from "react-native";
+
+interface TaskDetailsModalProps {
+  visible: boolean;
+  taskId: string | null;
+  onClose: () => void;
+  onTaskCompleted?: () => void;
+}
+
+export function TaskDetailsModal({
+  visible,
+  taskId,
+  onClose,
+  onTaskCompleted,
+}: TaskDetailsModalProps) {
+  const strings = useAppStrings().taskDetails;
+  const commonStrings = useAppStrings().common;
+  const { themeColors, isWeb } = useTheme();
+  const { width: windowWidth } = useWindowDimensions();
+
+  // Web mobile: < 640px (sm breakpoint)
+  const isWebMobile = isWeb && windowWidth < 640;
+
+  const taskRepository = useTaskRepository();
+  const completeTaskUseCase = useMemo(
+    () => new CompleteTask(taskRepository),
+    [taskRepository],
+  );
+
+  const [task, setTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!taskId || !visible) {
+        setTask(null);
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      const found = await taskRepository.findById(taskId);
+      setTask(found);
+      setLoading(false);
+    };
+    load();
+  }, [taskId, visible, taskRepository]);
+
+  const handleCompleteTask = async () => {
+    if (!task) return;
+    await completeTaskUseCase.execute(task.id);
+    showAlert(strings.congratsTitle, strings.completeSuccess, [
+      {
+        text: commonStrings.ok,
+        onPress: () => {
+          onTaskCompleted?.();
+          onClose();
+        },
+      },
+    ]);
+  };
+
+  if (loading) {
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+        accessibilityViewIsModal
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: themeColors.background,
+              borderRadius: 4,
+              width: "100%",
+              maxWidth: 600,
+              padding: Spacing.large,
+              alignItems: "center",
+            }}
+          >
+            <ActivityIndicator size="large" color={themeColors.tint} />
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  if (!task) {
+    return (
+      <Modal
+        visible={visible}
+        transparent
+        animationType="fade"
+        onRequestClose={onClose}
+        accessibilityViewIsModal
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            padding: 20,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: themeColors.background,
+              borderRadius: 4,
+              width: "100%",
+              maxWidth: 600,
+              padding: Spacing.large,
+            }}
+          >
+            <AccessibleText
+              accessibilityLabel={strings.notFoundA11y}
+              style={{ color: themeColors.text, textAlign: "center" }}
+            >
+              {strings.notFound}
+            </AccessibleText>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+      accessibilityViewIsModal
+    >
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          padding: 20,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: themeColors.background,
+            borderRadius: 4,
+            maxHeight: "90%",
+            width: "100%",
+            maxWidth: 600,
+            flexDirection: "column",
+          }}
+        >
+          {/* Header do Modal */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              paddingHorizontal: 20,
+              paddingVertical: 16,
+              borderBottomWidth: 1,
+              borderBottomColor: themeColors.icon + "20",
+              gap: 12,
+            }}
+          >
+            <AccessibleText
+              type="h2"
+              style={{
+                color: themeColors.text,
+                flex: 1,
+                fontSize: isWebMobile ? 18 : 20,
+              }}
+              accessibilityLabel={`Título: ${task.title}`}
+            >
+              {task.title}
+            </AccessibleText>
+
+            <TouchableOpacity
+              onPress={onClose}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel={commonStrings.close}
+              hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+              style={{ minWidth: 24, minHeight: 24 }}
+            >
+              <Ionicons
+                name="close"
+                size={24}
+                color={themeColors.icon}
+                accessibilityElementsHidden
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Conteúdo */}
+          <ScrollView
+            contentContainerStyle={{
+              padding: 20,
+              paddingBottom: 32,
+            }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
+            {task.description && (
+              <View style={{ marginBottom: Spacing.medium }}>
+                <AccessibleText
+                  type="caption"
+                  style={{
+                    color: themeColors.icon,
+                    marginBottom: Spacing.small,
+                    fontSize: isWebMobile ? 12 : 13,
+                  }}
+                  accessibilityLabel="Descrição"
+                >
+                  Descrição
+                </AccessibleText>
+                <AccessibleText
+                  style={{
+                    color: themeColors.text,
+                    lineHeight: 22,
+                    fontSize: isWebMobile ? 14 : 15,
+                  }}
+                  accessibilityLabel={task.description}
+                >
+                  {task.description}
+                </AccessibleText>
+              </View>
+            )}
+
+            {task.dueDate && (
+              <View style={{ marginBottom: Spacing.medium }}>
+                <AccessibleText
+                  type="caption"
+                  style={{
+                    color: themeColors.icon,
+                    marginBottom: Spacing.small,
+                    fontSize: isWebMobile ? 12 : 13,
+                  }}
+                  accessibilityLabel="Data de vencimento"
+                >
+                  {strings.dueDateLabel}
+                </AccessibleText>
+                <AccessibleText
+                  style={{
+                    color: themeColors.text,
+                    fontSize: isWebMobile ? 14 : 15,
+                  }}
+                  accessibilityLabel={formatDateLong(new Date(task.dueDate!))}
+                >
+                  {formatDateLong(new Date(task.dueDate!))}
+                </AccessibleText>
+              </View>
+            )}
+
+            <View style={{ marginTop: Spacing.large }}>
+              {task.status !== TaskStatus.COMPLETED ? (
+                <AccessibleButton
+                  title={strings.completeButton}
+                  onPress={handleCompleteTask}
+                  accessibilityLabel={strings.completeButtonA11y}
+                  style={sharedStyles.createButton}
+                />
+              ) : (
+                <AccessibleText
+                  style={{
+                    color: themeColors.success,
+                    textAlign: "center",
+                  }}
+                  accessibilityLabel={strings.completedTagA11y}
+                >
+                  ✔ {strings.completedTag}
+                </AccessibleText>
+              )}
+            </View>
+          </ScrollView>
+        </View>
+      </View>
+    </Modal>
+  );
+}

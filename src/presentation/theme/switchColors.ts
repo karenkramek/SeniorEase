@@ -1,6 +1,6 @@
-import { Colors } from "@/presentation/theme/colors";
+import type { ThemePalette } from "@/presentation/theme/colors";
 
-type ThemeColors = (typeof Colors)["light"];
+type ThemeColors = ThemePalette;
 
 export function getSwitchColors(themeColors: ThemeColors, value: boolean) {
   return {

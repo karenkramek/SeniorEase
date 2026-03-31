@@ -4,10 +4,11 @@ import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext"
 import { Slot, useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
-  AuthProvider,
-  useAuth,
+    AuthProvider,
+    useAuth,
 } from "../src/presentation/contexts/AuthContext";
 
 function InitialLayout() {
@@ -40,13 +41,15 @@ function InitialLayout() {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <PreferencesProvider>
-        <NotificationProvider>
-          <InitialLayout />
-          <GlobalNotification />
-        </NotificationProvider>
-      </PreferencesProvider>
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <PreferencesProvider>
+          <NotificationProvider>
+            <InitialLayout />
+            <GlobalNotification />
+          </NotificationProvider>
+        </PreferencesProvider>
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }

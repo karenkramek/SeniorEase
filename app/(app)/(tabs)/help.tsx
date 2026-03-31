@@ -3,9 +3,11 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import React from "react";
 import { ScrollView, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HelpScreen() {
   const { themeColors, colorScheme, preferences } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const cardBackground = preferences.isHighContrast
     ? themeColors.tint
@@ -18,20 +20,19 @@ export default function HelpScreen() {
 
   return (
     <ScrollView
-      style={{ backgroundColor: themeColors.background }}
-      contentContainerStyle={[sharedStyles.container, { paddingBottom: 32 }]}
-      accessibilityLabel="Tela de ajuda"
-    >
-      <View
-        style={[
-          sharedStyles.titleContainer,
-          { borderBottomColor: themeColors.icon },
-        ]}
+        style={{ backgroundColor: themeColors.background }}
+        contentContainerStyle={[sharedStyles.container, { paddingBottom: 32, paddingTop: insets.top }]}
+        accessibilityLabel="Tela de ajuda"
       >
+        <View
+          style={[
+            sharedStyles.titleContainer,
+          ]}
+        >
         <AccessibleText
           type="h1"
           accessibilityLabel="Título: Ajuda e Dicas"
-          style={{ textAlign: "center" }}
+          style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
         >
           Ajuda e Dicas
         </AccessibleText>
@@ -49,7 +50,7 @@ export default function HelpScreen() {
       <View
         style={{
           backgroundColor: cardBackground,
-          borderRadius: 12,
+          borderRadius: 4,
           padding: 18,
           marginBottom: 20,
           shadowColor: colorScheme === "dark" ? "#000" : "#A0A0A0",

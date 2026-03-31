@@ -1,7 +1,6 @@
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { usePreferences } from "@/presentation/contexts/PreferencesContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
-import { Colors } from "@/presentation/theme/colors";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
@@ -23,11 +22,7 @@ interface Step {
 export function StepItem({ step, onToggleComplete }: StepItemProps) {
   const appTexts = useAppStrings();
   const stepTexts = appTexts.stepItem;
-  const { preferences } = usePreferences();
-  const colorScheme = preferences.theme ?? "light";
-  const themeColors = preferences.isHighContrast
-    ? Colors.highContrast
-    : Colors[colorScheme as "light" | "dark"];
+  const { themeColors } = useTheme();
 
   const textStyle = {
     flex: 1,

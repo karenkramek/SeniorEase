@@ -8,6 +8,7 @@ export const ptBRStrings = {
     notPossibleNow: "Não foi possível concluir a operação agora. Tente novamente.",
   },
   navigation: {
+    mainNavigationA11y: "Navegação principal do aplicativo",
     tasksTabTitle: "Tarefas",
     tasksTabA11y: "Aba de tarefas",
     preferencesTabTitle: "Preferências",
@@ -27,7 +28,7 @@ export const ptBRStrings = {
     goHomeButtonA11y: "Botão para ir para a tela inicial",
   },
   createTask: {
-    screenLabel: "Tela de criação de tarefa",
+    screenLabel: "Nova tarefa",
     titleLabel: "Título da tarefa *",
     titlePlaceholder: "Título da tarefa",
     titleFieldLabel: "Título da tarefa",

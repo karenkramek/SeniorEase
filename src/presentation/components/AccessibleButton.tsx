@@ -4,10 +4,10 @@ import { Spacing } from "@/presentation/theme/spacing";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import {
-  GestureResponderEvent,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
+    GestureResponderEvent,
+    TouchableOpacity,
+    TouchableOpacityProps,
+    View,
 } from "react-native";
 
 interface AccessibleButtonProps extends TouchableOpacityProps {
@@ -45,7 +45,7 @@ export const AccessibleButton = React.forwardRef<
   const buttonStyle = {
     backgroundColor: themeColors.tint,
     padding: Spacing.medium * preferences.spacingMultiplier,
-    borderRadius: 40,
+    borderRadius: 4,
     alignItems: "center" as "center",
   };
 
