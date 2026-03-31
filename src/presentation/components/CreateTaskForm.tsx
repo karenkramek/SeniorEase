@@ -128,7 +128,6 @@ export function CreateTaskForm({
           onPress={handleCreate}
           accessibilityLabel={strings.createButtonA11y}
           style={sharedStyles.createButton}
-          transparent={true}
         />
       </View>
     </>

@@ -217,6 +217,7 @@ export default function TaskListScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: Spacing.small, paddingBottom: 4 }}
           accessibilityLabel={strings.filtersA11y}
+          style={{ backgroundColor: "transparent" }}
         >
           {FILTERS.map((f) => {
             const isActive = activeFilter === f.key;
@@ -316,7 +317,6 @@ export default function TaskListScreen() {
           }
           style={sharedStyles.createButton}
           accessibilityLabel={strings.newTaskButtonA11y}
-          transparent={true}
           onPress={() => {
             if (isWeb) {
               setIsCreateModalOpen(true);
