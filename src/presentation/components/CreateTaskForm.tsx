@@ -1,6 +1,6 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
+import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useNotification } from "@/presentation/hooks/useNotification";
 import { useTasks } from "@/presentation/hooks/useTasks";
@@ -121,7 +121,7 @@ export function CreateTaskForm({
             <MaterialIcons
               name="add"
               size={32}
-              color="#fff"
+              color={themeColors.buttonText}
               accessibilityLabel={appTexts.taskList.addIconA11y}
             />
           }
