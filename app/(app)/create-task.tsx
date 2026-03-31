@@ -3,9 +3,8 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { useRouter } from "expo-router";
 import React from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  View,
+    KeyboardAvoidingView,
+    Platform
 } from "react-native";
 
 export default function CreateTaskScreen() {

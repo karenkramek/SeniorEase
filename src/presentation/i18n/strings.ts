@@ -28,7 +28,7 @@ export const ptBRStrings = {
     goHomeButtonA11y: "Botão para ir para a tela inicial",
   },
   createTask: {
-    screenLabel: "Tela de criação de tarefa",
+    screenLabel: "Nova tarefa",
     titleLabel: "Título da tarefa *",
     titlePlaceholder: "Título da tarefa",
     titleFieldLabel: "Título da tarefa",

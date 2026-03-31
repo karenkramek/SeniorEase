@@ -3,6 +3,7 @@ import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-t
 import { Tabs } from "expo-router";
 import React, { useState } from "react";
 import { Platform, View, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { HapticTab } from "@/presentation/components/HapticTab";
@@ -31,6 +32,7 @@ export default function TabLayout() {
   const appTexts = useAppStrings();
   const { preferences } = usePreferences();
   const isWeb = isWebPlatform();
+  const insets = useSafeAreaInsets();
   const themeColors = resolveThemeColors(
     preferences.theme,
     preferences.isHighContrast,
@@ -48,6 +50,9 @@ export default function TabLayout() {
   const showDrawerMenu = isMediumScreen;
   const showBottomTabBar = isSmallScreen && isWeb;
 
+  // Em mobile (não web), usar safe area bottom para a barra de abas
+  const tabBarBottomInset = !isWeb ? insets.bottom : 0;
+
   const tabs = (
     <Tabs
       tabBar={showBottomTabBar ? WebBottomTabBar : TabBarForPlatform}
@@ -60,6 +65,7 @@ export default function TabLayout() {
           backgroundColor: themeColors.background,
           borderTopColor: themeColors.icon,
           height: showBottomTabBar ? 65 : 60,
+          paddingBottom: tabBarBottomInset,
         },
         tabBarLabelStyle: showBottomTabBar ? {
           fontSize: 12,
@@ -217,5 +223,6 @@ export default function TabLayout() {
     );
   }
 
+  // Versão nativa (iOS/Android)
   return tabs;
 }

@@ -16,10 +16,10 @@ import {
 } from "react-native";
 import { z } from "zod";
 
-import { ThemedText } from "@/presentation/components/ThemedText";
 import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
-import { useAuth } from "@/presentation/hooks/useAuth";
+import { ThemedText } from "@/presentation/components/ThemedText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { showAlert } from "@/presentation/utils/alert";
 import { Ionicons } from "@expo/vector-icons";
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   form: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
+    borderRadius: 4,
     padding: 24,
     marginBottom: 20,
   },
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     backgroundColor: "#1F4E79",
-    borderRadius: 40,
+    borderRadius: 4,
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 8,

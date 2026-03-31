@@ -1,10 +1,11 @@
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View, useWindowDimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AccessibleButton } from "./AccessibleButton";
 import { AccessibleText } from "./AccessibleText";
 import { HamburgerMenuButton } from "./HamburgerMenuButton";
@@ -18,6 +19,7 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
   const { user, signOut } = useAuth();
   const { themeColors, isWeb } = useTheme();
   const { width: screenWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
 
   // Breakpoints
   const isSmallScreen = screenWidth < 640; // Mobile web
@@ -26,8 +28,7 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
   const userName = user?.name || user?.email?.split("@")[0] || "Usuário";
 
   return (
-    <SafeAreaView
-      edges={["top", "left", "right"]}
+    <View
       style={{
         backgroundColor: themeColors.background,
         borderBottomWidth: 1,
@@ -41,6 +42,8 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
           alignItems: "center",
           paddingHorizontal: Spacing.large,
           paddingVertical: Spacing.medium,
+          paddingTop: !isWeb ? insets.top + Spacing.medium : Spacing.medium,
+          ...getWebContentShellStyle(),
         }}
       >
         {/* Hamburger Menu + Logo (esquerda) */}
@@ -121,6 +124,6 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
           </View>
         )}
       </View>
-    </SafeAreaView>
+    </View>
   );
 }

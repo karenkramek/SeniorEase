@@ -45,7 +45,7 @@ export const AccessibleButton = React.forwardRef<
   const buttonStyle = {
     backgroundColor: themeColors.tint,
     padding: Spacing.medium * preferences.spacingMultiplier,
-    borderRadius: 40,
+    borderRadius: 4,
     alignItems: "center" as "center",
   };
 

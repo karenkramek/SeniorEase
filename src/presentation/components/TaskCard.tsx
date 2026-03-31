@@ -35,7 +35,7 @@ export function TaskCard({
   const cardStyle = {
     backgroundColor: themeColors.background,
     padding: Spacing.medium * preferences.spacingMultiplier,
-    borderRadius: isWeb ? 16 : Spacing.small,
+    borderRadius: 4,
     marginBottom: Spacing.medium,
     borderWidth: isWeb ? 1.5 : 1,
     borderColor: themeColors.icon,
@@ -132,7 +132,7 @@ export function TaskCard({
             type="h2"
             style={{
               fontWeight: "bold",
-              fontSize: 18,
+              fontSize: 16 * preferences.fontSizeMultiplier,
               marginBottom: 4,
               color: themeColors.text,
             }}

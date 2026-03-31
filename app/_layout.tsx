@@ -2,13 +2,13 @@ import { GlobalNotification } from "@/presentation/components/GlobalNotification
 import { NotificationProvider } from "@/presentation/contexts/NotificationContext";
 import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
 import { Slot, useRouter, useSegments } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
-  AuthProvider,
-  useAuth,
+    AuthProvider,
+    useAuth,
 } from "../src/presentation/contexts/AuthContext";
 
 function InitialLayout() {

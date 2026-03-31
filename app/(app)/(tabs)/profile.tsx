@@ -8,17 +8,19 @@ import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const strings = useAppStrings().profile;
   const { user, signOut } = useAuth();
-  const { themeColors } = useTheme();
+  const { themeColors, preferences } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
     <View
       style={[
         sharedStyles.container,
-        { backgroundColor: themeColors.background },
+        { backgroundColor: themeColors.background, paddingTop: insets.top },
       ]}
     >
         <View
@@ -28,7 +30,7 @@ export default function ProfileScreen() {
         >
           <AccessibleText
           type="h1"
-          style={{ textAlign: "center" }}
+          style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
           accessibilityLabel={strings.titleA11y}
         >
           {strings.title}

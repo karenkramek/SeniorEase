@@ -13,11 +13,13 @@ import {
     Switch,
     View
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PreferencesScreen() {
   const strings = useAppStrings().preferences;
   const { preferences, isLoading, updatePreferences } = usePreferences();
   const { themeColors, isWeb } = useTheme();
+  const insets = useSafeAreaInsets();
 
   if (isLoading) {
     return (
@@ -61,7 +63,7 @@ export default function PreferencesScreen() {
     ? {
         borderBottomWidth: 0,
         marginBottom: 10,
-        borderRadius: 14,
+        borderRadius: 4,
         paddingVertical: 20,
         backgroundColor: getColorWithOpacity(themeColors.tint, 0.07),
         borderWidth: 1,
@@ -77,6 +79,7 @@ export default function PreferencesScreen() {
         sharedStyles.container,
         getWebContentShellStyle(),
         isWeb && { paddingHorizontal: 28, paddingBottom: 32 },
+        { paddingTop: insets.top },
       ]}
       accessibilityLabel={strings.screenLabel}
     >
@@ -87,7 +90,7 @@ export default function PreferencesScreen() {
       >
         <AccessibleText
           type="h1"
-          style={{ textAlign: "center" }}
+          style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
           accessibilityLabel={strings.titleA11y}
         >
           {strings.title}

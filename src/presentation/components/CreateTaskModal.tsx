@@ -31,16 +31,19 @@ export function CreateTaskModal({ visible, onClose }: CreateTaskModalProps) {
       <View
         style={{
           flex: 1,
-          justifyContent: "flex-end",
+          justifyContent: "center",
+          alignItems: "center",
           backgroundColor: "rgba(0,0,0,0.5)",
+          padding: 20,
         }}
       >
         <View
           style={{
             backgroundColor: themeColors.background,
-            borderTopLeftRadius: 20,
-            borderTopRightRadius: 20,
+            borderRadius: 4,
             maxHeight: "90%",
+            width: "100%",
+            maxWidth: 600,
             flexDirection: "column",
           }}
         >

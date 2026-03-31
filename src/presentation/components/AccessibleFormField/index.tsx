@@ -11,18 +11,18 @@
  * Supports both mobile native (iOS/Android) and web (react-native-web) with consistent semantics
  */
 
-import React, { useMemo } from 'react';
-import {
-  TextInput,
-  TextInputProps,
-  View,
-  ViewStyle,
-  StyleSheet,
-  Platform,
-  AccessibilityRole,
-} from 'react-native';
 import { ThemedText } from '@/presentation/components/ThemedText';
 import { A11yTokens } from '@/presentation/theme/a11y-tokens';
+import React, { useMemo } from 'react';
+import {
+    AccessibilityRole,
+    Platform,
+    StyleSheet,
+    TextInput,
+    TextInputProps,
+    View,
+    ViewStyle,
+} from 'react-native';
 
 interface AccessibleFormFieldProps extends TextInputProps {
   /**
@@ -180,6 +180,10 @@ export const AccessibleFormField = React.forwardRef<
       ? A11yTokens.error.color
       : borderColorDefault;
 
+    // Determine border radius - smaller for multiline inputs (textareas)
+    const isMultiline = restProps.multiline || false;
+    const containerBorderRadius = isMultiline ? 4 : 4;
+
     return (
       <View style={[styles.container, containerStyle]}>
         {labelComponent && <View style={styles.labelWrapper}>{labelComponent}</View>}
@@ -188,7 +192,7 @@ export const AccessibleFormField = React.forwardRef<
           style={[
             styles.inputContainer,
             inputContainerStyle,
-            { borderColor: inputContainerBorderColor },
+            { borderColor: inputContainerBorderColor, borderRadius: containerBorderRadius },
             error && styles.inputContainerError,
           ]}
           accessible={false}
@@ -241,8 +245,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
-    borderRadius: 40,
-    paddingHorizontal: 16,
+    borderRadius: 4,
+    paddingHorizontal: 5,
     backgroundColor: '#F8F9FA',
     minHeight: 48, // Touch target minimum 44x44
     paddingVertical: 2,
@@ -263,8 +267,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
     paddingVertical: 12,
-    // Touch target padding
-    paddingHorizontal: 8,
+    paddingHorizontal: 5,
   },
   errorContainer: {
     marginTop: 8,

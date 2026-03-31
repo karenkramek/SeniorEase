@@ -5,6 +5,7 @@ import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
 import { CreateTaskModal } from "@/presentation/components/CreateTaskModal";
 import { TaskCard } from "@/presentation/components/TaskCard";
+import { TaskDetailsModal } from "@/presentation/components/TaskDetailsModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
@@ -22,10 +23,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TaskListScreen() {
   const appTexts = useAppStrings();
   const strings = appTexts.taskList;
+  const insets = useSafeAreaInsets();
   const {
     tasks,
     isLoading,
@@ -41,6 +44,7 @@ export default function TaskListScreen() {
   const [pendingComplete, setPendingComplete] = useState<boolean>(false);
   const [activeFilter, setActiveFilter] = useState<TaskFilter | "ALL">("ALL");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [taskDetailsModalId, setTaskDetailsModalId] = useState<string | null>(null);
   const router = useRouter();
 
   const toggleTaskStatus = async (taskId: string, completed: boolean) => {
@@ -61,6 +65,7 @@ export default function TaskListScreen() {
   const contentColumnStyle = {
     flex: 1,
     padding: Spacing.medium,
+    paddingTop: insets.top + Spacing.medium,
     ...getWebContentShellStyle(),
   };
 
@@ -183,7 +188,7 @@ export default function TaskListScreen() {
     <View style={outerScreenStyle}>
       <View style={contentColumnStyle}>
       <View style={sharedStyles.titleContainer}>
-        <AccessibleText type="h1" style={{ textAlign: "center" }}>
+        <AccessibleText type="h1" style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 0, paddingBottom: 0 }}>
           {strings.screenTitle}
         </AccessibleText>
       </View>
@@ -231,7 +236,7 @@ export default function TaskListScreen() {
                   gap: 7,
                   paddingVertical: 10,
                   paddingHorizontal: 18,
-                  borderRadius: 28,
+                  borderRadius: 4,
                   borderWidth: 1.5,
                   borderColor: isActive
                     ? themeColors.tint
@@ -259,6 +264,7 @@ export default function TaskListScreen() {
                   style={{
                     color: isActive ? themeColors.buttonText : themeColors.text,
                     fontWeight: isActive ? "700" : "400",
+                    fontSize: 14 * preferences.fontSizeMultiplier,
                   }}
                   accessibilityLabel={f.label}
                 >
@@ -289,12 +295,16 @@ export default function TaskListScreen() {
               task={item}
               onToggleComplete={handleToggleComplete}
               onDelete={handleDelete}
-              onPress={(taskId) =>
-                router.push({
-                  pathname: "/task-details",
-                  params: { taskId },
-                })
-              }
+              onPress={(taskId) => {
+                if (isWeb) {
+                  setTaskDetailsModalId(taskId);
+                } else {
+                  router.push({
+                    pathname: "/task-details",
+                    params: { taskId },
+                  });
+                }
+              }}
             />
           )}
           onRefresh={refreshTasks}
@@ -304,7 +314,7 @@ export default function TaskListScreen() {
           accessibilityLabel={strings.listLabel}
         />
       )}
-      <View style={{ marginTop: 24, marginBottom: 8, alignItems: "center" }}>
+      <View style={{ marginTop: 5, marginBottom: 5, alignItems: "center" }}>
         <AccessibleButton
           title={strings.newTaskButton}
           icon={
@@ -350,6 +360,13 @@ export default function TaskListScreen() {
       <CreateTaskModal
         visible={isCreateModalOpen && isWeb}
         onClose={() => setIsCreateModalOpen(false)}
+      />
+
+      <TaskDetailsModal
+        visible={isWeb && !!taskDetailsModalId}
+        taskId={taskDetailsModalId}
+        onClose={() => setTaskDetailsModalId(null)}
+        onTaskCompleted={() => refreshTasks()}
       />
       </View>
     </View>

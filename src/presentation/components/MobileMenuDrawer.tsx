@@ -3,6 +3,7 @@ import { getColorWithOpacity } from "@/presentation/theme/colors";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface MobileMenuDrawerProps {
   isOpen: boolean;
@@ -12,6 +13,7 @@ interface MobileMenuDrawerProps {
 
 export function MobileMenuDrawer({ isOpen, onClose, children }: MobileMenuDrawerProps) {
   const { themeColors } = useTheme();
+  const insets = useSafeAreaInsets();
   const animationRef = useRef(new Animated.Value(0)).current;
 
   // Animação de abertura/fechamento
@@ -73,7 +75,7 @@ export function MobileMenuDrawer({ isOpen, onClose, children }: MobileMenuDrawer
             style={{
               position: "absolute",
               left: 0,
-              top: 0,
+              top: insets.top,
               bottom: 0,
               width: 264,
               backgroundColor: themeColors.background,
