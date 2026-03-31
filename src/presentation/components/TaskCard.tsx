@@ -9,7 +9,7 @@ import { formatDateRelative } from "@/presentation/utils/format";
 import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Animated, TouchableOpacity, View } from "react-native";
+import { Animated, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 interface TaskCardProps {
   task: Task;
@@ -27,6 +27,10 @@ export function TaskCard({
   const appTexts = useAppStrings();
   const taskCardTexts = appTexts.taskCard;
   const { themeColors, preferences, isWeb } = useTheme();
+  const { width: windowWidth } = useWindowDimensions();
+
+  // Web mobile: < 640px (sm breakpoint)
+  const isWebMobile = isWeb && windowWidth < 640;
 
   const cardStyle = {
     backgroundColor: themeColors.background,
@@ -166,13 +170,15 @@ export function TaskCard({
             name="trash"
             size={22}
             color={themeColors.error}
-            style={{ marginRight: 4 }}
+            style={{ marginRight: isWebMobile ? 0 : 4 }}
           />
-          <AccessibleText
-            style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
-          >
-            {taskCardTexts.deleteAction}
-          </AccessibleText>
+          {!isWebMobile && (
+            <AccessibleText
+              style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
+            >
+              {taskCardTexts.deleteAction}
+            </AccessibleText>
+          )}
         </TouchableOpacity>
       </View>
     </View>
