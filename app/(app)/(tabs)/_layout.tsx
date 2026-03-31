@@ -62,7 +62,7 @@ export default function TabLayout() {
           height: showBottomTabBar ? 65 : 60,
         },
         tabBarLabelStyle: showBottomTabBar ? {
-          fontSize: 10,
+          fontSize: 12,
           paddingBottom: 2,
           paddingTop: 0,
           margin: 0,
