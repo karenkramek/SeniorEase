@@ -59,11 +59,13 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: themeColors.background,
           borderTopColor: themeColors.icon,
+          height: showBottomTabBar ? 65 : 60,
         },
         tabBarLabelStyle: showBottomTabBar ? {
-          fontSize: 11,
-          paddingBottom: 4,
-          paddingTop: 2,
+          fontSize: 10,
+          paddingBottom: 2,
+          paddingTop: 0,
+          margin: 0,
         } : {
           fontSize: 12,
         },
