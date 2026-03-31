@@ -1,11 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
-import React from "react";
-import { Platform, View } from "react-native";
+import React, { useState } from "react";
+import { Platform, View, useWindowDimensions } from "react-native";
 
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { HapticTab } from "@/presentation/components/HapticTab";
+import { MobileMenuDrawer } from "@/presentation/components/MobileMenuDrawer";
+import { NavigationMenu } from "@/presentation/components/NavigationMenu";
 import { WebSidebar } from "@/presentation/components/WebSidebar";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
@@ -19,7 +21,13 @@ function TabBarForPlatform(props: BottomTabBarProps) {
   return <BottomTabBar {...props} />;
 }
 
+function WebBottomTabBar(props: BottomTabBarProps) {
+  return <BottomTabBar {...props} />;
+}
+
 export default function TabLayout() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { width: screenWidth } = useWindowDimensions();
   const appTexts = useAppStrings();
   const { preferences } = usePreferences();
   const isWeb = isWebPlatform();
@@ -29,9 +37,20 @@ export default function TabLayout() {
     isWeb,
   );
 
+  // Breakpoints para web:
+  // sm = < 640px (mobile web)
+  // md = 640px-1023px (tablet)
+  // lg = >= 1024px (desktop)
+  const isSmallScreen = screenWidth < 640;
+  const isMediumScreen = screenWidth >= 640 && screenWidth < 1024;
+  const isLargeScreen = screenWidth >= 1024;
+  const showSidebarPermanent = isLargeScreen;
+  const showDrawerMenu = isMediumScreen;
+  const showBottomTabBar = isSmallScreen && isWeb;
+
   const tabs = (
     <Tabs
-      tabBar={TabBarForPlatform}
+      tabBar={showBottomTabBar ? WebBottomTabBar : TabBarForPlatform}
       screenOptions={{
         tabBarActiveTintColor: themeColors.tabIconSelected,
         tabBarInactiveTintColor: themeColors.tabIconDefault,
@@ -107,19 +126,81 @@ export default function TabLayout() {
   );
 
   if (isWeb) {
-    return (
-      <View style={{ flex: 1, width: "100%", alignItems: "center", backgroundColor: "#F1F5F9" }}>
-        <View
-          style={{
-            flex: 1,
-            width: "100%",
-            maxWidth: 1200,
-            flexDirection: "column",
-          }}
-        >
+    // Mobile web (small screen < 640px): usar BottomTabBar
+    if (showBottomTabBar) {
+      return (
+        <View style={{ flex: 1, width: "100%", backgroundColor: themeColors.background }}>
           <AppHeader />
-          <View style={{ flex: 1, flexDirection: "row" }}>
+          {tabs}
+        </View>
+      );
+    }
+
+    // Tablet web (medium screen 640px-1023px): usar drawer menu com hamburger
+    if (showDrawerMenu) {
+      return (
+        <View style={{ flex: 1, width: "100%", backgroundColor: themeColors.background }}>
+          {/* Header - full width */}
+          <AppHeader
+            menuOpen={isMenuOpen}
+            onMenuToggle={() => setIsMenuOpen(!isMenuOpen)}
+          />
+
+          {/* Content area - centered with max-width constraint */}
+          <View style={{ flex: 1, width: "100%", alignItems: "center" }}>
+            <View
+              style={{
+                flex: 1,
+                width: "100%",
+                maxWidth: 1200,
+                flexDirection: "row",
+                position: "relative",
+              }}
+            >
+              {/* Mobile menu drawer - visível em telas menores (md a lg) */}
+              <MobileMenuDrawer
+                isOpen={isMenuOpen}
+                onClose={() => setIsMenuOpen(false)}
+              >
+                <View
+                  style={{
+                    paddingTop: 20,
+                    paddingBottom: 24,
+                  }}
+                >
+                  <NavigationMenu onNavigate={() => setIsMenuOpen(false)} />
+                </View>
+              </MobileMenuDrawer>
+
+              {/* Main content */}
+              <View style={{ flex: 1, minWidth: 0 }}>{tabs}</View>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    // Desktop web (large screen >= 1024px): usar sidebar permanente
+    return (
+      <View style={{ flex: 1, width: "100%", backgroundColor: themeColors.background }}>
+        {/* Header - full width */}
+        <AppHeader />
+
+        {/* Content area - centered with max-width constraint */}
+        <View style={{ flex: 1, width: "100%", alignItems: "center" }}>
+          <View
+            style={{
+              flex: 1,
+              width: "100%",
+              maxWidth: 1200,
+              flexDirection: "row",
+              position: "relative",
+            }}
+          >
+            {/* Sidebar - visível apenas em telas grandes (lg+) */}
             <WebSidebar />
+
+            {/* Main content */}
             <View style={{ flex: 1, minWidth: 0 }}>{tabs}</View>
           </View>
         </View>

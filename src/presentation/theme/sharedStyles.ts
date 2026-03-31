@@ -66,7 +66,7 @@ export const sharedStyles = StyleSheet.create({
     minWidth: 0,
   },
   titleContainer: {
-    paddingVertical: Spacing.large,
+    paddingVertical: 0,
   },
   input: {
     borderWidth: 2,

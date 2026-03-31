@@ -25,4 +25,30 @@
    .container-web {
       @apply w-full max-w-6xl mx-auto;
    }
+
+   /* Responsive menu utilities */
+   .menu-drawer-overlay {
+      @apply fixed inset-0 bg-black/50 z-40 md:hidden;
+   }
+
+   .menu-drawer {
+      @apply fixed left-0 top-0 z-50 w-64 h-screen bg-white transition-transform duration-300 md:hidden;
+   }
+
+   .sidebar-lg {
+      @apply hidden lg:flex;
+   }
+
+   .hamburger-md {
+      @apply flex md:hidden;
+   }
+}
+
+/* Media query styles for sidebar/hamburger */
+@media (max-width: 1023px) {
+   /* Sidebar tetap escondido em telas menores que lg */
+}
+
+@media (min-width: 1024px) {
+   /* Sidebar visível em telas lg+ */
 }
