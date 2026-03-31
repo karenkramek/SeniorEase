@@ -60,6 +60,13 @@ export default function TabLayout() {
           backgroundColor: themeColors.background,
           borderTopColor: themeColors.icon,
         },
+        tabBarLabelStyle: showBottomTabBar ? {
+          fontSize: 11,
+          paddingBottom: 4,
+          paddingTop: 2,
+        } : {
+          fontSize: 12,
+        },
       }}
     >
       <Tabs.Screen
