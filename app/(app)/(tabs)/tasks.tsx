@@ -72,7 +72,7 @@ export default function TaskListScreen() {
       showConfirmation({
         title: strings.confirmDeleteTitle,
         message: strings.confirmDeleteMessage,
-        confirmText: strings.confirmDeleteAction,
+        confirmText: appTexts.common.deleteAction,
         cancelText: appTexts.common.cancel,
         iconName: "trash",
         isDangerous: true,
@@ -231,7 +231,7 @@ export default function TaskListScreen() {
               paddingBottom: 0,
             }}
           >
-            {strings.screenTitle}
+            {appTexts.navigation.tasksTabTitle}
           </AccessibleText>
         </View>
 
@@ -292,7 +292,7 @@ export default function TaskListScreen() {
                     shadowOffset: { width: 0, height: 2 },
                     elevation: isActive ? 3 : 0,
                   }}
-                  accessibilityLabel={`${strings.filterByPrefixA11y}: ${f.label}`}
+                  accessibilityLabel={`${strings.filterByLabel}: ${f.label}`}
                   accessibilityRole="button"
                   accessibilityState={{ selected: isActive }}
                 >
@@ -363,7 +363,7 @@ export default function TaskListScreen() {
         )}
         <View style={{ marginTop: 5, marginBottom: 5, alignItems: "center" }}>
           <AccessibleButton
-            title={strings.newTaskButton}
+            title={appTexts.navigation.createTaskHeaderTitle}
             icon={
               <MaterialIcons
                 name="add"

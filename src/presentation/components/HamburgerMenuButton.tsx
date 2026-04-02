@@ -1,3 +1,4 @@
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
@@ -15,13 +16,14 @@ export function HamburgerMenuButton({
   accessibilityLabel,
 }: HamburgerMenuButtonProps) {
   const { themeColors } = useTheme();
+  const { navigation } = useAppStrings();
 
   return (
     <Pressable
       onPress={onPress}
       accessible={true}
       accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel || "Abrir menu"}
+      accessibilityLabel={accessibilityLabel || navigation.menuOpenA11y}
       accessibilityState={{ expanded: isOpen }}
       style={({ pressed }) => ({
         opacity: pressed ? 0.6 : 1,

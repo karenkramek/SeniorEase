@@ -1,6 +1,8 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import React from "react";
 import { Modal, Platform, TouchableOpacity, View } from "react-native";
 
@@ -12,9 +14,9 @@ interface ConfirmModalProps {
   cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
-  restoreFocusRef?: React.RefObject<
-    React.ElementRef<typeof TouchableOpacity> | null
-  >;
+  restoreFocusRef?: React.RefObject<React.ElementRef<
+    typeof TouchableOpacity
+  > | null>;
 }
 
 export function ConfirmModal({
@@ -28,11 +30,13 @@ export function ConfirmModal({
   restoreFocusRef,
 }: ConfirmModalProps) {
   const { themeColors } = useTheme();
-  const effectiveConfirmText = confirmText ?? "Confirmar";
-  const effectiveCancelText = cancelText ?? "Cancelar";
+  const { common } = useAppStrings();
+  const effectiveConfirmText = confirmText ?? common.confirm;
+  const effectiveCancelText = cancelText ?? common.cancel;
 
-  const confirmButtonRef =
-    React.useRef<React.ElementRef<typeof TouchableOpacity> | null>(null);
+  const confirmButtonRef = React.useRef<React.ElementRef<
+    typeof TouchableOpacity
+  > | null>(null);
   const wasVisibleRef = React.useRef(false);
 
   React.useEffect(() => {
@@ -89,7 +93,9 @@ export function ConfirmModal({
           <AccessibleText type="h2" accessibilityLabel={title}>
             {title}
           </AccessibleText>
-          <AccessibleText accessibilityLabel={message}>{message}</AccessibleText>
+          <AccessibleText accessibilityLabel={message}>
+            {message}
+          </AccessibleText>
 
           <View style={{ marginTop: 8, gap: 8 }}>
             <AccessibleButton
@@ -102,7 +108,14 @@ export function ConfirmModal({
               title={effectiveCancelText}
               onPress={onCancel}
               accessibilityLabel={effectiveCancelText}
-              style={{ backgroundColor: themeColors.icon }}
+              textColor={themeColors.text}
+              style={[
+                sharedStyles.secondaryButton,
+                {
+                  backgroundColor: "transparent",
+                  borderColor: themeColors.icon,
+                },
+              ]}
             />
           </View>
         </View>

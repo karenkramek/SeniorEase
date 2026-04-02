@@ -1,6 +1,8 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import { formatDate } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
@@ -42,6 +44,7 @@ export function DatePickerModal({
   selectedDate,
 }: DatePickerModalProps) {
   const { themeColors, isWeb } = useTheme();
+  const { datePicker, common } = useAppStrings();
   const { width: windowWidth } = useWindowDimensions();
   const isWebMobile = isWeb && windowWidth < 640;
 
@@ -153,16 +156,16 @@ export function DatePickerModal({
                 color: themeColors.text,
                 fontSize: isWebMobile ? 18 : 20,
               }}
-              accessibilityLabel="Selecionar data"
+              accessibilityLabel={datePicker.title}
             >
-              Selecionar data
+              {datePicker.title}
             </AccessibleText>
 
             <TouchableOpacity
               onPress={onClose}
               accessible
               accessibilityRole="button"
-              accessibilityLabel="Fechar"
+              accessibilityLabel={common.close}
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
               <Ionicons
@@ -193,9 +196,9 @@ export function DatePickerModal({
                   fontSize: isWebMobile ? 12 : 13,
                   fontWeight: "bold",
                 }}
-                accessibilityLabel="Dia"
+                accessibilityLabel={datePicker.dayLabel}
               >
-                Dia
+                {datePicker.dayLabel}
               </AccessibleText>
               <FlatList
                 ref={dayListRef}
@@ -216,7 +219,7 @@ export function DatePickerModal({
                     accessibilityState={{
                       selected: day === dayNum,
                     }}
-                    accessibilityLabel={`Dia ${dayNum}`}
+                    accessibilityLabel={`${datePicker.dayLabel} ${dayNum}`}
                   >
                     <AccessibleText
                       style={{
@@ -243,7 +246,7 @@ export function DatePickerModal({
                 contentContainerStyle={{ paddingVertical: 12 }}
                 scrollEnabled
                 nestedScrollEnabled
-                accessibilityLabel="Selecionar dia"
+                accessibilityLabel={datePicker.selectDayA11y}
               />
             </View>
 
@@ -257,9 +260,9 @@ export function DatePickerModal({
                   fontSize: isWebMobile ? 12 : 13,
                   fontWeight: "bold",
                 }}
-                accessibilityLabel="Mês"
+                accessibilityLabel={datePicker.monthLabel}
               >
-                Mês
+                {datePicker.monthLabel}
               </AccessibleText>
               <FlatList
                 ref={monthListRef}
@@ -309,7 +312,7 @@ export function DatePickerModal({
                 contentContainerStyle={{ paddingVertical: 12 }}
                 scrollEnabled
                 nestedScrollEnabled
-                accessibilityLabel="Selecionar mês"
+                accessibilityLabel={datePicker.selectMonthA11y}
               />
             </View>
 
@@ -323,9 +326,9 @@ export function DatePickerModal({
                   fontSize: isWebMobile ? 12 : 13,
                   fontWeight: "bold",
                 }}
-                accessibilityLabel="Ano"
+                accessibilityLabel={datePicker.yearLabel}
               >
-                Ano
+                {datePicker.yearLabel}
               </AccessibleText>
               <FlatList
                 ref={yearListRef}
@@ -346,7 +349,7 @@ export function DatePickerModal({
                     accessibilityState={{
                       selected: year === yearNum,
                     }}
-                    accessibilityLabel={`Ano ${yearNum}`}
+                    accessibilityLabel={`${datePicker.yearLabel} ${yearNum}`}
                   >
                     <AccessibleText
                       style={{
@@ -373,7 +376,7 @@ export function DatePickerModal({
                 contentContainerStyle={{ paddingVertical: 12 }}
                 scrollEnabled
                 nestedScrollEnabled
-                accessibilityLabel="Selecionar ano"
+                accessibilityLabel={datePicker.selectYearA11y}
               />
             </View>
           </View>
@@ -410,19 +413,23 @@ export function DatePickerModal({
             }}
           >
             <AccessibleButton
-              title="Cancelar"
+              title={common.cancel}
               onPress={onClose}
-              accessibilityLabel="Cancelar seleção de data"
-              style={{
-                flex: 1,
-                backgroundColor: themeColors.icon + "20",
-                borderColor: "transparent",
-              }}
+              accessibilityLabel={datePicker.cancelA11y}
+              textColor={themeColors.text}
+              style={[
+                sharedStyles.secondaryButton,
+                {
+                  flex: 1,
+                  backgroundColor: "transparent",
+                  borderColor: themeColors.icon,
+                },
+              ]}
             />
             <AccessibleButton
-              title="Confirmar"
+              title={common.confirm}
               onPress={handleConfirm}
-              accessibilityLabel="Confirmar data selecionada"
+              accessibilityLabel={datePicker.confirmA11y}
               style={{ flex: 1 }}
             />
           </View>

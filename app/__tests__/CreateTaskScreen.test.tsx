@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import CreateTaskScreen from "../(app)/create-task";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import React from "react";
@@ -43,12 +44,10 @@ jest.mock("@/presentation/hooks/useAppStrings", () => ({
     createTask: {
       screenLabel: "Tela de criação de tarefa",
       titleLabel: "Título da tarefa *",
-      titlePlaceholder: "Título da tarefa",
-      titleFieldLabel: "Campo para título da tarefa",
+      titleFieldLabel: "Título da tarefa",
       titleRequiredHint: "Campo obrigatório",
       descriptionLabel: "Descrição da tarefa (opcional)",
       descriptionPlaceholder: "Descrição (opcional)",
-      descriptionFieldLabel: "Campo para descrição da tarefa",
       createButton: "Criar Tarefa",
       createButtonA11y: "Botão para criar tarefa",
       titleRequiredError: "Informe um título para criar a tarefa.",

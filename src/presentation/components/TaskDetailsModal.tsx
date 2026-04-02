@@ -94,8 +94,7 @@ export function TaskDetailsModal({
           try {
             await completeTaskUseCase.execute(task.id);
             showSuccess({
-              message: strings.completeSuccess,
-              description: strings.congratsTitle,
+              message: appTexts.taskList.taskCompleted,
               duration: 6000,
             });
             setTimeout(() => {
@@ -113,7 +112,6 @@ export function TaskDetailsModal({
         await completeTaskUseCase.execute(task.id);
         showSuccess({
           message: strings.completeSuccess,
-          description: strings.congratsTitle,
           duration: 6000,
         });
         setTimeout(() => {
@@ -190,7 +188,7 @@ export function TaskDetailsModal({
             }}
           >
             <AccessibleText
-              accessibilityLabel={strings.notFoundA11y}
+              accessibilityLabel={strings.notFound}
               style={{ color: themeColors.text, textAlign: "center" }}
             >
               {strings.notFound}
@@ -288,9 +286,9 @@ export function TaskDetailsModal({
                     marginBottom: Spacing.small,
                     fontSize: isWebMobile ? 12 : 13,
                   }}
-                  accessibilityLabel="Descrição"
+                  accessibilityLabel={strings.descriptionLabel}
                 >
-                  Descrição
+                  {strings.descriptionLabel}
                 </AccessibleText>
                 <AccessibleText
                   style={{
@@ -314,7 +312,7 @@ export function TaskDetailsModal({
                     marginBottom: Spacing.small,
                     fontSize: isWebMobile ? 12 : 13,
                   }}
-                  accessibilityLabel="Data de vencimento"
+                  accessibilityLabel={strings.dueDateLabel}
                 >
                   {strings.dueDateLabel}
                 </AccessibleText>
@@ -334,6 +332,13 @@ export function TaskDetailsModal({
               {task.status !== TaskStatus.COMPLETED ? (
                 <AccessibleButton
                   title={strings.completeButton}
+                  icon={
+                    <Ionicons
+                      name="checkmark"
+                      size={32}
+                      color={themeColors.buttonText}
+                    />
+                  }
                   onPress={handleCompleteTask}
                   accessibilityLabel={strings.completeButtonA11y}
                   style={sharedStyles.createButton}
@@ -344,7 +349,7 @@ export function TaskDetailsModal({
                     color: themeColors.success,
                     textAlign: "center",
                   }}
-                  accessibilityLabel={strings.completedTagA11y}
+                  accessibilityLabel={commonStrings.taskCompletedA11y}
                 >
                   ✔ {strings.completedTag}
                 </AccessibleText>

@@ -11,7 +11,9 @@ import { View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
-  const strings = useAppStrings().profile;
+  const appTexts = useAppStrings();
+  const strings = appTexts.profile;
+  const commonStrings = appTexts.common;
   const { user, signOut } = useAuth();
   const { themeColors, preferences } = useTheme();
   const insets = useSafeAreaInsets();
@@ -31,9 +33,9 @@ export default function ProfileScreen() {
           <AccessibleText
           type="h1"
           style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
-          accessibilityLabel={strings.titleA11y}
+          accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${appTexts.navigation.profileTabTitle}`}
         >
-          {strings.title}
+          {appTexts.navigation.profileTabTitle}
         </AccessibleText>
       </View>
 
@@ -46,14 +48,14 @@ export default function ProfileScreen() {
         <AccessibleText
           type="h2"
           style={{ marginTop: Spacing.small, color: themeColors.text }}
-          accessibilityLabel={`${strings.nameA11yPrefix}: ${user?.name ?? strings.fallbackUserName}`}
+          accessibilityLabel={`${strings.nameA11yPrefix}: ${user?.name ?? strings.userLabel}`}
         >
-          {user?.name ?? strings.fallbackUserName}
+          {user?.name ?? strings.userLabel}
         </AccessibleText>
         <AccessibleText
           type="caption"
           style={{ color: themeColors.icon, marginTop: 4 }}
-          accessibilityLabel={`${strings.emailA11yPrefix}: ${user?.email ?? ""}`}
+          accessibilityLabel={`${commonStrings.emailLabel}: ${user?.email ?? ""}`}
         >
           {user?.email ?? ""}
         </AccessibleText>

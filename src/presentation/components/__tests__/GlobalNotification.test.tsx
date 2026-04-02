@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import type { AppNotification } from "@/presentation/contexts/NotificationContext";
 import { GlobalNotification } from "@/presentation/components/GlobalNotification";
 import { fireEvent, render } from "@testing-library/react-native";
@@ -15,8 +16,18 @@ jest.mock("@/presentation/contexts/NotificationContext", () => ({
   }),
 }));
 
-jest.mock("@/presentation/hooks/usePreferences", () => ({
-  usePreferences: () => ({
+jest.mock("@/presentation/hooks/useTheme", () => ({
+  useTheme: () => ({
+    themeColors: {
+      background: "#ffffff",
+      text: "#000000",
+      tint: "#007aff",
+      icon: "#8e8e93",
+      success: "#34c759",
+      error: "#ff3b30",
+      warning: "#ff9500",
+      buttonText: "#ffffff",
+    },
     preferences: {
       fontSizeMultiplier: 1,
       isHighContrast: false,
@@ -25,6 +36,8 @@ jest.mock("@/presentation/hooks/usePreferences", () => ({
       useExtraConfirmation: false,
       theme: "light",
     },
+    isWeb: false,
+    colorScheme: "light",
   }),
 }));
 

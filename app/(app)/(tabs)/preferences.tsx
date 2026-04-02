@@ -16,7 +16,9 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PreferencesScreen() {
-  const strings = useAppStrings().preferences;
+  const appTexts = useAppStrings();
+  const strings = appTexts.preferences;
+  const commonStrings = appTexts.common;
   const { preferences, isLoading, updatePreferences } = usePreferences();
   const { themeColors, isWeb } = useTheme();
   const insets = useSafeAreaInsets();
@@ -91,7 +93,7 @@ export default function PreferencesScreen() {
         <AccessibleText
           type="h1"
           style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
-          accessibilityLabel={strings.titleA11y}
+          accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${strings.title}`}
         >
           {strings.title}
         </AccessibleText>

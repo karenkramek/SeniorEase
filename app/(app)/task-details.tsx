@@ -12,6 +12,7 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import { formatDateLong } from "@/presentation/utils/format";
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
@@ -68,8 +69,7 @@ export default function TaskDetailsScreen() {
           try {
             await completeTaskUseCase.execute(task.id);
             showSuccess({
-              message: strings.completeSuccess,
-              description: strings.congratsTitle,
+              message: appTexts.taskList.taskCompleted,
               duration: 6000,
             });
             setTimeout(() => router.back(), 1000);
@@ -84,7 +84,6 @@ export default function TaskDetailsScreen() {
         await completeTaskUseCase.execute(task.id);
         showSuccess({
           message: strings.completeSuccess,
-          description: strings.congratsTitle,
           duration: 6000,
         });
         setTimeout(() => router.back(), 1000);
@@ -108,7 +107,7 @@ export default function TaskDetailsScreen() {
   if (!task) {
     return (
       <View style={[containerStyle, sharedStyles.loader]}>
-        <AccessibleText accessibilityLabel={strings.notFoundA11y}>
+        <AccessibleText accessibilityLabel={strings.notFound}>
           {strings.notFound}
         </AccessibleText>
       </View>
@@ -123,10 +122,36 @@ export default function TaskDetailsScreen() {
       <AccessibleText
         type="h1"
         style={{ color: themeColors.text, marginBottom: Spacing.small }}
-        accessibilityLabel={`Título: ${task.title}`}
+        accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${task.title}`}
       >
         {task.title}
       </AccessibleText>
+
+      {task.description && (
+        <View style={{ marginBottom: Spacing.medium }}>
+          <AccessibleText
+            type="caption"
+            style={{
+              color: themeColors.icon,
+              marginBottom: Spacing.small,
+              fontSize: 13,
+            }}
+            accessibilityLabel={strings.descriptionLabel}
+          >
+            {strings.descriptionLabel}
+          </AccessibleText>
+          <AccessibleText
+            style={{
+              color: themeColors.text,
+              lineHeight: 22,
+              fontSize: 15,
+            }}
+            accessibilityLabel={task.description}
+          >
+            {task.description}
+          </AccessibleText>
+        </View>
+      )}
 
       {task.dueDate && (
         <AccessibleText
@@ -142,6 +167,13 @@ export default function TaskDetailsScreen() {
         <View style={{ alignItems: "center", marginTop: Spacing.medium }}>
           <AccessibleButton
             title={strings.completeButton}
+            icon={
+              <Ionicons
+                name="checkmark"
+                size={32}
+                color={themeColors.buttonText}
+              />
+            }
             onPress={handleCompleteTask}
             accessibilityLabel={strings.completeButtonA11y}
             style={sharedStyles.createButton}
@@ -154,7 +186,7 @@ export default function TaskDetailsScreen() {
             textAlign: "center",
             marginTop: Spacing.medium,
           }}
-          accessibilityLabel={strings.completedTagA11y}
+          accessibilityLabel={commonStrings.taskCompletedA11y}
         >
           ✔ {strings.completedTag}
         </AccessibleText>

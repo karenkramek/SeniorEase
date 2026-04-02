@@ -53,7 +53,7 @@ export function CreateTaskForm({
 
         // Validate date
         if (isNaN(dueDateTime.getTime())) {
-          setSubmissionError("Data de vencimento inválida");
+          setSubmissionError(strings.dueDateInvalidError);
           return;
         }
       }
@@ -85,10 +85,10 @@ export function CreateTaskForm({
       </View>
       <AccessibleFormField
         fieldId="taskTitle"
-        accessibilityLabel={strings.titleFieldA11yLabel}
+        accessibilityLabel={strings.titleFieldLabel}
         accessibilityHint={strings.titleFieldA11yHint}
         required
-        placeholder={strings.titlePlaceholder}
+        placeholder={strings.titleFieldLabel}
         placeholderTextColor={themeColors.icon}
         value={title}
         onChangeText={(text) => {
@@ -139,15 +139,15 @@ export function CreateTaskForm({
 
       <View style={{ marginBottom: 8, marginTop: 16 }}>
         <AccessibleText style={{ fontWeight: "bold", color: themeColors.text }}>
-          Data de Vencimento (opcional)
+          {strings.dueDateLabel}
         </AccessibleText>
       </View>
       <TouchableOpacity
         onPress={() => setIsDatePickerOpen(true)}
         accessible
         accessibilityRole="button"
-        accessibilityLabel="Data de vencimento da tarefa"
-        accessibilityHint={`Data selecionada: ${dueDate || "nenhuma"}. Toque para abrir o seletor de data`}
+        accessibilityLabel={strings.dueDateA11yLabel}
+        accessibilityHint={`${strings.dueDateA11yHintSelected}: ${dueDate || strings.dueDateA11yHintNone}. ${strings.dueDateA11yHintAction}`}
         style={{
           borderWidth: 2,
           borderColor: themeColors.tint,
@@ -167,7 +167,7 @@ export function CreateTaskForm({
             fontSize: 16,
           }}
         >
-          {dueDate || "Selecione uma data"}
+          {dueDate || strings.dueDatePlaceholder}
         </AccessibleText>
         <Ionicons
           name="calendar"

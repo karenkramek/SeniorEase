@@ -32,8 +32,9 @@ interface RegisterFormData {
 }
 
 export default function RegisterScreen() {
-  const strings = useAppStrings().authRegister;
-  const commonStrings = useAppStrings().common;
+  const appTexts = useAppStrings();
+  const strings = appTexts.authRegister;
+  const commonStrings = appTexts.common;
   const { signUp } = useAuth();
   const { themeColors } = useTheme();
   const router = useRouter();
@@ -48,8 +49,8 @@ export default function RegisterScreen() {
       z
         .object({
           name: z.string().min(3, strings.nameMinError),
-          email: z.string().email(strings.emailInvalidError),
-          password: z.string().min(6, strings.passwordMinError),
+          email: z.string().email(commonStrings.emailInvalidError),
+          password: z.string().min(6, commonStrings.passwordMinError),
           confirmPassword: z.string().min(6, strings.confirmPasswordRequiredError),
         })
         .refine((data) => data.password === data.confirmPassword, {
@@ -58,8 +59,8 @@ export default function RegisterScreen() {
         }),
     [
       strings.nameMinError,
-      strings.emailInvalidError,
-      strings.passwordMinError,
+      commonStrings.emailInvalidError,
+      commonStrings.passwordMinError,
       strings.confirmPasswordRequiredError,
       strings.passwordMismatchError,
     ],
@@ -113,7 +114,7 @@ export default function RegisterScreen() {
         >
           <View style={styles.header}>
             <Ionicons name="person-add-outline" size={60} color="#FFFFFF" />
-            <Text style={styles.title}>{strings.appTitle}</Text>
+            <Text style={styles.title}>{commonStrings.appTitle}</Text>
           </View>
 
           <View style={styles.form}>
@@ -125,10 +126,10 @@ export default function RegisterScreen() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <AccessibleFormField
                   fieldId="registerName"
-                  accessibilityLabel={strings.nameFieldLabel}
+                  accessibilityLabel={commonStrings.nameLabel}
                   accessibilityHint={strings.nameFieldHint}
                   required
-                  placeholder={strings.namePlaceholder}
+                  placeholder={commonStrings.nameLabel}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -149,10 +150,10 @@ export default function RegisterScreen() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <AccessibleFormField
                   fieldId="registerEmail"
-                  accessibilityLabel={strings.emailFieldLabel}
+                  accessibilityLabel={commonStrings.emailLabel}
                   accessibilityHint={strings.emailFieldHint}
                   required
-                  placeholder={strings.emailPlaceholder}
+                  placeholder={commonStrings.emailLabel}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -175,10 +176,10 @@ export default function RegisterScreen() {
                 <View style={styles.passwordFieldWrapper}>
                   <AccessibleFormField
                     fieldId="registerPassword"
-                    accessibilityLabel={strings.passwordFieldLabel}
+                    accessibilityLabel={commonStrings.passwordLabel}
                     accessibilityHint={strings.passwordFieldHint}
                     required
-                    placeholder={strings.passwordPlaceholder}
+                    placeholder={commonStrings.passwordLabel}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -195,8 +196,8 @@ export default function RegisterScreen() {
                     style={styles.eyeIcon}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={showPassword ? strings.hidePasswordA11y : strings.showPasswordA11y}
-                    accessibilityHint="Alternar visibilidade da senha"
+                    accessibilityLabel={showPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
+                    accessibilityHint={commonStrings.togglePasswordHint}
                   >
                     <Ionicons
                       name={showPassword ? "eye-outline" : "eye-off-outline"}
@@ -235,8 +236,8 @@ export default function RegisterScreen() {
                     style={styles.eyeIcon}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={showConfirmPassword ? strings.hidePasswordA11y : strings.showPasswordA11y}
-                    accessibilityHint="Alternar visibilidade da confirmação de senha"
+                    accessibilityLabel={showConfirmPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
+                    accessibilityHint={strings.toggleConfirmPasswordHint}
                   >
                     <Ionicons
                       name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}

@@ -1,4 +1,5 @@
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import React from "react";
@@ -7,6 +8,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function HelpScreen() {
   const { themeColors, colorScheme, preferences } = useTheme();
+  const appTexts = useAppStrings();
+  const strings = appTexts.help;
+  const commonStrings = appTexts.common;
   const insets = useSafeAreaInsets();
 
   const cardBackground = preferences.isHighContrast
@@ -22,7 +26,7 @@ export default function HelpScreen() {
     <ScrollView
         style={{ backgroundColor: themeColors.background }}
         contentContainerStyle={[sharedStyles.container, { paddingBottom: 32, paddingTop: insets.top }]}
-        accessibilityLabel="Tela de ajuda"
+        accessibilityLabel={strings.screenLabel}
       >
         <View
           style={[
@@ -31,10 +35,10 @@ export default function HelpScreen() {
         >
         <AccessibleText
           type="h1"
-          accessibilityLabel="Título: Ajuda e Dicas"
+          accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${strings.title}`}
           style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
         >
-          Ajuda e Dicas
+          {strings.title}
         </AccessibleText>
       </View>
       <AccessibleText
@@ -45,7 +49,7 @@ export default function HelpScreen() {
           color: themeColors.text,
         }}
       >
-        Dúvidas sobre o app? Veja como usar:
+        {strings.intro}
       </AccessibleText>
       <View
         style={{
@@ -68,19 +72,19 @@ export default function HelpScreen() {
             color: cardText,
           }}
         >
-          Como usar o SeniorEase
+          {strings.guideTitle}
         </AccessibleText>
         <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
-          • Adicione tarefas com o botão Nova Tarefa.
+          {strings.guideAddTask}
         </AccessibleText>
         <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
-          • Complete tarefas marcando etapas ou finalizando.
+          {strings.guideCompleteTask}
         </AccessibleText>
         <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
-          • Filtre tarefas para ver as mais importantes ou pendentes.
+          {strings.guideFilterTask}
         </AccessibleText>
         <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
-          • Personalize o app nas preferências: fonte, contraste, espaçamento.
+          {strings.guidePreferences}
         </AccessibleText>
       </View>
 
@@ -92,7 +96,7 @@ export default function HelpScreen() {
           color: themeColors.text,
         }}
       >
-        Qualquer dúvida, estamos aqui para ajudar!
+        {strings.footer}
       </AccessibleText>
     </ScrollView>
   );
