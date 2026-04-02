@@ -3,22 +3,24 @@ import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { ConfirmModal } from "@/presentation/components/ConfirmModal";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
+import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { showAlert } from "@/presentation/utils/alert";
 import { formatDateLong } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Modal,
-    ScrollView,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 
 interface TaskDetailsModalProps {
@@ -34,10 +36,12 @@ export function TaskDetailsModal({
   onClose,
   onTaskCompleted,
 }: TaskDetailsModalProps) {
-  const strings = useAppStrings().taskDetails;
-  const commonStrings = useAppStrings().common;
+  const appTexts = useAppStrings();
+  const strings = appTexts.taskDetails;
+  const commonStrings = appTexts.common;
   const { themeColors, isWeb } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
+  const { preferences } = usePreferences();
 
   // Web mobile: < 640px (sm breakpoint)
   const isWebMobile = isWeb && windowWidth < 640;
@@ -47,6 +51,16 @@ export function TaskDetailsModal({
     () => new CompleteTask(taskRepository),
     [taskRepository],
   );
+
+  const {
+    isOpen,
+    options,
+    handleConfirm,
+    handleCancel,
+    showConfirmation,
+    showSuccess,
+    showError,
+  } = useConfirmationFlow();
 
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,16 +82,49 @@ export function TaskDetailsModal({
 
   const handleCompleteTask = async () => {
     if (!task) return;
-    await completeTaskUseCase.execute(task.id);
-    showAlert(strings.congratsTitle, strings.completeSuccess, [
-      {
-        text: commonStrings.ok,
-        onPress: () => {
+
+    if (preferences?.confirmOnComplete) {
+      showConfirmation({
+        title: appTexts.taskList.confirmCompleteTitle,
+        message: appTexts.taskList.confirmCompleteMessage,
+        confirmText: appTexts.taskList.confirmCompleteAction,
+        cancelText: commonStrings.cancel,
+        iconName: "checkmark-circle",
+        onConfirm: async () => {
+          try {
+            await completeTaskUseCase.execute(task.id);
+            showSuccess({
+              message: strings.completeSuccess,
+              description: strings.congratsTitle,
+              duration: 6000,
+            });
+            setTimeout(() => {
+              onTaskCompleted?.();
+              onClose();
+            }, 1000);
+          } catch (_error) {
+            console.log(_error);
+            showError(strings.completeError);
+          }
+        },
+      });
+    } else {
+      try {
+        await completeTaskUseCase.execute(task.id);
+        showSuccess({
+          message: strings.completeSuccess,
+          description: strings.congratsTitle,
+          duration: 6000,
+        });
+        setTimeout(() => {
           onTaskCompleted?.();
           onClose();
-        },
-      },
-    ]);
+        }, 1000);
+      } catch (_error) {
+        console.log(_error);
+        showError(strings.completeError);
+      }
+    }
   };
 
   if (loading) {
@@ -306,6 +353,16 @@ export function TaskDetailsModal({
           </ScrollView>
         </View>
       </View>
+
+      <ConfirmModal
+        visible={isOpen}
+        title={options?.title ?? ""}
+        message={options?.message ?? ""}
+        confirmText={options?.confirmText}
+        cancelText={options?.cancelText}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+      />
     </Modal>
   );
 }

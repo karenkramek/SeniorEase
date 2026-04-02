@@ -2,20 +2,20 @@ import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useNotification } from "@/presentation/contexts/NotificationContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect } from "react";
-import { Animated, TouchableOpacity, View } from "react-native";
+import { Animated, Platform, TouchableOpacity, View } from "react-native";
 
 export function GlobalNotification() {
   const strings = useAppStrings().notifications;
   const { notification, clearNotification } = useNotification();
-  const slideAnim = React.useRef(new Animated.Value(-120)).current;
-
-  const { themeColors } = useTheme();
+  const { themeColors, preferences, isWeb } = useTheme();
+  const slideAnim = React.useRef(new Animated.Value(-200)).current;
 
   const handleClose = React.useCallback(() => {
     Animated.timing(slideAnim, {
-      toValue: -120,
+      toValue: -200,
       duration: 220,
       useNativeDriver: true,
     }).start(() => {
@@ -31,13 +31,14 @@ export function GlobalNotification() {
     Animated.spring(slideAnim, {
       toValue: 0,
       useNativeDriver: true,
-      tension: 55,
-      friction: 7,
+      tension: 50,
+      friction: 8,
     }).start();
 
+    const duration = notification.duration ?? 4000;
     const timer = setTimeout(() => {
       handleClose();
-    }, 4000);
+    }, duration);
 
     return () => clearTimeout(timer);
   }, [handleClose, notification, slideAnim]);
@@ -51,14 +52,26 @@ export function GlobalNotification() {
       ? themeColors.success
       : notification.type === "error"
         ? themeColors.error
-        : themeColors.tint;
+        : notification.type === "warning"
+          ? themeColors.warning
+          : themeColors.tint;
 
   const iconName =
     notification.type === "success"
-      ? "checkmark-circle"
+      ? "checkmark-circle-outline"
       : notification.type === "error"
-        ? "alert-circle"
-        : "information-circle";
+        ? "alert-circle-outline"
+        : notification.type === "warning"
+          ? "alert-outline"
+          : "information-circle-outline";
+
+  const fontSize = 15 * (preferences.fontSizeMultiplier || 1);
+  const descriptionFontSize = 13 * (preferences.fontSizeMultiplier || 1);
+  const iconSize = isWeb ? 28 : 24;
+
+  const a11yLabel = notification.description
+    ? `${notification.type}: ${notification.message}. ${notification.description}`
+    : `${notification.type}: ${notification.message}`;
 
   return (
     <Animated.View
@@ -68,32 +81,108 @@ export function GlobalNotification() {
         left: 0,
         right: 0,
         zIndex: 9999,
-        paddingTop: 52,
-        paddingHorizontal: 16,
-        paddingBottom: 12,
-        backgroundColor,
+        paddingHorizontal: isWeb ? Spacing.large : Spacing.medium,
+        paddingTop: Platform.OS === "web" ? Spacing.large : 52,
+        paddingBottom: isWeb ? Spacing.medium : Spacing.small,
+        backgroundColor: "transparent",
         transform: [{ translateY: slideAnim }],
       }}
       accessibilityRole="alert"
       accessibilityLiveRegion="polite"
+      accessibilityLabel={a11yLabel}
       importantForAccessibility="yes"
-      accessibilityLabel={notification.message}
     >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
-        <Ionicons name={iconName} size={22} color={themeColors.buttonText} />
-        <AccessibleText
-          style={{ color: themeColors.buttonText, flex: 1, fontWeight: "600" }}
+      {/* Container com limite de largura para web */}
+      <View
+        style={{
+          marginHorizontal: "auto",
+          maxWidth: isWeb ? 600 : "100%",
+          width: "100%",
+        }}
+      >
+        <View
+          style={{
+            backgroundColor,
+            borderRadius: 8,
+            paddingVertical: Spacing.medium,
+            paddingHorizontal: Spacing.large,
+            flexDirection: "row",
+            alignItems: "flex-start",
+            gap: Spacing.medium,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.25,
+            shadowRadius: 8,
+            elevation: 6,
+          }}
         >
-          {notification.message}
-        </AccessibleText>
-        <TouchableOpacity
-          onPress={handleClose}
-          accessibilityRole="button"
-          accessibilityLabel={strings.closeA11y}
-          style={{ minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center" }}
-        >
-          <Ionicons name="close" size={20} color={themeColors.buttonText} />
-        </TouchableOpacity>
+          {/* Ícone */}
+          <View
+            style={{
+              marginTop: 2,
+              minWidth: iconSize,
+              minHeight: iconSize,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Ionicons
+              name={iconName}
+              size={iconSize}
+              color={themeColors.buttonText}
+              accessibilityElementsHidden
+            />
+          </View>
+
+          {/* Conteúdo (Mensagem + Descrição) */}
+          <View style={{ flex: 1, gap: 4 }}>
+            <AccessibleText
+              style={{
+                color: themeColors.buttonText,
+                fontWeight: "600",
+                fontSize,
+                lineHeight: fontSize * 1.4,
+              }}
+            >
+              {notification.message}
+            </AccessibleText>
+            {notification.description && (
+              <AccessibleText
+                style={{
+                  color: themeColors.buttonText,
+                  opacity: 0.92,
+                  fontSize: descriptionFontSize,
+                  lineHeight: descriptionFontSize * 1.35,
+                }}
+              >
+                {notification.description}
+              </AccessibleText>
+            )}
+          </View>
+
+          {/* Botão Fechar */}
+          <TouchableOpacity
+            onPress={handleClose}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={strings.closeA11y}
+            hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
+            style={{
+              marginTop: 2,
+              minWidth: 40,
+              minHeight: 40,
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Ionicons
+              name="close"
+              size={22}
+              color={themeColors.buttonText}
+              accessibilityElementsHidden
+            />
+          </TouchableOpacity>
+        </View>
       </View>
     </Animated.View>
   );
