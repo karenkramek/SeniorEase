@@ -83,7 +83,7 @@ export default function TaskDetailsScreen() {
       try {
         await completeTaskUseCase.execute(task.id);
         showSuccess({
-          message: strings.completeSuccess,
+          message: appTexts.taskList.taskCompleted,
           duration: 6000,
         });
         setTimeout(() => router.back(), 1000);
