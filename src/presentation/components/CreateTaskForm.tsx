@@ -26,7 +26,7 @@ export function CreateTaskForm({
   const strings = appTexts.createTask;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState(""); // Format: "dd-mm-yyyy"
+  const [dueDate, setDueDate] = useState(""); // Format: "dd/mm/yyyy"
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -46,8 +46,9 @@ export function CreateTaskForm({
       let dueDateTime: Date | undefined = undefined;
 
       if (dueDate) {
-        // Convert from dd-mm-yyyy to Date
-        const [day, month, year] = dueDate.split("-").map(Number);
+        // Convert from dd/mm/yyyy or dd-mm-yyyy to Date
+        const separator = dueDate.includes("/") ? "/" : "-";
+        const [day, month, year] = dueDate.split(separator).map(Number);
         dueDateTime = new Date(year, month - 1, day);
 
         // Validate date
@@ -182,7 +183,13 @@ export function CreateTaskForm({
         onDateSelect={setDueDate}
         selectedDate={dueDate}
       />
-      <View style={{ marginTop: 24, marginBottom: isModal ? 0 : 8, alignItems: "center" }}>
+      <View
+        style={{
+          marginTop: 24,
+          marginBottom: isModal ? 0 : 8,
+          alignItems: "center",
+        }}
+      >
         <AccessibleButton
           title={strings.createButton}
           icon={
