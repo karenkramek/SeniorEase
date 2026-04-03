@@ -101,7 +101,7 @@ export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
             style={({ pressed }) => ({
               paddingHorizontal: 12,
               paddingVertical: 10,
-              borderRadius: 4,
+              borderRadius: 12,
               backgroundColor: isActive
                 ? getColorWithOpacity(themeColors.tint, 0.1)
                 : pressed

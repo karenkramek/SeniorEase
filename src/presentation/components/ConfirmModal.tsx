@@ -82,7 +82,7 @@ export function ConfirmModal({
           style={{
             width: "100%",
             maxWidth: 420,
-            borderRadius: 4,
+            borderRadius: 12,
             padding: 24,
             backgroundColor: themeColors.background,
             borderWidth: 1,

@@ -1,6 +1,7 @@
 import { GlobalNotification } from "@/presentation/components/GlobalNotification";
 import { NotificationProvider } from "@/presentation/contexts/NotificationContext";
 import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
+import { usePageTitle } from "@/presentation/hooks/usePageTitle";
 import { Slot, useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -15,6 +16,9 @@ function InitialLayout() {
   const { isAuthenticated, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+
+  // Atualiza o título da página na aba do navegador
+  usePageTitle();
 
   useEffect(() => {
     if (loading) return;

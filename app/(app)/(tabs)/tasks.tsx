@@ -18,11 +18,11 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  ScrollView,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    ScrollView,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -278,7 +278,7 @@ export default function TaskListScreen() {
                     gap: 7,
                     paddingVertical: 10,
                     paddingHorizontal: 18,
-                    borderRadius: 4,
+                    borderRadius: 12,
                     borderWidth: 1.5,
                     borderColor: isActive
                       ? themeColors.tint
@@ -404,6 +404,7 @@ export default function TaskListScreen() {
           taskId={taskDetailsModalId}
           onClose={() => setTaskDetailsModalId(null)}
           onTaskCompleted={() => refreshTasks()}
+          onTaskEdited={() => refreshTasks()}
         />
       </View>
     </View>

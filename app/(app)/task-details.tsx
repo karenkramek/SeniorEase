@@ -4,6 +4,7 @@ import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
+import { EditTaskModal } from "@/presentation/components/EditTaskModal";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
@@ -15,7 +16,7 @@ import { formatDateLong } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, View, useWindowDimensions } from "react-native";
 
 export default function TaskDetailsScreen() {
   const appTexts = useAppStrings();
@@ -25,6 +26,10 @@ export default function TaskDetailsScreen() {
   const router = useRouter();
   const { themeColors } = useTheme();
   const { preferences } = usePreferences();
+  const { width: windowWidth } = useWindowDimensions();
+
+  // Responsive: Mobile < 640px (stacked), Tablet+ >= 640px (side-by-side)
+  const isSmallScreen = windowWidth < 640;
 
   const taskRepository = useTaskRepository();
   const completeTaskUseCase = useMemo(
@@ -44,6 +49,7 @@ export default function TaskDetailsScreen() {
 
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -91,6 +97,15 @@ export default function TaskDetailsScreen() {
         console.log(_error);
         showError(strings.completeError);
       }
+    }
+  };
+
+  const handleEditSuccess = async () => {
+    setIsEditModalOpen(false);
+    // Recarregar os dados da tarefa
+    if (taskId) {
+      const updated = await taskRepository.findById(taskId);
+      setTask(updated);
     }
   };
 
@@ -164,19 +179,45 @@ export default function TaskDetailsScreen() {
       )}
 
       {task.status !== TaskStatus.COMPLETED ? (
-        <View style={{ alignItems: "center", marginTop: Spacing.medium }}>
+        <View style={{ flexDirection: isSmallScreen ? "column" : "row", gap: Spacing.medium, marginTop: Spacing.medium, overflow: "visible", paddingBottom: Spacing.large }}>
+          <AccessibleButton
+            title={strings.editButton}
+            icon={
+              <Ionicons
+                name="pencil"
+                size={20}
+                color={themeColors.tint}
+              />
+            }
+            onPress={() => setIsEditModalOpen(true)}
+            accessibilityLabel={strings.editButtonA11y}
+            textColor={themeColors.tint}
+            style={[
+              sharedStyles.createButton,
+              {
+                flex: !isSmallScreen ? 1 : undefined,
+                height: 66,
+                borderColor: themeColors.tint,
+                borderWidth: 1.5,
+                backgroundColor: "transparent",
+                shadowColor: "transparent",
+                shadowOpacity: 0,
+                elevation: 0,
+              },
+            ]}
+          />
           <AccessibleButton
             title={strings.completeButton}
             icon={
               <Ionicons
                 name="checkmark"
-                size={32}
+                size={24}
                 color={themeColors.buttonText}
               />
             }
             onPress={handleCompleteTask}
             accessibilityLabel={strings.completeButtonA11y}
-            style={sharedStyles.createButton}
+            style={[sharedStyles.createButton, { flex: !isSmallScreen ? 1 : undefined, height: 66, shadowColor: "transparent", shadowOpacity: 0, elevation: 0, borderWidth: 1.5, borderColor: "transparent" }]}
           />
         </View>
       ) : (
@@ -200,6 +241,12 @@ export default function TaskDetailsScreen() {
         cancelText={options?.cancelText}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
+      />
+
+      <EditTaskModal
+        visible={isEditModalOpen}
+        task={task}
+        onClose={handleEditSuccess}
       />
     </ScrollView>
   );

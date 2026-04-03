@@ -182,7 +182,7 @@ export const AccessibleFormField = React.forwardRef<
 
     // Determine border radius - smaller for multiline inputs (textareas)
     const isMultiline = restProps.multiline || false;
-    const containerBorderRadius = isMultiline ? 4 : 4;
+    const containerBorderRadius = isMultiline ? 12 : 12;
 
     return (
       <View style={[styles.container, containerStyle]}>
@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
-    borderRadius: 4,
+    borderRadius: 12,
     paddingHorizontal: 5,
     backgroundColor: '#F8F9FA',
     minHeight: 48, // Touch target minimum 44x44
@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
     borderLeftWidth: 4,
     borderLeftColor: A11yTokens.error.color,
-    borderRadius: 4,
+    borderRadius: 12,
   },
   errorText: {
     color: A11yTokens.error.color,

@@ -65,7 +65,7 @@ export default function PreferencesScreen() {
     ? {
         borderBottomWidth: 0,
         marginBottom: 10,
-        borderRadius: 4,
+        borderRadius: 12,
         paddingVertical: 20,
         backgroundColor: getColorWithOpacity(themeColors.tint, 0.07),
         borderWidth: 1,
