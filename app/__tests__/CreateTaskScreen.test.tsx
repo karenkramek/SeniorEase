@@ -58,6 +58,22 @@ jest.mock("@/presentation/hooks/useAppStrings", () => ({
     taskList: {
       addIconA11y: "Ícone de adicionar",
     },
+    datePicker: {
+      title: "Selecionar data",
+      dayLabel: "Dia",
+      selectDayA11y: "Selecionar dia",
+      monthLabel: "Mês",
+      selectMonthA11y: "Selecionar mês",
+      yearLabel: "Ano",
+      selectYearA11y: "Selecionar ano",
+      cancelA11y: "Cancelar seleção de data",
+      confirmA11y: "Confirmar data selecionada",
+    },
+    common: {
+      cancel: "Cancelar",
+      confirm: "Confirmar",
+      close: "Fechar",
+    },
   }),
 }));
 
