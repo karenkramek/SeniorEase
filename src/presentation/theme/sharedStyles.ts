@@ -41,6 +41,15 @@ export const sharedStyles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  secondaryButton: {
+    borderRadius: 4,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderWidth: 1.5,
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
+  },
   list: {
     paddingTop: Spacing.medium,
   },

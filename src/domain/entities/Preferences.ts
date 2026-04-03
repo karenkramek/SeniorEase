@@ -5,5 +5,5 @@ export interface Preferences {
   isSimplifiedMode: boolean;
   useExtraConfirmation: boolean;
   theme?: "light" | "dark";
-  confirmOnComplete?: boolean; // Adicionado: confirmação ao concluir tarefa
+  confirmOnComplete?: boolean;
 }

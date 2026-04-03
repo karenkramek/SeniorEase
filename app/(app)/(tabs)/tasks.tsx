@@ -7,6 +7,7 @@ import { CreateTaskModal } from "@/presentation/components/CreateTaskModal";
 import { TaskCard } from "@/presentation/components/TaskCard";
 import { TaskDetailsModal } from "@/presentation/components/TaskDetailsModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
@@ -15,7 +16,7 @@ import { Spacing } from "@/presentation/theme/spacing";
 import { filterTasks, sortTasks } from "@/presentation/utils/taskFilters";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -29,6 +30,8 @@ export default function TaskListScreen() {
   const appTexts = useAppStrings();
   const strings = appTexts.taskList;
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { themeColors, preferences, isWeb } = useTheme();
   const {
     tasks,
     isLoading,
@@ -37,15 +40,24 @@ export default function TaskListScreen() {
     uncompleteTask,
     deleteTask,
   } = useTasks();
-  const [confirmTaskId, setConfirmTaskId] = useState<string | null>(null);
-  const [confirmCompleteTaskId, setConfirmCompleteTaskId] = useState<
+
+  const {
+    isOpen,
+    options,
+    handleConfirm,
+    handleCancel,
+    showConfirmation,
+    showSuccess,
+    showError,
+  } = useConfirmationFlow();
+
+  const [activeFilter, setActiveFilter] = React.useState<TaskFilter | "ALL">(
+    "ALL",
+  );
+  const [isCreateModalOpen, setIsCreateModalOpen] = React.useState(false);
+  const [taskDetailsModalId, setTaskDetailsModalId] = React.useState<
     string | null
   >(null);
-  const [pendingComplete, setPendingComplete] = useState<boolean>(false);
-  const [activeFilter, setActiveFilter] = useState<TaskFilter | "ALL">("ALL");
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [taskDetailsModalId, setTaskDetailsModalId] = useState<string | null>(null);
-  const router = useRouter();
 
   const toggleTaskStatus = async (taskId: string, completed: boolean) => {
     if (completed) {
@@ -55,18 +67,67 @@ export default function TaskListScreen() {
     }
   };
 
-  const { themeColors, preferences, isWeb } = useTheme();
-
-  const outerScreenStyle = {
-    flex: 1,
-    width: "100%" as const,
-    backgroundColor: themeColors.background,
+  const handleDelete = (taskId: string) => {
+    if (preferences.useExtraConfirmation) {
+      showConfirmation({
+        title: strings.confirmDeleteTitle,
+        message: strings.confirmDeleteMessage,
+        confirmText: appTexts.common.deleteAction,
+        cancelText: appTexts.common.cancel,
+        iconName: "trash",
+        isDangerous: true,
+        onConfirm: async () => {
+          try {
+            await deleteTask(taskId);
+            showSuccess({
+              message: strings.taskDeleted,
+              duration: 6000,
+            });
+          } catch (_error) {
+            console.log(_error);
+            showError(strings.taskDeleteError);
+          }
+        },
+      });
+    } else {
+      deleteTask(taskId);
+      showSuccess({
+        message: strings.taskDeleted,
+        duration: 6000,
+      });
+    }
   };
-  const contentColumnStyle = {
-    flex: 1,
-    padding: Spacing.medium,
-    paddingTop: insets.top + Spacing.medium,
-    ...getWebContentShellStyle(),
+
+  const handleToggleComplete = (taskId: string, completed: boolean) => {
+    if (preferences.confirmOnComplete && completed) {
+      showConfirmation({
+        title: appTexts.taskList.confirmCompleteTitle,
+        message: appTexts.taskList.confirmCompleteMessage,
+        confirmText: appTexts.taskList.confirmCompleteAction,
+        cancelText: appTexts.common.cancel,
+        iconName: "checkmark-circle",
+        onConfirm: async () => {
+          try {
+            await toggleTaskStatus(taskId, completed);
+            showSuccess({
+              message: strings.taskCompleted,
+              duration: 6000,
+            });
+          } catch (_error) {
+            console.log(_error);
+            showError(strings.taskUpdateError);
+          }
+        },
+      });
+    } else {
+      toggleTaskStatus(taskId, completed);
+      if (completed) {
+        showSuccess({
+          message: strings.taskCompleted,
+          duration: 5000,
+        });
+      }
+    }
   };
 
   const filteredTasks = useMemo(() => {
@@ -128,43 +189,16 @@ export default function TaskListScreen() {
     },
   ];
 
-  const handleDelete = (taskId: string) => {
-    if (preferences.useExtraConfirmation) {
-      setConfirmTaskId(taskId);
-    } else {
-      deleteTask(taskId);
-    }
+  const outerScreenStyle = {
+    flex: 1,
+    width: "100%" as const,
+    backgroundColor: themeColors.background,
   };
-
-  const confirmDelete = () => {
-    if (confirmTaskId) {
-      deleteTask(confirmTaskId);
-      setConfirmTaskId(null);
-    }
-  };
-
-  const cancelDelete = () => setConfirmTaskId(null);
-
-  const handleToggleComplete = (taskId: string, completed: boolean) => {
-    if (preferences.confirmOnComplete && completed) {
-      setConfirmCompleteTaskId(taskId);
-      setPendingComplete(true);
-    } else {
-      toggleTaskStatus(taskId, completed);
-    }
-  };
-
-  const confirmComplete = () => {
-    if (confirmCompleteTaskId) {
-      toggleTaskStatus(confirmCompleteTaskId, true);
-      setConfirmCompleteTaskId(null);
-      setPendingComplete(false);
-    }
-  };
-
-  const cancelComplete = () => {
-    setConfirmCompleteTaskId(null);
-    setPendingComplete(false);
+  const contentColumnStyle = {
+    flex: 1,
+    padding: Spacing.medium,
+    paddingTop: insets.top + Spacing.medium,
+    ...getWebContentShellStyle(),
   };
 
   useFocusEffect(
@@ -187,187 +221,190 @@ export default function TaskListScreen() {
   return (
     <View style={outerScreenStyle}>
       <View style={contentColumnStyle}>
-      <View style={sharedStyles.titleContainer}>
-        <AccessibleText type="h1" style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 0, paddingBottom: 0 }}>
-          {strings.screenTitle}
-        </AccessibleText>
-      </View>
-
-      {/* Barra de filtros */}
-      <View style={{ marginTop: Spacing.medium, marginBottom: 4 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 6,
-            marginBottom: Spacing.small,
-          }}
-        >
-          <Ionicons
-            name="funnel-outline"
-            size={isWeb ? 18 : 15}
-            color={themeColors.icon}
-            accessibilityElementsHidden
-          />
+        <View style={sharedStyles.titleContainer}>
           <AccessibleText
-            type="caption"
-            style={{ color: themeColors.icon, letterSpacing: 0.4 }}
+            type="h1"
+            style={{
+              textAlign: "center",
+              fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32,
+              paddingTop: 0,
+              paddingBottom: 0,
+            }}
           >
-            {strings.filterByLabel}
+            {appTexts.navigation.tasksTabTitle}
           </AccessibleText>
         </View>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ gap: Spacing.small, paddingBottom: 4 }}
-          accessibilityLabel={strings.filtersA11y}
-          style={{ backgroundColor: "transparent" }}
-        >
-          {FILTERS.map((f) => {
-            const isActive = activeFilter === f.key;
-            return (
-              <TouchableOpacity
-                key={f.key}
-                onPress={() => setActiveFilter(f.key)}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 7,
-                  paddingVertical: 10,
-                  paddingHorizontal: 18,
-                  borderRadius: 4,
-                  borderWidth: 1.5,
-                  borderColor: isActive
-                    ? themeColors.tint
-                    : themeColors.icon + "40",
-                  backgroundColor: isActive
-                    ? themeColors.tint
-                    : themeColors.background,
-                  shadowColor: themeColors.tint,
-                  shadowOpacity: isActive ? 0.25 : 0,
-                  shadowRadius: 6,
-                  shadowOffset: { width: 0, height: 2 },
-                  elevation: isActive ? 3 : 0,
-                }}
-                accessibilityLabel={`${strings.filterByPrefixA11y}: ${f.label}`}
-                accessibilityRole="button"
-                accessibilityState={{ selected: isActive }}
-              >
-                <Ionicons
-                  name={f.icon}
-                  size={18}
-                  color={isActive ? themeColors.buttonText : themeColors.icon}
-                  accessibilityElementsHidden
-                />
-                <AccessibleText
+        {/* Barra de filtros */}
+        <View style={{ marginTop: Spacing.medium, marginBottom: 4 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              marginBottom: Spacing.small,
+            }}
+          >
+            <Ionicons
+              name="funnel-outline"
+              size={isWeb ? 18 : 15}
+              color={themeColors.icon}
+              accessibilityElementsHidden
+            />
+            <AccessibleText
+              type="caption"
+              style={{ color: themeColors.icon, letterSpacing: 0.4 }}
+            >
+              {strings.filterByLabel}
+            </AccessibleText>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{ gap: Spacing.small, paddingBottom: 4 }}
+            accessibilityLabel={strings.filtersA11y}
+            style={{ backgroundColor: "transparent" }}
+          >
+            {FILTERS.map((f) => {
+              const isActive = activeFilter === f.key;
+              return (
+                <TouchableOpacity
+                  key={f.key}
+                  onPress={() => setActiveFilter(f.key)}
                   style={{
-                    color: isActive ? themeColors.buttonText : themeColors.text,
-                    fontWeight: isActive ? "700" : "400",
-                    fontSize: 14 * preferences.fontSizeMultiplier,
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 7,
+                    paddingVertical: 10,
+                    paddingHorizontal: 18,
+                    borderRadius: 4,
+                    borderWidth: 1.5,
+                    borderColor: isActive
+                      ? themeColors.tint
+                      : themeColors.icon + "40",
+                    backgroundColor: isActive
+                      ? themeColors.tint
+                      : themeColors.background,
+                    shadowColor: themeColors.tint,
+                    shadowOpacity: isActive ? 0.25 : 0,
+                    shadowRadius: 6,
+                    shadowOffset: { width: 0, height: 2 },
+                    elevation: isActive ? 3 : 0,
                   }}
-                  accessibilityLabel={f.label}
+                  accessibilityLabel={`${strings.filterByLabel}: ${f.label}`}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isActive }}
                 >
-                  {f.label}
-                </AccessibleText>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      <View style={{ height: 16 }} />
-      {filteredTasks.length === 0 ? (
-        <View style={sharedStyles.emptyContainer}>
-          <AccessibleText accessibilityLabel={strings.noTasks}>
-            {strings.noTasks}
-          </AccessibleText>
-          <AccessibleText type="caption" accessibilityLabel={strings.noTasksHintA11y}>
-            {strings.noTasksHint}
-          </AccessibleText>
+                  <Ionicons
+                    name={f.icon}
+                    size={18}
+                    color={isActive ? themeColors.buttonText : themeColors.icon}
+                    accessibilityElementsHidden
+                  />
+                  <AccessibleText
+                    style={{
+                      color: isActive
+                        ? themeColors.buttonText
+                        : themeColors.text,
+                      fontWeight: isActive ? "700" : "400",
+                      fontSize: 14 * preferences.fontSizeMultiplier,
+                    }}
+                    accessibilityLabel={f.label}
+                  >
+                    {f.label}
+                  </AccessibleText>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </View>
-      ) : (
-        <FlatList
-          data={filteredTasks}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TaskCard
-              task={item}
-              onToggleComplete={handleToggleComplete}
-              onDelete={handleDelete}
-              onPress={(taskId) => {
-                if (isWeb) {
-                  setTaskDetailsModalId(taskId);
-                } else {
-                  router.push({
-                    pathname: "/task-details",
-                    params: { taskId },
-                  });
-                }
-              }}
-            />
-          )}
-          onRefresh={refreshTasks}
-          refreshing={isLoading}
-          contentContainerStyle={sharedStyles.list}
-          showsVerticalScrollIndicator={false}
-          accessibilityLabel={strings.listLabel}
-        />
-      )}
-      <View style={{ marginTop: 5, marginBottom: 5, alignItems: "center" }}>
-        <AccessibleButton
-          title={strings.newTaskButton}
-          icon={
-            <MaterialIcons
-              name="add"
-              size={32}
-              color={themeColors.buttonText}
-              accessibilityLabel={strings.addIconA11y}
-            />
-          }
-          style={sharedStyles.createButton}
-          accessibilityLabel={strings.newTaskButtonA11y}
-          onPress={() => {
-            if (isWeb) {
-              setIsCreateModalOpen(true);
-            } else {
-              router.push("/create-task");
+
+        <View style={{ height: 16 }} />
+        {filteredTasks.length === 0 ? (
+          <View style={sharedStyles.emptyContainer}>
+            <AccessibleText accessibilityLabel={strings.noTasks}>
+              {strings.noTasks}
+            </AccessibleText>
+            <AccessibleText
+              type="caption"
+              accessibilityLabel={strings.noTasksHintA11y}
+            >
+              {strings.noTasksHint}
+            </AccessibleText>
+          </View>
+        ) : (
+          <FlatList
+            data={filteredTasks}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <TaskCard
+                task={item}
+                onToggleComplete={handleToggleComplete}
+                onDelete={handleDelete}
+                onPress={(taskId) => {
+                  if (isWeb) {
+                    setTaskDetailsModalId(taskId);
+                  } else {
+                    router.push({
+                      pathname: "/task-details",
+                      params: { taskId },
+                    });
+                  }
+                }}
+              />
+            )}
+            onRefresh={refreshTasks}
+            refreshing={isLoading}
+            contentContainerStyle={sharedStyles.list}
+            showsVerticalScrollIndicator={false}
+            accessibilityLabel={strings.listLabel}
+          />
+        )}
+        <View style={{ marginTop: 5, marginBottom: 5, alignItems: "center" }}>
+          <AccessibleButton
+            title={appTexts.navigation.createTaskHeaderTitle}
+            icon={
+              <MaterialIcons
+                name="add"
+                size={32}
+                color={themeColors.buttonText}
+                accessibilityLabel={strings.addIconA11y}
+              />
             }
-          }}
+            style={sharedStyles.createButton}
+            accessibilityLabel={strings.newTaskButtonA11y}
+            onPress={() => {
+              if (isWeb) {
+                setIsCreateModalOpen(true);
+              } else {
+                router.push("/create-task");
+              }
+            }}
+          />
+        </View>
+
+        <ConfirmModal
+          visible={isOpen}
+          title={options?.title ?? ""}
+          message={options?.message ?? ""}
+          confirmText={options?.confirmText}
+          cancelText={options?.cancelText}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
         />
-      </View>
 
-      <ConfirmModal
-        visible={!!confirmTaskId}
-        title={strings.confirmDeleteTitle}
-        message={strings.confirmDeleteMessage}
-        confirmText={strings.confirmDeleteAction}
-        cancelText={appTexts.common.cancel}
-        onConfirm={confirmDelete}
-        onCancel={cancelDelete}
-      />
+        <CreateTaskModal
+          visible={isCreateModalOpen && isWeb}
+          onClose={() => setIsCreateModalOpen(false)}
+        />
 
-      <ConfirmModal
-        visible={!!confirmCompleteTaskId && pendingComplete}
-        title={strings.confirmCompleteTitle}
-        message={strings.confirmCompleteMessage}
-        confirmText={strings.confirmCompleteAction}
-        cancelText={appTexts.common.cancel}
-        onConfirm={confirmComplete}
-        onCancel={cancelComplete}
-      />
-
-      <CreateTaskModal
-        visible={isCreateModalOpen && isWeb}
-        onClose={() => setIsCreateModalOpen(false)}
-      />
-
-      <TaskDetailsModal
-        visible={isWeb && !!taskDetailsModalId}
-        taskId={taskDetailsModalId}
-        onClose={() => setTaskDetailsModalId(null)}
-        onTaskCompleted={() => refreshTasks()}
-      />
+        <TaskDetailsModal
+          visible={isWeb && !!taskDetailsModalId}
+          taskId={taskDetailsModalId}
+          onClose={() => setTaskDetailsModalId(null)}
+          onTaskCompleted={() => refreshTasks()}
+        />
       </View>
     </View>
   );

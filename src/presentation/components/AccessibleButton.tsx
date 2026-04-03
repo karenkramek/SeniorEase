@@ -13,6 +13,7 @@ import {
 interface AccessibleButtonProps extends TouchableOpacityProps {
   title: string;
   icon?: React.ReactNode;
+  textColor?: string;
 }
 
 export const AccessibleButton = React.forwardRef<
@@ -27,6 +28,7 @@ export const AccessibleButton = React.forwardRef<
     icon,
     onPress,
     style,
+    textColor,
     accessibilityLabel,
     accessibilityRole = "button",
     ...rest
@@ -50,7 +52,7 @@ export const AccessibleButton = React.forwardRef<
   };
 
   const textStyle = {
-    color: themeColors.buttonText,
+    color: textColor || themeColors.buttonText,
     fontWeight: "bold" as "bold",
   };
 

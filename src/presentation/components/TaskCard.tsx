@@ -78,7 +78,7 @@ export function TaskCard({
         onPress={handleToggleComplete}
         accessibilityLabel={
           task.status === TaskStatus.COMPLETED
-            ? taskCardTexts.completedA11y
+            ? appTexts.common.taskCompletedA11y
             : taskCardTexts.markCompletedA11y
         }
         accessibilityRole="checkbox"
@@ -124,7 +124,7 @@ export function TaskCard({
         <TouchableOpacity
           style={{ flex: 1 }}
           onPress={() => onPress && onPress(task.id)}
-          accessibilityLabel={`Ver detalhes da tarefa: ${task.title}`}
+          accessibilityLabel={`${taskCardTexts.viewDetailsA11yPrefix}: ${task.title}`}
           accessibilityRole="button"
           disabled={!onPress}
         >
@@ -144,7 +144,7 @@ export function TaskCard({
             <AccessibleText
               type="caption"
               style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
-              accessibilityLabel={`${taskCardTexts.dueDateLabelPrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
+              accessibilityLabel={`${taskCardTexts.dueDatePrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
             >
               {taskCardTexts.dueDatePrefix}: {formatDateRelative(new Date(task.dueDate))}
             </AccessibleText>
@@ -176,7 +176,7 @@ export function TaskCard({
             <AccessibleText
               style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
             >
-              {taskCardTexts.deleteAction}
+              {appTexts.common.deleteAction}
             </AccessibleText>
           )}
         </TouchableOpacity>

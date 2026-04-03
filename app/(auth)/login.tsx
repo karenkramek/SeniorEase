@@ -31,7 +31,9 @@ interface LoginFormData {
 }
 
 export default function LoginScreen() {
-  const strings = useAppStrings().authLogin;
+  const appTexts = useAppStrings();
+  const strings = appTexts.authLogin;
+  const commonStrings = appTexts.common;
   const { signIn } = useAuth();
   const { themeColors } = useTheme();
   const [loading, setLoading] = useState(false);
@@ -43,10 +45,10 @@ export default function LoginScreen() {
   const loginSchema = React.useMemo(
     () =>
       z.object({
-        email: z.string().email(strings.emailInvalidError),
-        password: z.string().min(6, strings.passwordMinError),
+        email: z.string().email(commonStrings.emailInvalidError),
+        password: z.string().min(6, commonStrings.passwordMinError),
       }),
-    [strings.emailInvalidError, strings.passwordMinError],
+    [commonStrings.emailInvalidError, commonStrings.passwordMinError],
   );
 
   const {
@@ -90,7 +92,7 @@ export default function LoginScreen() {
         >
           <View style={styles.header}>
             <Ionicons name="finger-print" size={60} color="#FFFFFF" />
-            <Text style={styles.title}>{strings.appTitle}</Text>
+            <Text style={styles.title}>{commonStrings.appTitle}</Text>
           </View>
 
           <View style={styles.form}>
@@ -102,10 +104,10 @@ export default function LoginScreen() {
               render={({ field: { onChange, onBlur, value } }) => (
                 <AccessibleFormField
                   fieldId="loginEmail"
-                  accessibilityLabel={strings.emailFieldLabel}
+                  accessibilityLabel={commonStrings.emailLabel}
                   accessibilityHint={strings.emailFieldHint}
                   required
-                  placeholder={strings.emailPlaceholder}
+                  placeholder={commonStrings.emailLabel}
                   onBlur={onBlur}
                   onChangeText={onChange}
                   value={value}
@@ -132,10 +134,10 @@ export default function LoginScreen() {
                   <AccessibleFormField
                     ref={passwordRef}
                     fieldId="loginPassword"
-                    accessibilityLabel={strings.passwordFieldLabel}
+                    accessibilityLabel={commonStrings.passwordLabel}
                     accessibilityHint={strings.passwordFieldHint}
                     required
-                    placeholder={strings.passwordPlaceholder}
+                    placeholder={commonStrings.passwordLabel}
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -155,8 +157,8 @@ export default function LoginScreen() {
                     style={styles.eyeIcon}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={showPassword ? strings.hidePasswordA11y : strings.showPasswordA11y}
-                    accessibilityHint="Alternar visibilidade da senha"
+                    accessibilityLabel={showPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
+                    accessibilityHint={commonStrings.togglePasswordHint}
                   >
                     <Ionicons
                       name={showPassword ? "eye-outline" : "eye-off-outline"}

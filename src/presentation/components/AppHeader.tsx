@@ -1,3 +1,4 @@
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
@@ -20,12 +21,13 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
   const { themeColors, isWeb } = useTheme();
   const { width: screenWidth } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const { common, navigation, profile } = useAppStrings();
 
   // Breakpoints
   const isSmallScreen = screenWidth < 640; // Mobile web
   const showHamburgerMenu = screenWidth < 1024; // Tablet e mobile web
 
-  const userName = user?.name || user?.email?.split("@")[0] || "Usuário";
+  const userName = user?.name || user?.email?.split("@")[0] || profile.userLabel;
 
   return (
     <View
@@ -53,7 +55,7 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
             <HamburgerMenuButton
               isOpen={menuOpen}
               onPress={onMenuToggle}
-              accessibilityLabel={menuOpen ? "Fechar menu" : "Abrir menu"}
+              accessibilityLabel={menuOpen ? navigation.menuCloseA11y : navigation.menuOpenA11y}
             />
           )}
 
@@ -64,9 +66,9 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
               color: themeColors.tint,
               fontWeight: "700",
             }}
-            accessibilityLabel="SeniorEase"
+            accessibilityLabel={common.appTitle}
           >
-            SeniorEase
+            {common.appTitle}
           </AccessibleText>
         </View>
 
@@ -85,7 +87,7 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
                 name="person-circle-outline"
                 size={32}
                 color={themeColors.tint}
-                accessibilityLabel={`Ícone do usuário`}
+                accessibilityLabel={profile.userIconA11y}
               />
             )}
 
@@ -96,7 +98,7 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
                 style={{
                   color: themeColors.text,
                 }}
-                accessibilityLabel={`Usuário: ${userName}`}
+                accessibilityLabel={`${profile.userLabel}: ${userName}`}
               >
                 {userName}
               </AccessibleText>
@@ -104,15 +106,15 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
 
             {/* Botão de logout */}
             <AccessibleButton
-              title="Sair"
+              title={profile.logoutButton}
               onPress={signOut}
-              accessibilityLabel="Deslogar"
+              accessibilityLabel={profile.logoutButtonA11y}
               icon={
                 <Ionicons
                   name="log-out-outline"
                   size={18}
                   color={themeColors.buttonText}
-                  accessibilityLabel="Ícone de logout"
+                  accessibilityLabel={profile.logoutIconA11y}
                 />
               }
               style={{

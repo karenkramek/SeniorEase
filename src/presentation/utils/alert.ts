@@ -1,3 +1,4 @@
+import { appStrings } from "@/presentation/i18n/strings";
 import { Platform, Alert as RNAlert } from "react-native";
 
 /**
@@ -52,12 +53,12 @@ export const showConfirm = (
 ) => {
   showAlert(title, message, [
     {
-      text: "Cancelar",
+      text: appStrings.common.cancel,
       style: "cancel",
       onPress: onCancel,
     },
     {
-      text: "Confirmar",
+      text: appStrings.common.confirm,
       onPress: onConfirm,
     },
   ]);

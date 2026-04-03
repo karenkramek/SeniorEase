@@ -1,15 +1,28 @@
-import React, { createContext, ReactNode, useCallback, useContext, useState } from "react";
+import React, {
+  createContext,
+  ReactNode,
+  useCallback,
+  useContext,
+  useState,
+} from "react";
 
-export type NotificationType = "success" | "error" | "info";
+export type NotificationType = "success" | "error" | "info" | "warning";
 
 export interface AppNotification {
   message: string;
   type: NotificationType;
+  duration?: number;
+  description?: string;
 }
 
 interface NotificationContextType {
   notification: AppNotification | null;
-  showNotification: (message: string, type?: NotificationType) => void;
+  showNotification: (
+    message: string,
+    type?: NotificationType,
+    duration?: number,
+    description?: string,
+  ) => void;
   clearNotification: () => void;
 }
 
@@ -26,11 +39,18 @@ interface NotificationProviderProps {
 }
 
 export function NotificationProvider({ children }: NotificationProviderProps) {
-  const [notification, setNotification] = useState<AppNotification | null>(null);
+  const [notification, setNotification] = useState<AppNotification | null>(
+    null,
+  );
 
   const showNotification = useCallback(
-    (message: string, type: NotificationType = "info") => {
-      setNotification({ message, type });
+    (
+      message: string,
+      type: NotificationType = "info",
+      duration: number = 4000,
+      description?: string,
+    ) => {
+      setNotification({ message, type, duration, description });
     },
     [],
   );

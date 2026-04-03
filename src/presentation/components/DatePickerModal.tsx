@@ -1,23 +1,41 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
+import { formatDate } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    Modal,
-    ScrollView,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  FlatList,
+  Modal,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 
 interface DatePickerModalProps {
   visible: boolean;
   onClose: () => void;
-  onDateSelect: (date: string) => void; // Format: "dd-mm-yyyy"
-  selectedDate?: string; // Format: "dd-mm-yyyy"
+  onDateSelect: (date: string) => void;
+  selectedDate?: string;
 }
+
+const MONTHS = [
+  { value: 1, label: "Janeiro" },
+  { value: 2, label: "Fevereiro" },
+  { value: 3, label: "Março" },
+  { value: 4, label: "Abril" },
+  { value: 5, label: "Maio" },
+  { value: 6, label: "Junho" },
+  { value: 7, label: "Julho" },
+  { value: 8, label: "Agosto" },
+  { value: 9, label: "Setembro" },
+  { value: 10, label: "Outubro" },
+  { value: 11, label: "Novembro" },
+  { value: 12, label: "Dezembro" },
+];
 
 export function DatePickerModal({
   visible,
@@ -26,55 +44,75 @@ export function DatePickerModal({
   selectedDate,
 }: DatePickerModalProps) {
   const { themeColors, isWeb } = useTheme();
+  const { datePicker, common } = useAppStrings();
   const { width: windowWidth } = useWindowDimensions();
   const isWebMobile = isWeb && windowWidth < 640;
 
-  // Parse selected date or use today
-  const today = new Date();
-  const parseDate = (dateStr?: string) => {
+  const today = useMemo(() => new Date(), []);
+
+  const parseDate = (dateStr?: string): Date => {
     if (!dateStr) return today;
-    const [day, month, year] = dateStr.split("-").map(Number);
+    const separator = dateStr.includes("/") ? "/" : "-";
+    const [day, month, year] = dateStr.split(separator).map(Number);
     return new Date(year, month - 1, day);
   };
 
   const initialDate = parseDate(selectedDate);
-  const [selectedDay, setSelectedDay] = useState(initialDate.getDate());
-  const [selectedMonth, setSelectedMonth] = useState(initialDate.getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState(initialDate.getFullYear());
+  const [day, setDay] = useState(initialDate.getDate());
+  const [month, setMonth] = useState(initialDate.getMonth() + 1);
+  const [year, setYear] = useState(initialDate.getFullYear());
 
-  // Generate arrays for days, months, years
+  const dayListRef = useRef<FlatList>(null);
+  const monthListRef = useRef<FlatList>(null);
+  const yearListRef = useRef<FlatList>(null);
+
   const days = useMemo(() => Array.from({ length: 31 }, (_, i) => i + 1), []);
+  const months = MONTHS;
+  const startYear = useMemo(() => today.getFullYear() - 5, [today]);
+  const endYear = useMemo(() => today.getFullYear() + 10, [today]);
+  const years = useMemo(
+    () =>
+      Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i),
+    [startYear, endYear],
+  );
 
-  const months = [
-    { value: 1, label: "Janeiro" },
-    { value: 2, label: "Fevereiro" },
-    { value: 3, label: "Março" },
-    { value: 4, label: "Abril" },
-    { value: 5, label: "Maio" },
-    { value: 6, label: "Junho" },
-    { value: 7, label: "Julho" },
-    { value: 8, label: "Agosto" },
-    { value: 9, label: "Setembro" },
-    { value: 10, label: "Outubro" },
-    { value: 11, label: "Novembro" },
-    { value: 12, label: "Dezembro" },
-  ];
-
-  const startYear = today.getFullYear() - 5;
-  const endYear = today.getFullYear() + 10;
-  const years = Array.from(
-    { length: endYear - startYear + 1 },
-    (_, i) => startYear + i
+  const maxDays = useMemo(
+    () => new Date(year, month, 0).getDate(),
+    [year, month],
   );
 
   const handleConfirm = () => {
-    const formattedDate = `${String(selectedDay).padStart(2, "0")}-${String(selectedMonth).padStart(2, "0")}-${selectedYear}`;
-    onDateSelect(formattedDate);
+    const formattedDate = new Date(year, month - 1, day);
+    const dateString = formatDate(formattedDate);
+    onDateSelect(dateString);
     onClose();
   };
 
-  // Get max days for selected month/year
-  const maxDays = new Date(selectedYear, selectedMonth, 0).getDate();
+  useEffect(() => {
+    if (visible) {
+      setTimeout(() => {
+        try {
+          dayListRef.current?.scrollToIndex({
+            index: Math.max(0, day - 1),
+            animated: false,
+            viewPosition: 0.5,
+          });
+          monthListRef.current?.scrollToIndex({
+            index: Math.max(0, month - 1),
+            animated: false,
+            viewPosition: 0.5,
+          });
+          yearListRef.current?.scrollToIndex({
+            index: Math.max(0, year - startYear),
+            animated: false,
+            viewPosition: 0.5,
+          });
+        } catch (e) {
+          console.warn("Erro ao fazer scroll do date picker", e);
+        }
+      }, 300);
+    }
+  }, [visible, day, month, year, startYear]);
 
   return (
     <Modal
@@ -118,16 +156,16 @@ export function DatePickerModal({
                 color: themeColors.text,
                 fontSize: isWebMobile ? 18 : 20,
               }}
-              accessibilityLabel="Selecionar data"
+              accessibilityLabel={datePicker.title}
             >
-              Selecionar data
+              {datePicker.title}
             </AccessibleText>
 
             <TouchableOpacity
               onPress={onClose}
               accessible
               accessibilityRole="button"
-              accessibilityLabel="Fechar"
+              accessibilityLabel={common.close}
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
               <Ionicons
@@ -156,12 +194,48 @@ export function DatePickerModal({
                   color: themeColors.icon,
                   marginBottom: Spacing.small,
                   fontSize: isWebMobile ? 12 : 13,
+                  fontWeight: "bold",
                 }}
-                accessibilityLabel="Dia"
+                accessibilityLabel={datePicker.dayLabel}
               >
-                Dia
+                {datePicker.dayLabel}
               </AccessibleText>
-              <ScrollView
+              <FlatList
+                ref={dayListRef}
+                data={days}
+                renderItem={({ item: dayNum }) => (
+                  <TouchableOpacity
+                    onPress={() => setDay(Math.min(dayNum, maxDays))}
+                    style={{
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      backgroundColor:
+                        day === dayNum ? themeColors.tint : "transparent",
+                      borderRadius: 4,
+                      marginVertical: 2,
+                    }}
+                    accessible
+                    accessibilityRole="radio"
+                    accessibilityState={{
+                      selected: day === dayNum,
+                    }}
+                    accessibilityLabel={`${datePicker.dayLabel} ${dayNum}`}
+                  >
+                    <AccessibleText
+                      style={{
+                        color:
+                          day === dayNum
+                            ? themeColors.buttonText
+                            : themeColors.text,
+                        textAlign: "center",
+                        fontSize: isWebMobile ? 13 : 14,
+                      }}
+                    >
+                      {String(dayNum).padStart(2, "0")}
+                    </AccessibleText>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(dayNum) => `day-${dayNum}`}
                 style={{
                   height: 150,
                   borderWidth: 1,
@@ -170,42 +244,10 @@ export function DatePickerModal({
                   backgroundColor: themeColors.background,
                 }}
                 contentContainerStyle={{ paddingVertical: 12 }}
-                accessibilityLabel="Selecionar dia"
-              >
-                {days.map((day) => (
-                  <TouchableOpacity
-                    key={day}
-                    onPress={() => setSelectedDay(Math.min(day, maxDays))}
-                    style={{
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      backgroundColor:
-                        selectedDay === day ? themeColors.tint : "transparent",
-                      borderRadius: 4,
-                      marginVertical: 2,
-                    }}
-                    accessible
-                    accessibilityRole="radio"
-                    accessibilityState={{
-                      selected: selectedDay === day,
-                    }}
-                    accessibilityLabel={`${day}`}
-                  >
-                    <AccessibleText
-                      style={{
-                        color:
-                          selectedDay === day
-                            ? themeColors.buttonText
-                            : themeColors.text,
-                        textAlign: "center",
-                        fontSize: isWebMobile ? 13 : 14,
-                      }}
-                    >
-                      {String(day).padStart(2, "0")}
-                    </AccessibleText>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+                scrollEnabled
+                nestedScrollEnabled
+                accessibilityLabel={datePicker.selectDayA11y}
+              />
             </View>
 
             {/* Months */}
@@ -216,31 +258,23 @@ export function DatePickerModal({
                   color: themeColors.icon,
                   marginBottom: Spacing.small,
                   fontSize: isWebMobile ? 12 : 13,
+                  fontWeight: "bold",
                 }}
-                accessibilityLabel="Mês"
+                accessibilityLabel={datePicker.monthLabel}
               >
-                Mês
+                {datePicker.monthLabel}
               </AccessibleText>
-              <ScrollView
-                style={{
-                  height: 150,
-                  borderWidth: 1,
-                  borderColor: themeColors.icon + "30",
-                  borderRadius: 4,
-                  backgroundColor: themeColors.background,
-                }}
-                contentContainerStyle={{ paddingVertical: 12 }}
-                accessibilityLabel="Selecionar mês"
-              >
-                {months.map((month) => (
+              <FlatList
+                ref={monthListRef}
+                data={months}
+                renderItem={({ item: monthItem }) => (
                   <TouchableOpacity
-                    key={month.value}
-                    onPress={() => setSelectedMonth(month.value)}
+                    onPress={() => setMonth(monthItem.value)}
                     style={{
                       paddingVertical: 8,
                       paddingHorizontal: 12,
                       backgroundColor:
-                        selectedMonth === month.value
+                        month === monthItem.value
                           ? themeColors.tint
                           : "transparent",
                       borderRadius: 4,
@@ -249,25 +283,37 @@ export function DatePickerModal({
                     accessible
                     accessibilityRole="radio"
                     accessibilityState={{
-                      selected: selectedMonth === month.value,
+                      selected: month === monthItem.value,
                     }}
-                    accessibilityLabel={month.label}
+                    accessibilityLabel={monthItem.label}
                   >
                     <AccessibleText
                       style={{
                         color:
-                          selectedMonth === month.value
+                          month === monthItem.value
                             ? themeColors.buttonText
                             : themeColors.text,
                         textAlign: "center",
                         fontSize: isWebMobile ? 12 : 13,
                       }}
                     >
-                      {month.label}
+                      {monthItem.label}
                     </AccessibleText>
                   </TouchableOpacity>
-                ))}
-              </ScrollView>
+                )}
+                keyExtractor={(monthItem) => `month-${monthItem.value}`}
+                style={{
+                  height: 150,
+                  borderWidth: 1,
+                  borderColor: themeColors.icon + "30",
+                  borderRadius: 4,
+                  backgroundColor: themeColors.background,
+                }}
+                contentContainerStyle={{ paddingVertical: 12 }}
+                scrollEnabled
+                nestedScrollEnabled
+                accessibilityLabel={datePicker.selectMonthA11y}
+              />
             </View>
 
             {/* Years */}
@@ -278,12 +324,48 @@ export function DatePickerModal({
                   color: themeColors.icon,
                   marginBottom: Spacing.small,
                   fontSize: isWebMobile ? 12 : 13,
+                  fontWeight: "bold",
                 }}
-                accessibilityLabel="Ano"
+                accessibilityLabel={datePicker.yearLabel}
               >
-                Ano
+                {datePicker.yearLabel}
               </AccessibleText>
-              <ScrollView
+              <FlatList
+                ref={yearListRef}
+                data={years}
+                renderItem={({ item: yearNum }) => (
+                  <TouchableOpacity
+                    onPress={() => setYear(yearNum)}
+                    style={{
+                      paddingVertical: 8,
+                      paddingHorizontal: 12,
+                      backgroundColor:
+                        year === yearNum ? themeColors.tint : "transparent",
+                      borderRadius: 4,
+                      marginVertical: 2,
+                    }}
+                    accessible
+                    accessibilityRole="radio"
+                    accessibilityState={{
+                      selected: year === yearNum,
+                    }}
+                    accessibilityLabel={`${datePicker.yearLabel} ${yearNum}`}
+                  >
+                    <AccessibleText
+                      style={{
+                        color:
+                          year === yearNum
+                            ? themeColors.buttonText
+                            : themeColors.text,
+                        textAlign: "center",
+                        fontSize: isWebMobile ? 13 : 14,
+                      }}
+                    >
+                      {yearNum}
+                    </AccessibleText>
+                  </TouchableOpacity>
+                )}
+                keyExtractor={(yearNum) => `year-${yearNum}`}
                 style={{
                   height: 150,
                   borderWidth: 1,
@@ -292,42 +374,10 @@ export function DatePickerModal({
                   backgroundColor: themeColors.background,
                 }}
                 contentContainerStyle={{ paddingVertical: 12 }}
-                accessibilityLabel="Selecionar ano"
-              >
-                {years.map((year) => (
-                  <TouchableOpacity
-                    key={year}
-                    onPress={() => setSelectedYear(year)}
-                    style={{
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      backgroundColor:
-                        selectedYear === year ? themeColors.tint : "transparent",
-                      borderRadius: 4,
-                      marginVertical: 2,
-                    }}
-                    accessible
-                    accessibilityRole="radio"
-                    accessibilityState={{
-                      selected: selectedYear === year,
-                    }}
-                    accessibilityLabel={`${year}`}
-                  >
-                    <AccessibleText
-                      style={{
-                        color:
-                          selectedYear === year
-                            ? themeColors.buttonText
-                            : themeColors.text,
-                        textAlign: "center",
-                        fontSize: isWebMobile ? 13 : 14,
-                      }}
-                    >
-                      {year}
-                    </AccessibleText>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+                scrollEnabled
+                nestedScrollEnabled
+                accessibilityLabel={datePicker.selectYearA11y}
+              />
             </View>
           </View>
 
@@ -347,10 +397,10 @@ export function DatePickerModal({
                 fontSize: isWebMobile ? 16 : 18,
                 fontWeight: "bold",
               }}
-              accessibilityLabel={`Data selecionada: ${String(selectedDay).padStart(2, "0")}-${String(selectedMonth).padStart(2, "0")}-${selectedYear}`}
+              accessibilityLabel={formatDate(new Date(year, month - 1, day))}
             >
-              {String(selectedDay).padStart(2, "0")}/
-              {String(selectedMonth).padStart(2, "0")}/{selectedYear}
+              {String(day).padStart(2, "0")}/{String(month).padStart(2, "0")}/
+              {year}
             </AccessibleText>
           </View>
 
@@ -363,19 +413,23 @@ export function DatePickerModal({
             }}
           >
             <AccessibleButton
-              title="Cancelar"
+              title={common.cancel}
               onPress={onClose}
-              accessibilityLabel="Cancelar seleção de data"
-              style={{
-                flex: 1,
-                backgroundColor: themeColors.icon + "20",
-                borderColor: "transparent",
-              }}
+              accessibilityLabel={datePicker.cancelA11y}
+              textColor={themeColors.text}
+              style={[
+                sharedStyles.secondaryButton,
+                {
+                  flex: 1,
+                  backgroundColor: "transparent",
+                  borderColor: themeColors.icon,
+                },
+              ]}
             />
             <AccessibleButton
-              title="Confirmar"
+              title={common.confirm}
               onPress={handleConfirm}
-              accessibilityLabel="Confirmar data selecionada"
+              accessibilityLabel={datePicker.confirmA11y}
               style={{ flex: 1 }}
             />
           </View>

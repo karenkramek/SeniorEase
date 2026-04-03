@@ -1,3 +1,4 @@
+/// <reference types="jest" />
 import type { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { TaskCard } from "@/presentation/components/TaskCard";
@@ -5,8 +6,18 @@ import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { Animated } from "react-native";
 
-jest.mock("@/presentation/contexts/PreferencesContext", () => ({
-  usePreferences: () => ({
+jest.mock("@/presentation/hooks/useTheme", () => ({
+  useTheme: () => ({
+    themeColors: {
+      background: "#ffffff",
+      text: "#000000",
+      tint: "#007aff",
+      icon: "#8e8e93",
+      success: "#34c759",
+      error: "#ff3b30",
+      warning: "#ff9500",
+      buttonText: "#ffffff",
+    },
     preferences: {
       fontSizeMultiplier: 1,
       isHighContrast: false,
@@ -15,20 +26,27 @@ jest.mock("@/presentation/contexts/PreferencesContext", () => ({
       useExtraConfirmation: false,
       theme: "light",
     },
+    isWeb: false,
+    colorScheme: "light",
   }),
+}));
+
+jest.mock("react-native/Libraries/Utilities/useWindowDimensions", () => ({
+  default: () => ({ width: 390, height: 844 }),
 }));
 
 jest.mock("@/presentation/hooks/useAppStrings", () => ({
   useAppStrings: () => ({
+    common: {
+      taskCompletedA11y: "Tarefa concluída",
+      deleteAction: "Excluir",
+    },
     taskCard: {
       cardLabelPrefix: "Cartão da tarefa",
-      completedA11y: "Tarefa concluída",
       markCompletedA11y: "Marcar como concluída",
       titleLabelPrefix: "Título da tarefa",
       dueDatePrefix: "Vencimento",
-      dueDateLabelPrefix: "Vencimento",
       deleteTaskA11yPrefix: "Excluir tarefa",
-      deleteAction: "Excluir",
     },
   }),
 }));

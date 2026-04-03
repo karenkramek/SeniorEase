@@ -26,7 +26,7 @@ export function CreateTaskForm({
   const strings = appTexts.createTask;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState(""); // Format: "dd-mm-yyyy"
+  const [dueDate, setDueDate] = useState(""); // Format: "dd/mm/yyyy"
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -46,13 +46,14 @@ export function CreateTaskForm({
       let dueDateTime: Date | undefined = undefined;
 
       if (dueDate) {
-        // Convert from dd-mm-yyyy to Date
-        const [day, month, year] = dueDate.split("-").map(Number);
+        // Convert from dd/mm/yyyy or dd-mm-yyyy to Date
+        const separator = dueDate.includes("/") ? "/" : "-";
+        const [day, month, year] = dueDate.split(separator).map(Number);
         dueDateTime = new Date(year, month - 1, day);
 
         // Validate date
         if (isNaN(dueDateTime.getTime())) {
-          setSubmissionError("Data de vencimento inválida");
+          setSubmissionError(strings.dueDateInvalidError);
           return;
         }
       }
@@ -84,10 +85,10 @@ export function CreateTaskForm({
       </View>
       <AccessibleFormField
         fieldId="taskTitle"
-        accessibilityLabel={strings.titleFieldA11yLabel}
+        accessibilityLabel={strings.titleFieldLabel}
         accessibilityHint={strings.titleFieldA11yHint}
         required
-        placeholder={strings.titlePlaceholder}
+        placeholder={strings.titleFieldLabel}
         placeholderTextColor={themeColors.icon}
         value={title}
         onChangeText={(text) => {
@@ -138,15 +139,15 @@ export function CreateTaskForm({
 
       <View style={{ marginBottom: 8, marginTop: 16 }}>
         <AccessibleText style={{ fontWeight: "bold", color: themeColors.text }}>
-          Data de Vencimento (opcional)
+          {strings.dueDateLabel}
         </AccessibleText>
       </View>
       <TouchableOpacity
         onPress={() => setIsDatePickerOpen(true)}
         accessible
         accessibilityRole="button"
-        accessibilityLabel="Data de vencimento da tarefa"
-        accessibilityHint={`Data selecionada: ${dueDate || "nenhuma"}. Toque para abrir o seletor de data`}
+        accessibilityLabel={strings.dueDateA11yLabel}
+        accessibilityHint={`${strings.dueDateA11yHintSelected}: ${dueDate || strings.dueDateA11yHintNone}. ${strings.dueDateA11yHintAction}`}
         style={{
           borderWidth: 2,
           borderColor: themeColors.tint,
@@ -166,7 +167,7 @@ export function CreateTaskForm({
             fontSize: 16,
           }}
         >
-          {dueDate || "Selecione uma data"}
+          {dueDate || strings.dueDatePlaceholder}
         </AccessibleText>
         <Ionicons
           name="calendar"
@@ -182,7 +183,13 @@ export function CreateTaskForm({
         onDateSelect={setDueDate}
         selectedDate={dueDate}
       />
-      <View style={{ marginTop: 24, marginBottom: isModal ? 0 : 8, alignItems: "center" }}>
+      <View
+        style={{
+          marginTop: 24,
+          marginBottom: isModal ? 0 : 8,
+          alignItems: "center",
+        }}
+      >
         <AccessibleButton
           title={strings.createButton}
           icon={
