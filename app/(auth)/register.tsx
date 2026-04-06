@@ -105,8 +105,8 @@ export default function RegisterScreen() {
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
-        backgroundColor="#0F766E"
         scrollEnabled={false}
+        style={{ backgroundColor: "#0F766E" }}
       >
         <View
           style={[
