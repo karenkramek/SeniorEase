@@ -33,7 +33,7 @@ export function HamburgerMenuButton({
       <Ionicons
         name={isOpen ? "close" : "menu"}
         size={28}
-        color={themeColors.tint}
+        color="#ffffff"
       />
     </Pressable>
   );

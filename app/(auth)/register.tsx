@@ -114,6 +114,19 @@ export default function RegisterScreen() {
             isDesktop && styles.contentWrapperDesktop,
           ]}
         >
+          {Platform.OS === "web" && (
+            <TouchableOpacity
+              onPress={() => router.push("/(public)/home")}
+              style={styles.backButton}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel="Voltar para home"
+            >
+              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+              <Text style={styles.backButtonText}>Voltar</Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.header}>
             <Ionicons name="person-add-outline" size={60} color="#FFFFFF" />
             <Text style={styles.title}>{commonStrings.appTitle}</Text>
@@ -300,6 +313,18 @@ const styles = StyleSheet.create({
     maxWidth: 440,
     width: "100%",
     alignSelf: "center",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 24,
+    paddingVertical: 8,
+  },
+  backButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
   header: {
     alignItems: "center",

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -36,6 +36,7 @@ export default function LoginScreen() {
   const commonStrings = appTexts.common;
   const { signIn } = useAuth();
   const { themeColors } = useTheme();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const passwordRef = React.useRef<TextInput>(null);
@@ -92,6 +93,19 @@ export default function LoginScreen() {
             isDesktop && styles.contentWrapperDesktop,
           ]}
         >
+          {Platform.OS === "web" && (
+            <TouchableOpacity
+              onPress={() => router.push("/(public)/home")}
+              style={styles.backButton}
+              accessible
+              accessibilityRole="button"
+              accessibilityLabel="Voltar para home"
+            >
+              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+              <Text style={styles.backButtonText}>Voltar</Text>
+            </TouchableOpacity>
+          )}
+
           <View style={styles.header}>
             <Ionicons name="finger-print" size={60} color="#FFFFFF" />
             <Text style={styles.title}>{commonStrings.appTitle}</Text>
@@ -221,6 +235,18 @@ const styles = StyleSheet.create({
     maxWidth: 440,
     width: "100%",
     alignSelf: "center",
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 24,
+    paddingVertical: 8,
+  },
+  backButtonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
   header: {
     alignItems: "center",

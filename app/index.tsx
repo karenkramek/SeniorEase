@@ -1,9 +1,10 @@
 import { useAuth } from "@/presentation/contexts/AuthContext";
 import { Redirect } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Platform, View } from "react-native";
 
 export default function Index() {
   const { loading, isAuthenticated } = useAuth();
+  const isWeb = Platform.OS === "web";
 
   if (loading) {
     return (
@@ -17,5 +18,11 @@ export default function Index() {
     return <Redirect href="/(app)/(tabs)/tasks" />;
   }
 
+  // Apenas web tem acesso à homepage pública
+  if (isWeb) {
+    return <Redirect href="/(public)/home" />;
+  }
+
+  // Mobile vai direto para login
   return <Redirect href="/(auth)/login" />;
 }
