@@ -4,18 +4,19 @@ import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext"
 import { usePageTitle } from "@/presentation/hooks/usePageTitle";
 import { Slot, useRouter, useSegments } from "expo-router";
 import React, { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
+import { ActivityIndicator, Platform, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
-    AuthProvider,
-    useAuth,
+  AuthProvider,
+  useAuth,
 } from "../src/presentation/contexts/AuthContext";
 
 function InitialLayout() {
   const { isAuthenticated, loading } = useAuth();
   const segments = useSegments();
   const router = useRouter();
+  const isWeb = Platform.OS === "web";
 
   // Atualiza o título da página na aba do navegador
   usePageTitle();
@@ -24,13 +25,21 @@ function InitialLayout() {
     if (loading) return;
 
     const inAuthGroup = segments[0] === "(auth)";
+    const inPublicGroup = segments[0] === "(public)";
 
     if (isAuthenticated && inAuthGroup) {
       router.replace("/(app)/(tabs)/tasks");
-    } else if (!isAuthenticated && !inAuthGroup) {
-      router.replace("/(auth)/login");
+    } else if (!isAuthenticated && !inAuthGroup && !inPublicGroup) {
+      // Se é web, deixa acessar a homepage pública
+      if (isWeb) {
+        // Não redireciona, deixa acessar a rota atual ou homepage
+        router.replace("/(public)/home");
+      } else {
+        // Se é mobile, força para login
+        router.replace("/(auth)/login");
+      }
     }
-  }, [isAuthenticated, loading, segments, router]);
+  }, [isAuthenticated, loading, segments, router, isWeb]);
 
   if (loading) {
     return (

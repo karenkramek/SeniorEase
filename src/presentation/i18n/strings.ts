@@ -238,6 +238,33 @@ export const ptBRStrings = {
       "• Notificações e mensagens de erro são anunciadas com prioridade de acessibilidade.",
     footer: "Qualquer dúvida, estamos aqui para ajudar!",
   },
+  homepage: {
+    tagline: "Organize suas tarefas e viva com mais qualidade",
+    description:
+      "O SeniorEase é um aplicativo intuitivo e acessível projetado para ajudar você a gerenciar suas tarefas diárias com facilidade. Com uma interface simples e funcionalidades poderosas, organizamos sua vida para que você possa focar no que realmente importa.",
+    headerHome: "Home",
+    headerAbout: "Sobre",
+    headerLogin: "Entrar",
+    footerCopyright: "© {year} SeniorEase. Todos os direitos reservados.",
+  },
+  about: {
+    title: "Sobre o SeniorEase",
+    intro: "SeniorEase é um aplicativo inovador e acessível desenvolvido com o objetivo de simplificar o gerenciamento de tarefas para pessoas idosas, permitindo que vivam com mais qualidade, autonomia e foco no que realmente importa.",
+    projectSection: "Projeto Hackaton",
+    projectDescription: "O SeniorEase é um projeto educacional desenvolvido por 3 alunas da Pós-Graduação em Front-End Engineering para a Hackaton. Nós acreditamos que a tecnologia deve ser inclusiva e acessível para todos, independente da idade ou habilidades técnicas.",
+    studentsLabel: "Desenvolvedoras",
+    features: "Funcionalidades Principais",
+    feature1: "Interface intuitiva e fácil de usar",
+    feature2: "Modo de acessibilidade com fonte grande e alto contraste",
+    feature3: "Gerenciamento simples de tarefas diárias",
+    feature4: "Lembretes e notificações oportunas",
+    gettingStarted: "Como Criar sua Conta",
+    getStartedSteps:
+      "1. Clique no botão 'Entrar' para acessar a página de login\n2. Clique em 'Não tem uma conta? Cadastre-se' para criar uma nova conta\n3. Preencha seu nome completo, e-mail e uma senha segura (mínimo 6 caracteres)\n4. Confirme sua senha e clique em 'Cadastrar'\n5. Você será redirecionado para fazer o login com suas credenciais",
+    githubLabel: "Repositório GitHub",
+    githubLink: "https://github.com/karenkramek/SeniorEase",
+    githubLinkText: "Acesse nosso repositório no GitHub",
+  },
 } as const;
 
 export type SupportedLocale = "pt-BR";
