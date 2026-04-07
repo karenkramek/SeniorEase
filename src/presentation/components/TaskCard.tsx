@@ -35,7 +35,7 @@ export function TaskCard({
   const cardStyle = {
     backgroundColor: themeColors.background,
     padding: Spacing.medium * preferences.spacingMultiplier,
-    borderRadius: 4,
+    borderRadius: 12,
     marginBottom: Spacing.medium,
     borderWidth: isWeb ? 1.5 : 1,
     borderColor: themeColors.icon,

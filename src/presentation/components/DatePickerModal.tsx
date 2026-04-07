@@ -8,11 +8,11 @@ import { formatDate } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  FlatList,
-  Modal,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
+    FlatList,
+    Modal,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
 } from "react-native";
 
 interface DatePickerModalProps {
@@ -134,7 +134,7 @@ export function DatePickerModal({
         <View
           style={{
             backgroundColor: themeColors.background,
-            borderRadius: 4,
+            borderRadius: 12,
             width: "100%",
             maxWidth: 500,
             paddingHorizontal: 20,
@@ -211,7 +211,7 @@ export function DatePickerModal({
                       paddingHorizontal: 12,
                       backgroundColor:
                         day === dayNum ? themeColors.tint : "transparent",
-                      borderRadius: 4,
+                      borderRadius: 12,
                       marginVertical: 2,
                     }}
                     accessible
@@ -240,7 +240,7 @@ export function DatePickerModal({
                   height: 150,
                   borderWidth: 1,
                   borderColor: themeColors.icon + "30",
-                  borderRadius: 4,
+                  borderRadius: 12,
                   backgroundColor: themeColors.background,
                 }}
                 contentContainerStyle={{ paddingVertical: 12 }}
@@ -277,7 +277,7 @@ export function DatePickerModal({
                         month === monthItem.value
                           ? themeColors.tint
                           : "transparent",
-                      borderRadius: 4,
+                      borderRadius: 12,
                       marginVertical: 2,
                     }}
                     accessible
@@ -306,7 +306,7 @@ export function DatePickerModal({
                   height: 150,
                   borderWidth: 1,
                   borderColor: themeColors.icon + "30",
-                  borderRadius: 4,
+                  borderRadius: 12,
                   backgroundColor: themeColors.background,
                 }}
                 contentContainerStyle={{ paddingVertical: 12 }}
@@ -341,7 +341,7 @@ export function DatePickerModal({
                       paddingHorizontal: 12,
                       backgroundColor:
                         year === yearNum ? themeColors.tint : "transparent",
-                      borderRadius: 4,
+                      borderRadius: 12,
                       marginVertical: 2,
                     }}
                     accessible
@@ -370,7 +370,7 @@ export function DatePickerModal({
                   height: 150,
                   borderWidth: 1,
                   borderColor: themeColors.icon + "30",
-                  borderRadius: 4,
+                  borderRadius: 12,
                   backgroundColor: themeColors.background,
                 }}
                 contentContainerStyle={{ paddingVertical: 12 }}
@@ -386,7 +386,7 @@ export function DatePickerModal({
             style={{
               backgroundColor: themeColors.tint + "15",
               padding: 12,
-              borderRadius: 4,
+              borderRadius: 12,
               marginBottom: Spacing.medium,
               alignItems: "center",
             }}

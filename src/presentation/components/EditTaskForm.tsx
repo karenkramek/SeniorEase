@@ -1,3 +1,4 @@
+import { Task } from "@/domain/entities/Task";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
@@ -8,33 +9,48 @@ import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
-interface CreateTaskFormProps {
+interface EditTaskFormProps {
+  task: Task;
   onSuccess?: () => void;
   isModal?: boolean;
   showScrollView?: boolean;
 }
 
-export function CreateTaskForm({
+export function EditTaskForm({
+  task,
   onSuccess,
   isModal = false,
   showScrollView = true,
-}: CreateTaskFormProps) {
+}: EditTaskFormProps) {
   const appTexts = useAppStrings();
-  const strings = appTexts.createTask;
+  const strings = appTexts.editTask;
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(""); // Format: "dd/mm/yyyy"
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const { createTask } = useTasks();
+  const { editTask } = useTasks();
   const { showNotification } = useNotification();
   const { themeColors } = useTheme();
 
-  const handleCreate = async () => {
+  // Initialize form with task data
+  useEffect(() => {
+    setTitle(task.title);
+    setDescription(task.description || "");
+    if (task.dueDate) {
+      const date = new Date(task.dueDate);
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      setDueDate(`${day}/${month}/${year}`);
+    }
+  }, [task]);
+
+  const handleEdit = async () => {
     setSubmissionError(null);
 
     if (!title.trim()) {
@@ -58,21 +74,23 @@ export function CreateTaskForm({
         }
       }
 
-      await createTask({
+      await editTask(task.id, {
         title: title.trim(),
         description: description.trim(),
         dueDate: dueDateTime,
       });
       setTitleError(null);
-      setTitle("");
-      setDescription("");
-      setDueDate("");
-      showNotification(strings.createSuccess, "success");
+      showNotification(strings.editSuccess, "success");
       onSuccess?.();
     } catch (error) {
-      console.error("Falha ao criar tarefa", error);
-      showNotification(strings.createError, "error");
-      setSubmissionError(strings.createErrorDetail);
+      console.error("Falha ao editar tarefa", error);
+      if ((error as Error).message.includes("concluída")) {
+        showNotification(strings.completedTaskError, "error");
+        setSubmissionError(strings.completedTaskError);
+      } else {
+        showNotification(strings.editError, "error");
+        setSubmissionError(strings.editErrorDetail);
+      }
     }
   };
 
@@ -191,17 +209,17 @@ export function CreateTaskForm({
         }}
       >
         <AccessibleButton
-          title={strings.createButton}
+          title={strings.editButton}
           icon={
             <MaterialIcons
-              name="add"
+              name="edit"
               size={32}
               color={themeColors.buttonText}
-              accessibilityLabel={appTexts.taskList.addIconA11y}
+              accessibilityLabel="Ícone de editar"
             />
           }
-          onPress={handleCreate}
-          accessibilityLabel={strings.createButtonA11y}
+          onPress={handleEdit}
+          accessibilityLabel={strings.editButtonA11y}
           style={sharedStyles.createButton}
         />
       </View>

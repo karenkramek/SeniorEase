@@ -4,6 +4,7 @@ import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
+import { EditTaskModal } from "@/presentation/components/EditTaskModal";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
@@ -15,12 +16,12 @@ import { formatDateLong } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Modal,
-  ScrollView,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
+    ActivityIndicator,
+    Modal,
+    ScrollView,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
 } from "react-native";
 
 interface TaskDetailsModalProps {
@@ -28,6 +29,7 @@ interface TaskDetailsModalProps {
   taskId: string | null;
   onClose: () => void;
   onTaskCompleted?: () => void;
+  onTaskEdited?: () => void;
 }
 
 export function TaskDetailsModal({
@@ -35,6 +37,7 @@ export function TaskDetailsModal({
   taskId,
   onClose,
   onTaskCompleted,
+  onTaskEdited,
 }: TaskDetailsModalProps) {
   const appTexts = useAppStrings();
   const strings = appTexts.taskDetails;
@@ -45,6 +48,8 @@ export function TaskDetailsModal({
 
   // Web mobile: < 640px (sm breakpoint)
   const isWebMobile = isWeb && windowWidth < 640;
+  // Responsive: Mobile < 640px (stacked), Tablet+ >= 640px (side-by-side)
+  const buttonLayoutIsRow = windowWidth >= 640;
 
   const taskRepository = useTaskRepository();
   const completeTaskUseCase = useMemo(
@@ -64,6 +69,7 @@ export function TaskDetailsModal({
 
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -125,6 +131,17 @@ export function TaskDetailsModal({
     }
   };
 
+  const handleEditSuccess = async () => {
+    setIsEditModalOpen(false);
+    // Recarregar os dados da tarefa
+    if (taskId) {
+      const updated = await taskRepository.findById(taskId);
+      setTask(updated);
+    // Chamar callback para atualizar a lista principal
+    onTaskEdited?.();
+    }
+  };
+
   if (loading) {
     return (
       <Modal
@@ -146,7 +163,7 @@ export function TaskDetailsModal({
           <View
             style={{
               backgroundColor: themeColors.background,
-              borderRadius: 4,
+              borderRadius: 12,
               width: "100%",
               maxWidth: 600,
               padding: Spacing.large,
@@ -181,7 +198,7 @@ export function TaskDetailsModal({
           <View
             style={{
               backgroundColor: themeColors.background,
-              borderRadius: 4,
+              borderRadius: 12,
               width: "100%",
               maxWidth: 600,
               padding: Spacing.large,
@@ -219,7 +236,7 @@ export function TaskDetailsModal({
         <View
           style={{
             backgroundColor: themeColors.background,
-            borderRadius: 4,
+            borderRadius: 12,
             maxHeight: "90%",
             width: "100%",
             maxWidth: 600,
@@ -330,19 +347,44 @@ export function TaskDetailsModal({
 
             <View style={{ marginTop: Spacing.large }}>
               {task.status !== TaskStatus.COMPLETED ? (
-                <AccessibleButton
-                  title={strings.completeButton}
-                  icon={
-                    <Ionicons
-                      name="checkmark"
-                      size={32}
-                      color={themeColors.buttonText}
-                    />
-                  }
-                  onPress={handleCompleteTask}
-                  accessibilityLabel={strings.completeButtonA11y}
-                  style={sharedStyles.createButton}
-                />
+                <View style={{ flexDirection: buttonLayoutIsRow ? "row" : "column", gap: Spacing.medium, overflow: "visible" }}>
+                  <AccessibleButton
+                    title={strings.editButton}
+                    icon={
+                      <Ionicons
+                        name="pencil"
+                        size={20}
+                        color={themeColors.tint}
+                      />
+                    }
+                    onPress={() => setIsEditModalOpen(true)}
+                    accessibilityLabel={strings.editButtonA11y}
+                    textColor={themeColors.tint}
+                    style={[
+                      sharedStyles.createButton,
+                      {
+                        flex: buttonLayoutIsRow ? 1 : undefined,
+                        height: 66,
+                        borderColor: themeColors.tint,
+                        borderWidth: 1.5,
+                        backgroundColor: "transparent",
+                      },
+                    ]}
+                  />
+                  <AccessibleButton
+                    title={strings.completeButton}
+                    icon={
+                      <Ionicons
+                        name="checkmark"
+                        size={24}
+                        color={themeColors.buttonText}
+                      />
+                    }
+                    onPress={handleCompleteTask}
+                    accessibilityLabel={strings.completeButtonA11y}
+                    style={[sharedStyles.createButton, { flex: buttonLayoutIsRow ? 1 : undefined, height: 66, borderWidth: 1.5, borderColor: "transparent" }]}
+                  />
+                </View>
               ) : (
                 <AccessibleText
                   style={{
@@ -367,6 +409,12 @@ export function TaskDetailsModal({
         cancelText={options?.cancelText}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
+      />
+
+      <EditTaskModal
+        visible={isEditModalOpen}
+        task={task}
+        onClose={handleEditSuccess}
       />
     </Modal>
   );

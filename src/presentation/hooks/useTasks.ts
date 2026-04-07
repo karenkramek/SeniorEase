@@ -1,6 +1,7 @@
 import { CompleteTask } from "@/application/useCases/task/CompleteTask";
 import { CreateTask } from "@/application/useCases/task/CreateTask";
 import { DeleteTask } from "@/application/useCases/task/DeleteTask";
+import { EditTask } from "@/application/useCases/task/EditTask";
 import { ListTasks } from "@/application/useCases/task/ListTasks";
 import { UncompleteTask } from "@/application/useCases/task/UncompleteTask";
 import { Task } from "@/domain/entities/Task";
@@ -33,6 +34,10 @@ export function useTasks() {
   );
   const deleteTaskUseCase = useMemo(
     () => new DeleteTask(taskRepository),
+    [taskRepository],
+  );
+  const editTaskUseCase = useMemo(
+    () => new EditTask(taskRepository),
     [taskRepository],
   );
 
@@ -95,6 +100,14 @@ export function useTasks() {
     [deleteTaskUseCase, refreshTasks],
   );
 
+  const editTask = useCallback(
+    async (taskId: string, data: { title: string; description?: string; dueDate?: Date }) => {
+      await editTaskUseCase.execute({ id: taskId, ...data });
+      await refreshTasks();
+    },
+    [editTaskUseCase, refreshTasks],
+  );
+
   const getFilteredTasks = useCallback(
     (status: TaskStatus) => {
       return tasks.filter((t) => t.status === status);
@@ -110,6 +123,7 @@ export function useTasks() {
     completeTask,
     uncompleteTask,
     deleteTask,
+    editTask,
     getFilteredTasks,
   };
 }

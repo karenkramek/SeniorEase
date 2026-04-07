@@ -27,7 +27,7 @@ export const sharedStyles = StyleSheet.create({
     gap: Spacing.small,
   },
   createButton: {
-    borderRadius: 4,
+    borderRadius: 12,
     paddingVertical: 22,
     paddingHorizontal: 40,
     minWidth: 160,
@@ -42,7 +42,7 @@ export const sharedStyles = StyleSheet.create({
     elevation: 4,
   },
   secondaryButton: {
-    borderRadius: 4,
+    borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderWidth: 1.5,
@@ -78,7 +78,7 @@ export const sharedStyles = StyleSheet.create({
   },
   input: {
     borderWidth: 2,
-    borderRadius: 4,
+    borderRadius: 12,
     paddingVertical: 18,
     paddingHorizontal: 5,
     marginBottom: Spacing.large,
@@ -102,7 +102,7 @@ export const sharedStyles = StyleSheet.create({
   },
   modalCard: {
     padding: Spacing.large,
-    borderRadius: 4,
+    borderRadius: 12,
     alignItems: "center",
     width: "90%",
   },

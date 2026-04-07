@@ -107,7 +107,7 @@ export function GlobalNotification() {
             paddingVertical: Spacing.medium,
             paddingHorizontal: Spacing.large,
             flexDirection: "row",
-            alignItems: "flex-start",
+            alignItems: "center",
             gap: Spacing.medium,
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 4 },
@@ -119,7 +119,6 @@ export function GlobalNotification() {
           {/* Ícone */}
           <View
             style={{
-              marginTop: 2,
               minWidth: iconSize,
               minHeight: iconSize,
               alignItems: "center",
@@ -169,7 +168,6 @@ export function GlobalNotification() {
             hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
             style={{
               marginTop: 2,
-              minWidth: 40,
               minHeight: 40,
               alignItems: "center",
               justifyContent: "center",

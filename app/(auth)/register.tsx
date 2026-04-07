@@ -101,10 +101,12 @@ export default function RegisterScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <StatusBar style="light" backgroundColor="#1F4E79" />
+      <StatusBar style="light" backgroundColor="#0F766E" />
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
+        scrollEnabled={false}
+        style={{ backgroundColor: "#0F766E" }}
       >
         <View
           style={[
@@ -283,12 +285,13 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1F4E79",
+    backgroundColor: "#0F766E",
   },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: "center",
     padding: 20,
+    backgroundColor: "#0F766E",
   },
   contentWrapper: {
     width: "100%",
@@ -310,7 +313,7 @@ const styles = StyleSheet.create({
   },
   form: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 4,
+    borderRadius: 12,
     padding: 24,
     marginBottom: 20,
   },
@@ -339,8 +342,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   registerButton: {
-    backgroundColor: "#1F4E79",
-    borderRadius: 4,
+    backgroundColor: "#0F766E",
+    borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 8,

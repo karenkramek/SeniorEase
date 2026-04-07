@@ -54,7 +54,7 @@ export default function HelpScreen() {
       <View
         style={{
           backgroundColor: cardBackground,
-          borderRadius: 4,
+          borderRadius: 12,
           padding: 18,
           marginBottom: 20,
           shadowColor: colorScheme === "dark" ? "#000" : "#A0A0A0",

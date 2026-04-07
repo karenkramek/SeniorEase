@@ -1,20 +1,30 @@
+import { Task } from "@/domain/entities/Task";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { CreateTaskForm } from "@/presentation/components/CreateTaskForm";
+import { EditTaskForm } from "@/presentation/components/EditTaskForm";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 
-interface CreateTaskModalProps {
+interface EditTaskModalProps {
   visible: boolean;
+  task: Task | null;
   onClose: () => void;
 }
 
-export function CreateTaskModal({ visible, onClose }: CreateTaskModalProps) {
+export function EditTaskModal({
+  visible,
+  task,
+  onClose,
+}: EditTaskModalProps) {
   const { themeColors } = useTheme();
   const appTexts = useAppStrings();
-  const strings = appTexts.createTask;
+  const strings = appTexts.editTask;
+
+  if (!task) {
+    return null;
+  }
 
   const handleSuccess = () => {
     onClose();
@@ -95,7 +105,8 @@ export function CreateTaskModal({ visible, onClose }: CreateTaskModalProps) {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <CreateTaskForm
+            <EditTaskForm
+              task={task}
               onSuccess={handleSuccess}
               isModal={true}
               showScrollView={false}
