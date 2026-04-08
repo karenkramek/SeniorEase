@@ -3,7 +3,9 @@ import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { BaseModal } from "@/presentation/components/BaseModal";
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
+import { DueDateBadge } from "@/presentation/components/DueDateBadge";
 import { EditTaskModal } from "@/presentation/components/EditTaskModal";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
@@ -13,12 +15,11 @@ import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { formatDateLong } from "@/presentation/utils/format";
+import { formatDateLong, getDueDateStatus } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
 import {
     ActivityIndicator,
-    Modal,
     ScrollView,
     TouchableOpacity,
     View,
@@ -144,270 +145,202 @@ export function TaskDetailsModal({
     }
   };
 
-  if (loading) {
-    return (
-      <Modal
-        visible={visible}
-        transparent
-        animationType="fade"
-        onRequestClose={onClose}
-        accessibilityViewIsModal
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            padding: 20,
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: themeColors.background,
-              borderRadius: 12,
-              width: "100%",
-              maxWidth: 600,
-              padding: Spacing.large,
-              alignItems: "center",
-            }}
-          >
-            <ActivityIndicator size="large" color={themeColors.tint} />
-          </View>
-        </View>
-      </Modal>
-    );
-  }
-
-  if (!task) {
-    return (
-      <Modal
-        visible={visible}
-        transparent
-        animationType="fade"
-        onRequestClose={onClose}
-        accessibilityViewIsModal
-      >
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            padding: 20,
-          }}
-        >
-          <View
-            style={{
-              backgroundColor: themeColors.background,
-              borderRadius: 12,
-              width: "100%",
-              maxWidth: 600,
-              padding: Spacing.large,
-            }}
-          >
-            <AccessibleText
-              accessibilityLabel={strings.notFound}
-              style={{ color: themeColors.text, textAlign: "center" }}
-            >
-              {strings.notFound}
-            </AccessibleText>
-          </View>
-        </View>
-      </Modal>
-    );
-  }
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-      accessibilityViewIsModal
+  const header = task ? (
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        gap: 12,
+      }}
     >
-      <View
+      <AccessibleText
+        type="h2"
         style={{
+          color: themeColors.text,
           flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          padding: 20,
+          fontSize: (isWebMobile ? 18 : 20) * preferences.fontSizeMultiplier,
         }}
+        accessibilityLabel={`Título: ${task.title}`}
       >
-        <View
-          style={{
-            backgroundColor: themeColors.background,
-            borderRadius: 12,
-            maxHeight: "90%",
-            width: "100%",
-            maxWidth: 600,
-            flexDirection: "column",
-          }}
+        {task.title}
+      </AccessibleText>
+
+      <TouchableOpacity
+        onPress={onClose}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={commonStrings.close}
+        hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+        style={{ minWidth: 24, minHeight: 24 }}
+      >
+        <Ionicons
+          name="close"
+          size={24}
+          color={themeColors.icon}
+          accessibilityElementsHidden
+        />
+      </TouchableOpacity>
+    </View>
+  ) : undefined;
+
+  const renderContent = () => {
+    if (loading) {
+      return (
+        <View style={{ alignItems: "center", padding: Spacing.large }}>
+          <ActivityIndicator size="large" color={themeColors.tint} />
+        </View>
+      );
+    }
+
+    if (!task) {
+      return (
+        <AccessibleText
+          accessibilityLabel={strings.notFound}
+          style={{ color: themeColors.text, textAlign: "center" }}
         >
-          {/* Header do Modal */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "flex-start",
-              paddingHorizontal: 20,
-              paddingVertical: 16,
-              borderBottomWidth: 1,
-              borderBottomColor: themeColors.icon + "20",
-              gap: 12,
-            }}
-          >
+          {strings.notFound}
+        </AccessibleText>
+      );
+    }
+
+    return (
+      <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 16,
+        }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        {task.description && (
+          <View style={{ marginBottom: Spacing.medium }}>
             <AccessibleText
-              type="h2"
+              type="caption"
+              style={{
+                color: themeColors.icon,
+                marginBottom: Spacing.small,
+                fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+              }}
+              accessibilityLabel={strings.descriptionLabel}
+            >
+              {strings.descriptionLabel}
+            </AccessibleText>
+            <AccessibleText
               style={{
                 color: themeColors.text,
-                flex: 1,
-                fontSize: (isWebMobile ? 18 : 20) * preferences.fontSizeMultiplier,
+                lineHeight: 22 * preferences.fontSizeMultiplier,
+                fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
               }}
-              accessibilityLabel={`Título: ${task.title}`}
+              accessibilityLabel={task.description}
             >
-              {task.title}
+              {task.description}
             </AccessibleText>
-
-            <TouchableOpacity
-              onPress={onClose}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel={commonStrings.close}
-              hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-              style={{ minWidth: 24, minHeight: 24 }}
-            >
-              <Ionicons
-                name="close"
-                size={24}
-                color={themeColors.icon}
-                accessibilityElementsHidden
-              />
-            </TouchableOpacity>
           </View>
+        )}
 
-          {/* Conteúdo */}
-          <ScrollView
-            contentContainerStyle={{
-              padding: 20,
-              paddingBottom: 32,
-            }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            {task.description && (
-              <View style={{ marginBottom: Spacing.medium }}>
-                <AccessibleText
-                  type="caption"
-                  style={{
-                    color: themeColors.icon,
-                    marginBottom: Spacing.small,
-                    fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
-                  }}
-                  accessibilityLabel={strings.descriptionLabel}
-                >
-                  {strings.descriptionLabel}
-                </AccessibleText>
-                <AccessibleText
-                  style={{
-                    color: themeColors.text,
-                    lineHeight: 22 * preferences.fontSizeMultiplier,
-                    fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
-                  }}
-                  accessibilityLabel={task.description}
-                >
-                  {task.description}
-                </AccessibleText>
-              </View>
-            )}
+        {task.dueDate && (
+          <View style={{ marginBottom: Spacing.medium }}>
+            <AccessibleText
+              type="caption"
+              style={{
+                color: themeColors.icon,
+                marginBottom: Spacing.small,
+                fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+              }}
+              accessibilityLabel={strings.dueDateLabel}
+            >
+              {strings.dueDateLabel}
+            </AccessibleText>
+            <AccessibleText
+              style={{
+                color: themeColors.text,
+                fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
+                marginBottom: 4,
+              }}
+              accessibilityLabel={formatDateLong(new Date(task.dueDate!))}
+            >
+              {formatDateLong(new Date(task.dueDate!))}
+            </AccessibleText>
+            <DueDateBadge
+              status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
+              size="md"
+            />
+          </View>
+        )}
 
-            {task.dueDate && (
-              <View style={{ marginBottom: Spacing.medium }}>
-                <AccessibleText
-                  type="caption"
-                  style={{
-                    color: themeColors.icon,
-                    marginBottom: Spacing.small,
-                    fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
-                  }}
-                  accessibilityLabel={strings.dueDateLabel}
-                >
-                  {strings.dueDateLabel}
-                </AccessibleText>
-                <AccessibleText
-                  style={{
-                    color: themeColors.text,
-                    fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
-                  }}
-                  accessibilityLabel={formatDateLong(new Date(task.dueDate!))}
-                >
-                  {formatDateLong(new Date(task.dueDate!))}
-                </AccessibleText>
-              </View>
-            )}
+        {!task.dueDate && task.status === TaskStatus.COMPLETED && (
+          <View style={{ marginBottom: Spacing.medium }}>
+            <DueDateBadge status="completed" size="md" />
+          </View>
+        )}
 
-            <View style={{ marginTop: Spacing.large }}>
-              {task.status !== TaskStatus.COMPLETED ? (
-                <View style={{ flexDirection: buttonLayoutIsRow ? "row" : "column", gap: Spacing.medium, overflow: "visible", justifyContent: "center", alignItems: "center", marginHorizontal: "auto" }}>
-                  <AccessibleButton
-                    title={strings.completeButton}
-                    icon={
-                      <Ionicons
-                        name="checkmark"
-                        size={24}
-                        color={themeColors.buttonText}
-                      />
-                    }
-                    onPress={handleCompleteTask}
-                    accessibilityLabel={strings.completeButtonA11y}
-                    style={[
-                      sharedStyles.createButton,
-                      {
-                        height: buttonHeight,
-                        borderWidth: 1.5,
-                        borderColor: "transparent",
-                      },
-                    ]}
+        <View style={{ marginTop: Spacing.large }}>
+          {task.status !== TaskStatus.COMPLETED ? (
+            <View style={{ flexDirection: buttonLayoutIsRow ? "row" : "column", gap: Spacing.medium, overflow: "visible", justifyContent: "center", alignItems: "center", marginHorizontal: "auto" }}>
+              <AccessibleButton
+                title={strings.completeButton}
+                icon={
+                  <Ionicons
+                    name="checkmark"
+                    size={24}
+                    color={themeColors.buttonText}
                   />
-                  <AccessibleButton
-                    title={strings.editButton}
-                    icon={
-                      <Ionicons
-                        name="pencil"
-                        size={20}
-                        color={themeColors.tint}
-                      />
-                    }
-                    onPress={() => setIsEditModalOpen(true)}
-                    accessibilityLabel={strings.editButtonA11y}
-                    textColor={themeColors.tint}
-                    style={[
-                      sharedStyles.createButton,
-                      {
-                        height: buttonHeight,
-                        borderColor: themeColors.tint,
-                        borderWidth: 1.5,
-                        backgroundColor: "transparent",
-                      },
-                    ]}
+                }
+                onPress={handleCompleteTask}
+                accessibilityLabel={strings.completeButtonA11y}
+                style={[
+                  sharedStyles.createButton,
+                  {
+                    height: buttonHeight,
+                    borderWidth: 1.5,
+                    borderColor: "transparent",
+                  },
+                ]}
+              />
+              <AccessibleButton
+                title={strings.editButton}
+                icon={
+                  <Ionicons
+                    name="pencil"
+                    size={20}
+                    color={themeColors.tint}
                   />
-                </View>
-              ) : (
-                <AccessibleText
-                  style={{
-                    color: themeColors.success,
-                    textAlign: "center",
-                  }}
-                  accessibilityLabel={commonStrings.taskCompletedA11y}
-                >
-                  ✔ {strings.completedTag}
-                </AccessibleText>
-              )}
+                }
+                onPress={() => setIsEditModalOpen(true)}
+                accessibilityLabel={strings.editButtonA11y}
+                textColor={themeColors.tint}
+                style={[
+                  sharedStyles.createButton,
+                  {
+                    height: buttonHeight,
+                    borderColor: themeColors.tint,
+                    borderWidth: 1.5,
+                    backgroundColor: "transparent",
+                  },
+                ]}
+              />
             </View>
-          </ScrollView>
+          ) : (
+            <AccessibleText
+              style={{
+                color: themeColors.success,
+                textAlign: "center",
+              }}
+              accessibilityLabel={commonStrings.taskCompletedA11y}
+            >
+              ✔ {strings.completedTag}
+            </AccessibleText>
+          )}
         </View>
-      </View>
+      </ScrollView>
+    );
+  };
+
+  return (
+    <>
+      <BaseModal visible={visible} onClose={onClose} header={header} maxWidth={600}>
+        {renderContent()}
+      </BaseModal>
 
       <ConfirmModal
         visible={isOpen}
@@ -425,6 +358,6 @@ export function TaskDetailsModal({
         task={task}
         onClose={handleEditSuccess}
       />
-    </Modal>
+    </>
   );
 }

@@ -68,3 +68,32 @@ export const formatDateInput = (
     return placeholder;
   }
 };
+
+// Status da data de vencimento (timezone-safe, usa componentes locais)
+export type DueDateStatus = "overdue" | "today" | "soon" | "upcoming" | null;
+
+export function getDueDateStatus(dueDate?: string): DueDateStatus {
+  if (!dueDate) return null;
+
+  const date = new Date(dueDate);
+  if (!isValid(date)) return null;
+
+  const now = new Date();
+  const todayY = now.getFullYear();
+  const todayM = now.getMonth();
+  const todayD = now.getDate();
+
+  const dueY = date.getFullYear();
+  const dueM = date.getMonth();
+  const dueD = date.getDate();
+
+  // Compara apenas a parte da data (ignora horário)
+  const todayStart = new Date(todayY, todayM, todayD).getTime();
+  const dueStart = new Date(dueY, dueM, dueD).getTime();
+  const soonLimit = new Date(todayY, todayM, todayD + 3).getTime();
+
+  if (dueStart < todayStart) return "overdue";
+  if (dueStart === todayStart) return "today";
+  if (dueStart <= soonLimit) return "soon";
+  return "upcoming";
+}

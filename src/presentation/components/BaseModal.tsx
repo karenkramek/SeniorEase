@@ -100,6 +100,15 @@ export function BaseModal({
           }}
         >
           {header}
+          {header && (
+            <View
+              style={{
+                height: 1,
+                backgroundColor: themeColors.icon + "30",
+                marginHorizontal: -24,
+              }}
+            />
+          )}
           {children}
           {footer}
         </View>

@@ -61,6 +61,7 @@ function getPageNameFromSegments(
     // Modal routes
     "create-task": appTexts.navigation.createTaskHeaderTitle || "Nova Tarefa",
     "task-details": appTexts.navigation.taskDetailsHeaderTitle || "Detalhes da Tarefa",
+    "edit-task": appTexts.editTask.screenLabel || "Editar tarefa",
     modal: appTexts.navigation.modalHeaderTitle || "Modal",
   };
 

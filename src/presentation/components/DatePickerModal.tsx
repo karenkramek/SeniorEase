@@ -122,49 +122,38 @@ export function DatePickerModal({
   }, [visible, day, month, year, startYear]);
 
   const header = (
-    <View>
-      <View
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
+      <AccessibleText
+        type="h2"
         style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: Spacing.medium,
+          color: themeColors.text,
+          fontSize: isWebMobile ? 18 : 20,
         }}
+        accessibilityLabel={datePicker.title}
       >
-        <AccessibleText
-          type="h2"
-          style={{
-            color: themeColors.text,
-            fontSize: isWebMobile ? 18 : 20,
-          }}
-          accessibilityLabel={datePicker.title}
-        >
-          {datePicker.title}
-        </AccessibleText>
+        {datePicker.title}
+      </AccessibleText>
 
-        <TouchableOpacity
-          onPress={onClose}
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel={common.close}
-          hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-        >
-          <Ionicons
-            name="close"
-            size={24}
-            color={themeColors.icon}
-            accessibilityElementsHidden
-          />
-        </TouchableOpacity>
-      </View>
-
-      <View
-        style={{
-          height: 1,
-          backgroundColor: themeColors.icon + "20",
-          marginBottom: Spacing.medium,
-        }}
-      />
+      <TouchableOpacity
+        onPress={onClose}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={common.close}
+        hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+      >
+        <Ionicons
+          name="close"
+          size={24}
+          color={themeColors.icon}
+          accessibilityElementsHidden
+        />
+      </TouchableOpacity>
     </View>
   );
 
@@ -204,9 +193,9 @@ export function DatePickerModal({
         }}
       >
         <AccessibleButton
-          title={common.confirm}
+          title={datePicker.selectButton}
           onPress={handleConfirm}
-          accessibilityLabel={datePicker.confirmA11y}
+          accessibilityLabel={datePicker.selectButtonA11y}
           textColor={themeColors.buttonText}
           style={[
             sharedStyles.secondaryButton,

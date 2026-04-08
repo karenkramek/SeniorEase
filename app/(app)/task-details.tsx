@@ -13,11 +13,12 @@ import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { formatDateLong } from "@/presentation/utils/format";
+import { formatDateLong, getDueDateStatus } from "@/presentation/utils/format";
+import { DueDateBadge } from "@/presentation/components/DueDateBadge";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, ScrollView, View, useWindowDimensions } from "react-native";
+import { ActivityIndicator, ScrollView, View } from "react-native";
 
 export default function TaskDetailsScreen() {
   const appTexts = useAppStrings();
@@ -28,10 +29,7 @@ export default function TaskDetailsScreen() {
   const { themeColors } = useTheme();
   const { preferences } = usePreferences();
   const buttonHeight = useButtonHeight();
-  const { width: windowWidth } = useWindowDimensions();
 
-  // Responsive: Mobile < 640px (stacked), Tablet+ >= 640px (side-by-side)
-  const isSmallScreen = windowWidth < 640;
 
   const taskRepository = useTaskRepository();
   const completeTaskUseCase = useMemo(
@@ -171,21 +169,33 @@ export default function TaskDetailsScreen() {
       )}
 
       {task.dueDate && (
-        <AccessibleText
-          type="caption"
-          style={{
-            color: themeColors.icon,
-            marginBottom: Spacing.medium,
-            fontSize: 13 * preferences.fontSizeMultiplier,
-          }}
-          accessibilityLabel={`Prazo: ${formatDateLong(new Date(task.dueDate!))}`}
-        >
-          {strings.dueDateLabel}: {formatDateLong(new Date(task.dueDate!))}
-        </AccessibleText>
+        <View style={{ marginBottom: Spacing.medium }}>
+          <AccessibleText
+            type="caption"
+            style={{
+              color: themeColors.icon,
+              marginBottom: 4,
+              fontSize: 13 * preferences.fontSizeMultiplier,
+            }}
+            accessibilityLabel={`Prazo: ${formatDateLong(new Date(task.dueDate!))}`}
+          >
+            {strings.dueDateLabel}: {formatDateLong(new Date(task.dueDate!))}
+          </AccessibleText>
+          <DueDateBadge
+            status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
+            size="md"
+          />
+        </View>
+      )}
+
+      {!task.dueDate && task.status === TaskStatus.COMPLETED && (
+        <View style={{ marginBottom: Spacing.medium }}>
+          <DueDateBadge status="completed" size="md" />
+        </View>
       )}
 
       {task.status !== TaskStatus.COMPLETED ? (
-        <View style={{ flexDirection: isSmallScreen ? "column" : "row", gap: Spacing.medium, marginTop: Spacing.medium, overflow: "visible", paddingBottom: Spacing.large, justifyContent: "center", alignItems: "center" }}>
+        <View style={{ flexDirection: "column", gap: Spacing.medium, marginTop: Spacing.medium, overflow: "visible", paddingBottom: Spacing.large, justifyContent: "center", alignItems: "center" }}>
           <AccessibleButton
             title={strings.editButton}
             icon={
