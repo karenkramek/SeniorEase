@@ -1,7 +1,7 @@
 /// <reference types="jest" />
-import CreateTaskScreen from "../(app)/create-task";
 import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import React from "react";
+import CreateTaskScreen from "../(app)/create-task";
 
 const mockCreateTask = jest.fn();
 const mockShowNotification = jest.fn();
@@ -23,57 +23,6 @@ jest.mock("expo-router", () => ({
   useRouter: () => ({
     back: mockBack,
     canGoBack: () => true,
-  }),
-}));
-
-jest.mock("@/presentation/hooks/usePreferences", () => ({
-  usePreferences: () => ({
-    preferences: {
-      fontSizeMultiplier: 1,
-      isHighContrast: false,
-      spacingMultiplier: 1,
-      isSimplifiedMode: false,
-      useExtraConfirmation: false,
-      theme: "light",
-    },
-  }),
-}));
-
-jest.mock("@/presentation/hooks/useAppStrings", () => ({
-  useAppStrings: () => ({
-    createTask: {
-      screenLabel: "Tela de criação de tarefa",
-      titleLabel: "Título da tarefa *",
-      titleFieldLabel: "Título da tarefa",
-      titleRequiredHint: "Campo obrigatório",
-      descriptionLabel: "Descrição da tarefa (opcional)",
-      descriptionPlaceholder: "Descrição (opcional)",
-      createButton: "Criar Tarefa",
-      createButtonA11y: "Botão para criar tarefa",
-      titleRequiredError: "Informe um título para criar a tarefa.",
-      createSuccess: "Tarefa criada com sucesso.",
-      createError: "Não foi possível criar a tarefa.",
-      createErrorDetail: "Não foi possível criar a tarefa agora. Tente novamente.",
-    },
-    taskList: {
-      addIconA11y: "Ícone de adicionar",
-    },
-    datePicker: {
-      title: "Selecionar data",
-      dayLabel: "Dia",
-      selectDayA11y: "Selecionar dia",
-      monthLabel: "Mês",
-      selectMonthA11y: "Selecionar mês",
-      yearLabel: "Ano",
-      selectYearA11y: "Selecionar ano",
-      cancelA11y: "Cancelar seleção de data",
-      confirmA11y: "Confirmar data selecionada",
-    },
-    common: {
-      cancel: "Cancelar",
-      confirm: "Confirmar",
-      close: "Fechar",
-    },
   }),
 }));
 
