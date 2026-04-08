@@ -1,6 +1,5 @@
 /// <reference types="jest" />
 import { ConfirmModal } from "@/presentation/components/ConfirmModal";
-import { appStrings } from "@/presentation/i18n/strings";
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
@@ -44,8 +43,8 @@ describe("ConfirmModal", () => {
       />,
     );
 
-    fireEvent.press(getByText(appStrings.common.confirm));
-    fireEvent.press(getByText(appStrings.common.cancel));
+    fireEvent.press(getByText("Confirmar"));
+    fireEvent.press(getByText("Cancelar"));
 
     expect(onConfirm).toHaveBeenCalledTimes(1);
     expect(onCancel).toHaveBeenCalledTimes(1);
