@@ -1,0 +1,109 @@
+import { useTheme } from "@/presentation/hooks/useTheme";
+import React from "react";
+import { Modal, Platform, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+/**
+ * BASE MODAL COMPONENT
+ *
+ * Provides a consistent modal wrapper for all dialogs throughout the project.
+ *
+ * BUTTON ORDERING CONVENTION:
+ * When rendering buttons in the footer, always follow this order:
+ * 1. Cancel/Close button (secondary, often transparent)
+ * 2. Confirm/Submit button (primary, colored)
+ * 3. Delete/Destructive button (if present, error color)
+ *
+ * Examples:
+ * - Cancel → Confirm
+ * - Cancel → Create
+ * - Cancel → Delete
+ * - Cancel → Confirm → Delete
+ *
+ * This ensures consistent UX across all modals in the application.
+ */
+
+interface BaseModalProps {
+  visible: boolean;
+  onClose: () => void;
+  children: React.ReactNode;
+  header?: React.ReactNode;
+  footer?: React.ReactNode;
+  maxWidth?: number;
+  onShow?: () => void;
+  restoreFocusRef?: React.RefObject<React.ElementRef<typeof TouchableOpacity> | null>;
+}
+
+export function BaseModal({
+  visible,
+  onClose,
+  children,
+  header,
+  footer,
+  maxWidth = 520,
+  onShow,
+  restoreFocusRef,
+}: BaseModalProps) {
+  const { themeColors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
+  const wasVisibleRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (visible) {
+      wasVisibleRef.current = true;
+      return;
+    }
+
+    if (Platform.OS === "web" && wasVisibleRef.current) {
+      const timer = setTimeout(() => {
+        restoreFocusRef?.current?.focus?.();
+      }, 0);
+      wasVisibleRef.current = false;
+      return () => clearTimeout(timer);
+    }
+  }, [restoreFocusRef, visible]);
+
+  // No mobile APP, deixa espaço para o menu inferior (insets.bottom) + 20px extra
+  const isMobileApp = Platform.OS !== "web";
+  const overlayMaxHeight = isMobileApp ? screenHeight - insets.bottom - 20 : screenHeight;
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+      accessibilityViewIsModal
+      onShow={onShow}
+    >
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          maxHeight: overlayMaxHeight,
+        }}
+      >
+        <View
+          style={{
+            width: "100%",
+            maxWidth,
+            borderRadius: 12,
+            padding: 24,
+            backgroundColor: themeColors.background,
+            borderWidth: 1,
+            borderColor: themeColors.icon,
+            gap: 12,
+            marginHorizontal: 20,
+          }}
+        >
+          {header}
+          {children}
+          {footer}
+        </View>
+      </View>
+    </Modal>
+  );
+}

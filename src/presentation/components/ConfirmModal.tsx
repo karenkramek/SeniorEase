@@ -1,10 +1,13 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { BaseModal } from "@/presentation/components/BaseModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebPlatform } from "@/presentation/theme/colors";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import React from "react";
-import { Modal, Platform, TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 interface ConfirmModalProps {
   visible: boolean;
@@ -14,6 +17,7 @@ interface ConfirmModalProps {
   cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  isDestructive?: boolean;
   restoreFocusRef?: React.RefObject<React.ElementRef<
     typeof TouchableOpacity
   > | null>;
@@ -27,40 +31,30 @@ export function ConfirmModal({
   cancelText,
   onConfirm,
   onCancel,
+  isDestructive = false,
   restoreFocusRef,
 }: ConfirmModalProps) {
   const { themeColors } = useTheme();
   const { common } = useAppStrings();
+  const { width: screenWidth } = useWindowDimensions();
+  const buttonHeight = useButtonHeight();
   const effectiveConfirmText = confirmText ?? common.confirm;
   const effectiveCancelText = cancelText ?? common.cancel;
+
+  const isWeb = isWebPlatform();
+  const isSmallScreen = screenWidth < 640;
+  const shouldStackButtons = !isWeb || (isWeb && isSmallScreen);
 
   const confirmButtonRef = React.useRef<React.ElementRef<
     typeof TouchableOpacity
   > | null>(null);
-  const wasVisibleRef = React.useRef(false);
-
-  React.useEffect(() => {
-    if (visible) {
-      wasVisibleRef.current = true;
-      return;
-    }
-
-    if (Platform.OS === "web" && wasVisibleRef.current) {
-      const timer = setTimeout(() => {
-        restoreFocusRef?.current?.focus?.();
-      }, 0);
-      wasVisibleRef.current = false;
-      return () => clearTimeout(timer);
-    }
-  }, [restoreFocusRef, visible]);
 
   return (
-    <Modal
+    <BaseModal
       visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onCancel}
-      accessibilityViewIsModal
+      onClose={onCancel}
+      restoreFocusRef={restoreFocusRef}
+      maxWidth={450}
       onShow={() => {
         if (Platform.OS === "web") {
           setTimeout(() => {
@@ -69,57 +63,49 @@ export function ConfirmModal({
         }
       }}
     >
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 20,
-          backgroundColor: "rgba(0,0,0,0.5)",
-        }}
-      >
-        <View
-          style={{
-            width: "100%",
-            maxWidth: 420,
-            borderRadius: 12,
-            padding: 24,
-            backgroundColor: themeColors.background,
-            borderWidth: 1,
-            borderColor: themeColors.icon,
-            gap: 12,
-          }}
-        >
-          <AccessibleText type="h2" accessibilityLabel={title}>
-            {title}
-          </AccessibleText>
-          <AccessibleText accessibilityLabel={message}>
-            {message}
-          </AccessibleText>
+      <AccessibleText type="h2" accessibilityLabel={title}>
+        {title}
+      </AccessibleText>
+      <AccessibleText accessibilityLabel={message}>
+        {message}
+      </AccessibleText>
 
-          <View style={{ marginTop: 8, gap: 8 }}>
-            <AccessibleButton
-              ref={confirmButtonRef}
-              title={effectiveConfirmText}
-              onPress={onConfirm}
-              accessibilityLabel={effectiveConfirmText}
-            />
-            <AccessibleButton
-              title={effectiveCancelText}
-              onPress={onCancel}
-              accessibilityLabel={effectiveCancelText}
-              textColor={themeColors.text}
-              style={[
-                sharedStyles.secondaryButton,
-                {
-                  backgroundColor: "transparent",
-                  borderColor: themeColors.icon,
-                },
-              ]}
-            />
-          </View>
-        </View>
+      <View style={{ marginTop: 12, gap: 12, flexDirection: shouldStackButtons ? "column" : "row", justifyContent: "center", alignItems: "center", width: "100%", marginHorizontal: "auto" }}>
+        <AccessibleButton
+          ref={confirmButtonRef}
+          title={effectiveConfirmText}
+          onPress={onConfirm}
+          accessibilityLabel={effectiveConfirmText}
+          textColor={themeColors.buttonText}
+          style={[
+            sharedStyles.secondaryButton,
+            {
+              height: buttonHeight,
+              backgroundColor: isDestructive ? themeColors.error : themeColors.tint,
+              borderWidth: 0,
+              borderColor: "transparent",
+              minWidth: 200,
+              maxWidth: 230,
+            },
+          ]}
+        />
+        <AccessibleButton
+          title={effectiveCancelText}
+          onPress={onCancel}
+          accessibilityLabel={effectiveCancelText}
+          textColor={themeColors.text}
+          style={[
+            sharedStyles.secondaryButton,
+            {
+              height: buttonHeight,
+              backgroundColor: "transparent",
+              borderColor: themeColors.icon,
+              minWidth: 200,
+              maxWidth: 230,
+            },
+          ]}
+        />
       </View>
-    </Modal>
+    </BaseModal>
   );
 }

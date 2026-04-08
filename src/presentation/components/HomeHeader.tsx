@@ -1,9 +1,10 @@
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
+import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React from "react";
-import { Pressable, View, useWindowDimensions } from "react-native";
+import { Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AccessibleButton } from "./AccessibleButton";
 import { AccessibleText } from "./AccessibleText";
@@ -59,19 +60,54 @@ export function HomeHeader() {
           gap: isMobile ? Spacing.medium : 0,
         }}
       >
-        {/* Logo */}
-        <AccessibleText
-          type="h2"
-          style={{
-            color: "#ffffff",
-            fontWeight: "700",
-            textAlign: isMobile ? "center" : "left",
-            width: isMobile ? "100%" : "auto",
-          }}
-          accessibilityLabel={common.appTitle}
-        >
-          {common.appTitle}
-        </AccessibleText>
+        {/* Logo with Icon */}
+        {Platform.OS === "web" ? (
+          <Pressable
+            onPress={navigateHome}
+            accessible={true}
+            accessibilityRole="link"
+            accessibilityLabel={`Ir para ${common.appTitle}`}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: Spacing.small,
+            }}
+          >
+            <Ionicons name="finger-print" size={32} color="#ffffff" />
+            <AccessibleText
+              type="h2"
+              style={{
+                color: "#ffffff",
+                fontWeight: "700",
+                textAlign: "left",
+              }}
+              accessibilityLabel={common.appTitle}
+            >
+              {common.appTitle}
+            </AccessibleText>
+          </Pressable>
+        ) : (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: Spacing.small,
+            }}
+          >
+            <AccessibleText
+              type="h2"
+              style={{
+                color: "#ffffff",
+                fontWeight: "700",
+                textAlign: isMobile ? "center" : "left",
+                width: isMobile ? "100%" : "auto",
+              }}
+              accessibilityLabel={common.appTitle}
+            >
+              {common.appTitle}
+            </AccessibleText>
+          </View>
+        )}
 
         {/* Navigation Links and Login Button */}
         <View

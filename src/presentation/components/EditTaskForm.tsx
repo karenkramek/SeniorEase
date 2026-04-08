@@ -4,17 +4,20 @@ import { AccessibleFormField } from "@/presentation/components/AccessibleFormFie
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { DatePickerModal } from "@/presentation/components/DatePickerModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useNotification } from "@/presentation/hooks/useNotification";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebPlatform } from "@/presentation/theme/colors";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 interface EditTaskFormProps {
   task: Task;
   onSuccess?: () => void;
+  onCancel?: () => void;
   isModal?: boolean;
   showScrollView?: boolean;
 }
@@ -22,11 +25,14 @@ interface EditTaskFormProps {
 export function EditTaskForm({
   task,
   onSuccess,
+  onCancel,
   isModal = false,
   showScrollView = true,
 }: EditTaskFormProps) {
   const appTexts = useAppStrings();
   const strings = appTexts.editTask;
+  const { width: screenWidth } = useWindowDimensions();
+  const buttonHeight = useButtonHeight();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(""); // Format: "dd/mm/yyyy"
@@ -35,7 +41,11 @@ export function EditTaskForm({
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { editTask } = useTasks();
   const { showNotification } = useNotification();
-  const { themeColors } = useTheme();
+  const { themeColors, colorScheme } = useTheme();
+
+  const isWeb = isWebPlatform();
+  const isSmallScreen = screenWidth < 640;
+  const shouldStackButtons = !isWeb || (isWeb && isSmallScreen);
 
   // Initialize form with task data
   useEffect(() => {
@@ -120,7 +130,7 @@ export function EditTaskForm({
           color: themeColors.text,
         }}
         inputContainerStyle={{
-          borderColor: titleError ? themeColors.error : themeColors.tint,
+          borderColor: titleError ? themeColors.error : undefined,
           backgroundColor: themeColors.background,
         }}
       />
@@ -146,7 +156,6 @@ export function EditTaskForm({
           textAlignVertical: "top" as "top",
         }}
         inputContainerStyle={{
-          borderColor: themeColors.tint,
           backgroundColor: themeColors.background,
           minHeight: 120,
           paddingVertical: 8,
@@ -168,7 +177,7 @@ export function EditTaskForm({
         accessibilityHint={`${strings.dueDateA11yHintSelected}: ${dueDate || strings.dueDateA11yHintNone}. ${strings.dueDateA11yHintAction}`}
         style={{
           borderWidth: 2,
-          borderColor: themeColors.tint,
+          borderColor: colorScheme === 'dark' ? '#FFFFFF' : themeColors.tint,
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 12,
@@ -205,7 +214,12 @@ export function EditTaskForm({
         style={{
           marginTop: 24,
           marginBottom: isModal ? 0 : 8,
+          gap: 12,
+          flexDirection: shouldStackButtons ? "column" : "row",
           alignItems: "center",
+          justifyContent: "center",
+          marginHorizontal: "auto",
+          width: "100%",
         }}
       >
         <AccessibleButton
@@ -213,15 +227,39 @@ export function EditTaskForm({
           icon={
             <MaterialIcons
               name="edit"
-              size={32}
+              size={24}
               color={themeColors.buttonText}
               accessibilityLabel="Ícone de editar"
             />
           }
           onPress={handleEdit}
           accessibilityLabel={strings.editButtonA11y}
-          style={sharedStyles.createButton}
+          style={[
+            sharedStyles.secondaryButton,
+            {
+              height: buttonHeight,
+              backgroundColor: themeColors.tint,
+              borderWidth: 0,
+              borderColor: "transparent",
+            },
+          ]}
         />
+        {onCancel && (
+          <AccessibleButton
+            title={strings.cancelButton}
+            onPress={onCancel}
+            accessibilityLabel={strings.cancelButton}
+            textColor={themeColors.text}
+            style={[
+              sharedStyles.secondaryButton,
+              {
+                height: buttonHeight,
+                backgroundColor: "transparent",
+                borderColor: themeColors.icon,
+              },
+            ]}
+          />
+        )}
       </View>
     </>
   );

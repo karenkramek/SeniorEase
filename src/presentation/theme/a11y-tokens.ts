@@ -11,7 +11,7 @@ export const A11yTokens = {
   // Focus indicator - visível em todas as interações (2.4.7 Focus Visible)
   focus: {
     outlineWidth: 3,
-    outlineColor: '#1F4E79', // Navy azul (alto contraste)
+    outlineColor: '#FFFFFF', // Navy azul (alto contraste)
     outlineStyle: 'solid' as const,
   },
 

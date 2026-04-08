@@ -22,6 +22,12 @@ export default function Root({ children }: PropsWithChildren) {
           href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&display=swap"
           rel="stylesheet"
         />
+        {/* Favicon SVG inline */}
+        <link
+          rel="icon"
+          type="image/svg+xml"
+          href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230F766E' width='100' height='100'/><g fill='none' stroke='white' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'><circle cx='50' cy='35' r='8'/><path d='M50 45 Q35 55 35 70 Q35 80 50 80 Q65 80 65 70 Q65 55 50 45'/><path d='M42 60 Q45 65 50 65 Q55 65 58 60'/></g></svg>"
+        />
       </head>
       <body
         style={{

@@ -7,6 +7,7 @@ import { ConfirmModal } from "@/presentation/components/ConfirmModal";
 import { EditTaskModal } from "@/presentation/components/EditTaskModal";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
@@ -26,6 +27,7 @@ export default function TaskDetailsScreen() {
   const router = useRouter();
   const { themeColors } = useTheme();
   const { preferences } = usePreferences();
+  const buttonHeight = useButtonHeight();
   const { width: windowWidth } = useWindowDimensions();
 
   // Responsive: Mobile < 640px (stacked), Tablet+ >= 640px (side-by-side)
@@ -149,7 +151,7 @@ export default function TaskDetailsScreen() {
             style={{
               color: themeColors.icon,
               marginBottom: Spacing.small,
-              fontSize: 13,
+              fontSize: 13 * preferences.fontSizeMultiplier,
             }}
             accessibilityLabel={strings.descriptionLabel}
           >
@@ -158,8 +160,8 @@ export default function TaskDetailsScreen() {
           <AccessibleText
             style={{
               color: themeColors.text,
-              lineHeight: 22,
-              fontSize: 15,
+              lineHeight: 22 * preferences.fontSizeMultiplier,
+              fontSize: 15 * preferences.fontSizeMultiplier,
             }}
             accessibilityLabel={task.description}
           >
@@ -171,7 +173,11 @@ export default function TaskDetailsScreen() {
       {task.dueDate && (
         <AccessibleText
           type="caption"
-          style={{ color: themeColors.icon, marginBottom: Spacing.medium }}
+          style={{
+            color: themeColors.icon,
+            marginBottom: Spacing.medium,
+            fontSize: 13 * preferences.fontSizeMultiplier,
+          }}
           accessibilityLabel={`Prazo: ${formatDateLong(new Date(task.dueDate!))}`}
         >
           {strings.dueDateLabel}: {formatDateLong(new Date(task.dueDate!))}
@@ -179,7 +185,7 @@ export default function TaskDetailsScreen() {
       )}
 
       {task.status !== TaskStatus.COMPLETED ? (
-        <View style={{ flexDirection: isSmallScreen ? "column" : "row", gap: Spacing.medium, marginTop: Spacing.medium, overflow: "visible", paddingBottom: Spacing.large }}>
+        <View style={{ flexDirection: isSmallScreen ? "column" : "row", gap: Spacing.medium, marginTop: Spacing.medium, overflow: "visible", paddingBottom: Spacing.large, justifyContent: "center", alignItems: "center" }}>
           <AccessibleButton
             title={strings.editButton}
             icon={
@@ -195,14 +201,10 @@ export default function TaskDetailsScreen() {
             style={[
               sharedStyles.createButton,
               {
-                flex: !isSmallScreen ? 1 : undefined,
-                height: 66,
+                height: buttonHeight,
                 borderColor: themeColors.tint,
                 borderWidth: 1.5,
                 backgroundColor: "transparent",
-                shadowColor: "transparent",
-                shadowOpacity: 0,
-                elevation: 0,
               },
             ]}
           />
@@ -217,7 +219,14 @@ export default function TaskDetailsScreen() {
             }
             onPress={handleCompleteTask}
             accessibilityLabel={strings.completeButtonA11y}
-            style={[sharedStyles.createButton, { flex: !isSmallScreen ? 1 : undefined, height: 66, shadowColor: "transparent", shadowOpacity: 0, elevation: 0, borderWidth: 1.5, borderColor: "transparent" }]}
+            style={[
+              sharedStyles.createButton,
+              {
+                height: buttonHeight,
+                borderWidth: 1.5,
+                borderColor: "transparent",
+              },
+            ]}
           />
         </View>
       ) : (
@@ -239,6 +248,7 @@ export default function TaskDetailsScreen() {
         message={options?.message ?? ""}
         confirmText={options?.confirmText}
         cancelText={options?.cancelText}
+        isDestructive={options?.isDangerous}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />

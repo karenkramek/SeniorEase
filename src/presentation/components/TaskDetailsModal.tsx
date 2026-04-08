@@ -7,6 +7,7 @@ import { ConfirmModal } from "@/presentation/components/ConfirmModal";
 import { EditTaskModal } from "@/presentation/components/EditTaskModal";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
@@ -45,6 +46,7 @@ export function TaskDetailsModal({
   const { themeColors, isWeb } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
   const { preferences } = usePreferences();
+  const buttonHeight = useButtonHeight();
 
   // Web mobile: < 640px (sm breakpoint)
   const isWebMobile = isWeb && windowWidth < 640;
@@ -261,7 +263,7 @@ export function TaskDetailsModal({
               style={{
                 color: themeColors.text,
                 flex: 1,
-                fontSize: isWebMobile ? 18 : 20,
+                fontSize: (isWebMobile ? 18 : 20) * preferences.fontSizeMultiplier,
               }}
               accessibilityLabel={`Título: ${task.title}`}
             >
@@ -301,7 +303,7 @@ export function TaskDetailsModal({
                   style={{
                     color: themeColors.icon,
                     marginBottom: Spacing.small,
-                    fontSize: isWebMobile ? 12 : 13,
+                    fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
                   }}
                   accessibilityLabel={strings.descriptionLabel}
                 >
@@ -310,8 +312,8 @@ export function TaskDetailsModal({
                 <AccessibleText
                   style={{
                     color: themeColors.text,
-                    lineHeight: 22,
-                    fontSize: isWebMobile ? 14 : 15,
+                    lineHeight: 22 * preferences.fontSizeMultiplier,
+                    fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
                   }}
                   accessibilityLabel={task.description}
                 >
@@ -327,7 +329,7 @@ export function TaskDetailsModal({
                   style={{
                     color: themeColors.icon,
                     marginBottom: Spacing.small,
-                    fontSize: isWebMobile ? 12 : 13,
+                    fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
                   }}
                   accessibilityLabel={strings.dueDateLabel}
                 >
@@ -336,7 +338,7 @@ export function TaskDetailsModal({
                 <AccessibleText
                   style={{
                     color: themeColors.text,
-                    fontSize: isWebMobile ? 14 : 15,
+                    fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
                   }}
                   accessibilityLabel={formatDateLong(new Date(task.dueDate!))}
                 >
@@ -347,7 +349,27 @@ export function TaskDetailsModal({
 
             <View style={{ marginTop: Spacing.large }}>
               {task.status !== TaskStatus.COMPLETED ? (
-                <View style={{ flexDirection: buttonLayoutIsRow ? "row" : "column", gap: Spacing.medium, overflow: "visible" }}>
+                <View style={{ flexDirection: buttonLayoutIsRow ? "row" : "column", gap: Spacing.medium, overflow: "visible", justifyContent: "center", alignItems: "center", marginHorizontal: "auto" }}>
+                  <AccessibleButton
+                    title={strings.completeButton}
+                    icon={
+                      <Ionicons
+                        name="checkmark"
+                        size={24}
+                        color={themeColors.buttonText}
+                      />
+                    }
+                    onPress={handleCompleteTask}
+                    accessibilityLabel={strings.completeButtonA11y}
+                    style={[
+                      sharedStyles.createButton,
+                      {
+                        height: buttonHeight,
+                        borderWidth: 1.5,
+                        borderColor: "transparent",
+                      },
+                    ]}
+                  />
                   <AccessibleButton
                     title={strings.editButton}
                     icon={
@@ -363,26 +385,12 @@ export function TaskDetailsModal({
                     style={[
                       sharedStyles.createButton,
                       {
-                        flex: buttonLayoutIsRow ? 1 : undefined,
-                        height: 66,
+                        height: buttonHeight,
                         borderColor: themeColors.tint,
                         borderWidth: 1.5,
                         backgroundColor: "transparent",
                       },
                     ]}
-                  />
-                  <AccessibleButton
-                    title={strings.completeButton}
-                    icon={
-                      <Ionicons
-                        name="checkmark"
-                        size={24}
-                        color={themeColors.buttonText}
-                      />
-                    }
-                    onPress={handleCompleteTask}
-                    accessibilityLabel={strings.completeButtonA11y}
-                    style={[sharedStyles.createButton, { flex: buttonLayoutIsRow ? 1 : undefined, height: 66, borderWidth: 1.5, borderColor: "transparent" }]}
                   />
                 </View>
               ) : (
@@ -407,6 +415,7 @@ export function TaskDetailsModal({
         message={options?.message ?? ""}
         confirmText={options?.confirmText}
         cancelText={options?.cancelText}
+        isDestructive={options?.isDangerous}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />
