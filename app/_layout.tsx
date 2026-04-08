@@ -1,3 +1,4 @@
+import { ErrorBoundaryFallback } from "@/presentation/components/ErrorBoundaryFallback";
 import { GlobalNotification } from "@/presentation/components/GlobalNotification";
 import { NotificationProvider } from "@/presentation/contexts/NotificationContext";
 import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
@@ -11,6 +12,16 @@ import {
   AuthProvider,
   useAuth,
 } from "../src/presentation/contexts/AuthContext";
+
+export function ErrorBoundary({
+  error,
+  retry,
+}: {
+  error: Error;
+  retry: () => void;
+}) {
+  return <ErrorBoundaryFallback error={error} retry={retry} />;
+}
 
 function InitialLayout() {
   const { isAuthenticated, loading } = useAuth();

@@ -238,6 +238,12 @@ export const ptBRStrings = {
       "• Notificações e mensagens de erro são anunciadas com prioridade de acessibilidade.",
     footer: "Qualquer dúvida, estamos aqui para ajudar!",
   },
+  errorBoundary: {
+    title: "Algo deu errado",
+    message: "Ocorreu um erro inesperado. Tente novamente.",
+    retryButton: "Tentar novamente",
+    retryA11y: "Botão para tentar novamente",
+  },
   homepage: {
     tagline: "Organize suas tarefas e viva com mais qualidade",
     description:
