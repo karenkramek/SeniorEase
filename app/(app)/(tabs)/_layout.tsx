@@ -19,8 +19,9 @@ function TabBarForPlatform(props: BottomTabBarProps) {
   if (Platform.OS === "web") {
     return null;
   }
+  const bgColor = (props.descriptors[props.state.routes[props.state.index].key]?.options?.tabBarStyle?.backgroundColor as string) || "#fff";
   return (
-    <SafeAreaView edges={["bottom"]} style={{ backgroundColor: props.descriptors[props.state.routes[props.state.index].key]?.options?.tabBarStyle?.backgroundColor || "#fff" }}>
+    <SafeAreaView edges={["bottom"]} style={{ backgroundColor: bgColor }}>
       <BottomTabBar {...props} />
     </SafeAreaView>
   );
