@@ -3,7 +3,7 @@ import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-t
 import { Tabs } from "expo-router";
 import React, { useState } from "react";
 import { Platform, View, useWindowDimensions } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppHeader } from "@/presentation/components/AppHeader";
 import { HapticTab } from "@/presentation/components/HapticTab";
@@ -19,7 +19,11 @@ function TabBarForPlatform(props: BottomTabBarProps) {
   if (Platform.OS === "web") {
     return null;
   }
-  return <BottomTabBar {...props} />;
+  return (
+    <SafeAreaView edges={["bottom"]} style={{ backgroundColor: props.descriptors[props.state.routes[props.state.index].key]?.options?.tabBarStyle?.backgroundColor || "#fff" }}>
+      <BottomTabBar {...props} />
+    </SafeAreaView>
+  );
 }
 
 function WebBottomTabBar(props: BottomTabBarProps) {
@@ -51,7 +55,7 @@ export default function TabLayout() {
   const showBottomTabBar = isSmallScreen && isWeb;
 
   // Em mobile (não web), usar safe area bottom para a barra de abas
-  const tabBarBottomInset = !isWeb ? insets.bottom : 0;
+  const tabBarBottomInset = isWeb && showBottomTabBar ? 0 : insets.bottom;
 
   const tabs = (
     <Tabs
@@ -66,6 +70,8 @@ export default function TabLayout() {
           borderTopColor: themeColors.icon,
           height: showBottomTabBar ? 65 : 60,
           paddingBottom: tabBarBottomInset,
+          elevation: 0,
+          shadowColor: 'transparent',
         },
         tabBarLabelStyle: showBottomTabBar ? {
           fontSize: 12,
@@ -224,5 +230,9 @@ export default function TabLayout() {
   }
 
   // Versão nativa (iOS/Android)
-  return tabs;
+  return (
+    <SafeAreaView style={{ flex: 1 }} edges={["top", "left", "right"]}>
+      {tabs}
+    </SafeAreaView>
+  );
 }

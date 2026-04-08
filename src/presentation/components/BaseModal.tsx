@@ -40,7 +40,7 @@ export function BaseModal({
   children,
   header,
   footer,
-  maxWidth = 420,
+  maxWidth = 520,
   onShow,
   restoreFocusRef,
 }: BaseModalProps) {

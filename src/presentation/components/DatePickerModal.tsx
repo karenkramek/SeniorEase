@@ -2,6 +2,8 @@ import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { BaseModal } from "@/presentation/components/BaseModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
+import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -45,8 +47,13 @@ export function DatePickerModal({
 }: DatePickerModalProps) {
   const { themeColors, isWeb } = useTheme();
   const { datePicker, common } = useAppStrings();
+  const { preferences } = usePreferences();
+  const buttonHeight = useButtonHeight();
   const { width: windowWidth } = useWindowDimensions();
   const isWebMobile = isWeb && windowWidth < 640;
+
+  const isSmallScreen = windowWidth < 640;
+  const shouldStackButtons = !isWeb || (isWeb && isSmallScreen);
 
   const today = useMemo(() => new Date(), []);
 
@@ -176,7 +183,7 @@ export function DatePickerModal({
         <AccessibleText
           style={{
             color: themeColors.text,
-            fontSize: isWebMobile ? 16 : 18,
+            fontSize: (isWebMobile ? 16 : 18) * preferences.fontSizeMultiplier,
             fontWeight: "bold",
           }}
           accessibilityLabel={formatDate(new Date(year, month - 1, day))}
@@ -189,11 +196,30 @@ export function DatePickerModal({
       {/* Buttons */}
       <View
         style={{
-          flexDirection: "row",
+          flexDirection: shouldStackButtons ? "column" : "row",
           gap: 12,
           justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
         }}
       >
+        <AccessibleButton
+          title={common.confirm}
+          onPress={handleConfirm}
+          accessibilityLabel={datePicker.confirmA11y}
+          textColor={themeColors.buttonText}
+          style={[
+            sharedStyles.secondaryButton,
+            {
+              height: buttonHeight,
+              backgroundColor: themeColors.tint,
+              borderWidth: 0,
+              borderColor: "transparent",
+              minWidth: 200,
+              maxWidth: 230,
+            },
+          ]}
+        />
         <AccessibleButton
           title={common.cancel}
           onPress={onClose}
@@ -202,17 +228,13 @@ export function DatePickerModal({
           style={[
             sharedStyles.secondaryButton,
             {
-              flex: 1,
+              height: buttonHeight,
               backgroundColor: "transparent",
               borderColor: themeColors.icon,
+              minWidth: 200,
+              maxWidth: 230,
             },
           ]}
-        />
-        <AccessibleButton
-          title={common.confirm}
-          onPress={handleConfirm}
-          accessibilityLabel={datePicker.confirmA11y}
-          style={{ flex: 1 }}
         />
       </View>
     </>
@@ -222,7 +244,7 @@ export function DatePickerModal({
     <BaseModal
       visible={visible}
       onClose={onClose}
-      maxWidth={500}
+      maxWidth={450}
       header={header}
       footer={footer}
     >
@@ -242,7 +264,7 @@ export function DatePickerModal({
             style={{
               color: themeColors.icon,
               marginBottom: Spacing.small,
-              fontSize: isWebMobile ? 12 : 13,
+              fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
               fontWeight: "bold",
             }}
             accessibilityLabel={datePicker.dayLabel}
@@ -277,7 +299,7 @@ export function DatePickerModal({
                         ? themeColors.buttonText
                         : themeColors.text,
                     textAlign: "center",
-                    fontSize: isWebMobile ? 13 : 14,
+                    fontSize: (isWebMobile ? 13 : 14) * preferences.fontSizeMultiplier,
                   }}
                 >
                   {String(dayNum).padStart(2, "0")}
@@ -306,7 +328,7 @@ export function DatePickerModal({
             style={{
               color: themeColors.icon,
               marginBottom: Spacing.small,
-              fontSize: isWebMobile ? 12 : 13,
+              fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
               fontWeight: "bold",
             }}
             accessibilityLabel={datePicker.monthLabel}
@@ -343,7 +365,7 @@ export function DatePickerModal({
                         ? themeColors.buttonText
                         : themeColors.text,
                     textAlign: "center",
-                    fontSize: isWebMobile ? 12 : 13,
+                    fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
                   }}
                 >
                   {monthItem.label}
@@ -372,7 +394,7 @@ export function DatePickerModal({
             style={{
               color: themeColors.icon,
               marginBottom: Spacing.small,
-              fontSize: isWebMobile ? 12 : 13,
+              fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
               fontWeight: "bold",
             }}
             accessibilityLabel={datePicker.yearLabel}
@@ -407,7 +429,7 @@ export function DatePickerModal({
                         ? themeColors.buttonText
                         : themeColors.text,
                     textAlign: "center",
-                    fontSize: isWebMobile ? 13 : 14,
+                    fontSize: (isWebMobile ? 13 : 14) * preferences.fontSizeMultiplier,
                   }}
                 >
                   {yearNum}

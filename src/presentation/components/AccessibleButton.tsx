@@ -76,9 +76,12 @@ export const AccessibleButton = React.forwardRef<
     backgroundColor: variantStyles.backgroundColor,
     borderWidth: variantStyles.borderWidth ?? 0,
     borderColor: variantStyles.borderColor ?? "transparent",
-    padding: Spacing.medium * preferences.spacingMultiplier,
+    paddingVertical: Spacing.medium * preferences.spacingMultiplier,
+    paddingHorizontal: Spacing.large * preferences.spacingMultiplier,
     borderRadius: 12,
     alignItems: "center" as const,
+    justifyContent: "center" as const,
+    minHeight: 48,
   };
 
   const textStyle = {
@@ -95,7 +98,7 @@ export const AccessibleButton = React.forwardRef<
       accessibilityRole={accessibilityRole}
       {...rest}
     >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
         {icon && <View style={{ marginRight: 12 }}>{icon}</View>}
         <AccessibleText
           style={textStyle}

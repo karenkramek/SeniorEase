@@ -7,6 +7,7 @@ import { CreateTaskModal } from "@/presentation/components/CreateTaskModal";
 import { TaskCard } from "@/presentation/components/TaskCard";
 import { TaskDetailsModal } from "@/presentation/components/TaskDetailsModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
@@ -32,6 +33,7 @@ export default function TaskListScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { themeColors, preferences, isWeb } = useTheme();
+  const buttonHeight = useButtonHeight();
   const {
     tasks,
     isLoading,
@@ -372,7 +374,7 @@ export default function TaskListScreen() {
                 accessibilityLabel={strings.addIconA11y}
               />
             }
-            style={sharedStyles.createButton}
+            style={[sharedStyles.createButton, { height: buttonHeight }]}
             accessibilityLabel={strings.newTaskButtonA11y}
             onPress={() => {
               if (isWeb) {

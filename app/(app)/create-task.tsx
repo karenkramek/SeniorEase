@@ -17,12 +17,18 @@ export default function CreateTaskScreen() {
     }
   };
 
+  const handleCancel = () => {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={[{ flex: 1 }, { backgroundColor: themeColors.background }]}
     >
-      <CreateTaskForm onSuccess={handleSuccess} showScrollView={true} />
+      <CreateTaskForm onSuccess={handleSuccess} onCancel={handleCancel} showScrollView={true} />
     </KeyboardAvoidingView>
   );
 }

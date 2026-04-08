@@ -3,27 +3,33 @@ import { AccessibleFormField } from "@/presentation/components/AccessibleFormFie
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { DatePickerModal } from "@/presentation/components/DatePickerModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useNotification } from "@/presentation/hooks/useNotification";
 import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebPlatform } from "@/presentation/theme/colors";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import { ScrollView, TouchableOpacity, View, useWindowDimensions } from "react-native";
 
 interface CreateTaskFormProps {
   onSuccess?: () => void;
+  onCancel?: () => void;
   isModal?: boolean;
   showScrollView?: boolean;
 }
 
 export function CreateTaskForm({
   onSuccess,
+  onCancel,
   isModal = false,
   showScrollView = true,
 }: CreateTaskFormProps) {
   const appTexts = useAppStrings();
   const strings = appTexts.createTask;
+  const { width: screenWidth } = useWindowDimensions();
+  const buttonHeight = useButtonHeight();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(""); // Format: "dd/mm/yyyy"
@@ -33,6 +39,10 @@ export function CreateTaskForm({
   const { createTask } = useTasks();
   const { showNotification } = useNotification();
   const { themeColors, colorScheme } = useTheme();
+
+  const isWeb = isWebPlatform();
+  const isSmallScreen = screenWidth < 640;
+  const shouldStackButtons = !isWeb || (isWeb && isSmallScreen);
 
   const handleCreate = async () => {
     setSubmissionError(null);
@@ -186,7 +196,12 @@ export function CreateTaskForm({
         style={{
           marginTop: 24,
           marginBottom: isModal ? 0 : 8,
+          gap: 12,
+          flexDirection: shouldStackButtons ? "column" : "row",
           alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          marginHorizontal: "auto",
         }}
       >
         <AccessibleButton
@@ -194,15 +209,39 @@ export function CreateTaskForm({
           icon={
             <MaterialIcons
               name="add"
-              size={32}
+              size={24}
               color={themeColors.buttonText}
               accessibilityLabel={appTexts.taskList.addIconA11y}
             />
           }
           onPress={handleCreate}
           accessibilityLabel={strings.createButtonA11y}
-          style={sharedStyles.createButton}
+          style={[
+            sharedStyles.secondaryButton,
+            {
+              height: buttonHeight,
+              backgroundColor: themeColors.tint,
+              borderWidth: 0,
+              borderColor: "transparent",
+            },
+          ]}
         />
+        {onCancel && (
+          <AccessibleButton
+            title={strings.cancelButton}
+            onPress={onCancel}
+            accessibilityLabel={strings.cancelButton}
+            textColor={themeColors.text}
+            style={[
+              sharedStyles.secondaryButton,
+              {
+                height: buttonHeight,
+                backgroundColor: "transparent",
+                borderColor: themeColors.icon,
+              },
+            ]}
+          />
+        )}
       </View>
     </>
   );

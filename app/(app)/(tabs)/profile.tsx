@@ -2,6 +2,7 @@ import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useAuth } from "@/presentation/hooks/useAuth";
+import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -16,6 +17,7 @@ export default function ProfileScreen() {
   const commonStrings = appTexts.common;
   const { user, signOut } = useAuth();
   const { themeColors, preferences } = useTheme();
+  const buttonHeight = useButtonHeight();
   const insets = useSafeAreaInsets();
 
   return (
@@ -74,7 +76,7 @@ export default function ProfileScreen() {
               accessibilityLabel={strings.logoutIconA11y}
             />
           }
-          style={sharedStyles.createButton}
+          style={[sharedStyles.createButton, { height: buttonHeight }]}
         />
       </View>
     </View>
