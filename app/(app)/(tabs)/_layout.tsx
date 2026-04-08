@@ -20,7 +20,7 @@ function TabBarForPlatform(props: BottomTabBarProps) {
     return null;
   }
   const tabBarStyle = props.descriptors[props.state.routes[props.state.index].key]?.options?.tabBarStyle;
-  const bgColor = (typeof tabBarStyle === "object" && tabBarStyle?.backgroundColor as string) || "#fff";
+  const bgColor = (typeof tabBarStyle === "object" && "backgroundColor" in tabBarStyle && (tabBarStyle.backgroundColor as string)) || "#fff";
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: bgColor }}>
       <BottomTabBar {...props} />
