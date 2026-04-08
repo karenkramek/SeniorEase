@@ -104,8 +104,8 @@ export class AuthRepository implements IAuthRepository {
         fontSizeMultiplier: 1,
         isHighContrast: false,
         spacingMultiplier: 1,
-        isSimplifiedMode: false,
         useExtraConfirmation: false,
+        confirmOnComplete: false,
       });
 
       return user;

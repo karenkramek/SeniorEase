@@ -64,7 +64,7 @@ export default function TaskDetailsScreen() {
   const handleCompleteTask = async () => {
     if (!task) return;
 
-    if (preferences?.confirmOnComplete) {
+    if (preferences.confirmOnComplete) {
       showConfirmation({
         title: appTexts.taskList.confirmCompleteTitle,
         message: appTexts.taskList.confirmCompleteMessage,

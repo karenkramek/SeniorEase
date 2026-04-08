@@ -54,7 +54,7 @@ export default function PreferencesScreen() {
   );
   const completeConfirmSwitchColors = getSwitchColors(
     themeColors,
-    preferences.confirmOnComplete ?? false,
+    preferences.confirmOnComplete,
   );
 
   const switchColumnStyle = {
@@ -239,7 +239,7 @@ export default function PreferencesScreen() {
         </View>
         <View style={switchColumnStyle}>
         <Switch
-          value={preferences.confirmOnComplete ?? false}
+          value={preferences.confirmOnComplete}
           onValueChange={(value) => updatePreferences({ confirmOnComplete: value })}
           thumbColor={completeConfirmSwitchColors.thumbColor}
           ios_backgroundColor={completeConfirmSwitchColors.iosBackgroundColor}

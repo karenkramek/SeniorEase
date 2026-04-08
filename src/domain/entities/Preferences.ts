@@ -2,8 +2,7 @@ export interface Preferences {
   fontSizeMultiplier: number;
   isHighContrast: boolean;
   spacingMultiplier: number;
-  isSimplifiedMode: boolean;
   useExtraConfirmation: boolean;
+  confirmOnComplete: boolean;
   theme?: "light" | "dark";
-  confirmOnComplete?: boolean;
 }
