@@ -19,7 +19,8 @@ function TabBarForPlatform(props: BottomTabBarProps) {
   if (Platform.OS === "web") {
     return null;
   }
-  const bgColor = (props.descriptors[props.state.routes[props.state.index].key]?.options?.tabBarStyle?.backgroundColor as string) || "#fff";
+  const tabBarStyle = props.descriptors[props.state.routes[props.state.index].key]?.options?.tabBarStyle;
+  const bgColor = (typeof tabBarStyle === "object" && tabBarStyle?.backgroundColor as string) || "#fff";
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: bgColor }}>
       <BottomTabBar {...props} />
@@ -51,7 +52,6 @@ export default function TabLayout() {
   const isSmallScreen = screenWidth < 640;
   const isMediumScreen = screenWidth >= 640 && screenWidth < 1024;
   const isLargeScreen = screenWidth >= 1024;
-  const showSidebarPermanent = isLargeScreen;
   const showDrawerMenu = isMediumScreen;
   const showBottomTabBar = isSmallScreen && isWeb;
 
