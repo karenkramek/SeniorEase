@@ -69,6 +69,19 @@ export const formatDateInput = (
   }
 };
 
+// Formata data sem relativos (ex: "08 de abril") — sempre mostra dia e mês
+export const formatDateMedium = (date: Date): string => {
+  if (!date || !isValid(date)) {
+    return "";
+  }
+  try {
+    return format(date, "dd 'de' MMMM", { locale: ptBR });
+  } catch (error) {
+    console.warn("Erro ao formatar data média:", error);
+    return "";
+  }
+};
+
 // Status da data de vencimento (timezone-safe, usa componentes locais)
 export type DueDateStatus = "overdue" | "today" | "soon" | "upcoming" | null;
 
@@ -91,9 +104,11 @@ export function getDueDateStatus(dueDate?: string): DueDateStatus {
   const todayStart = new Date(todayY, todayM, todayD).getTime();
   const dueStart = new Date(dueY, dueM, dueD).getTime();
   const soonLimit = new Date(todayY, todayM, todayD + 3).getTime();
+  const upcomingLimit = new Date(todayY, todayM, todayD + 15).getTime();
 
   if (dueStart < todayStart) return "overdue";
   if (dueStart === todayStart) return "today";
   if (dueStart <= soonLimit) return "soon";
-  return "upcoming";
+  if (dueStart <= upcomingLimit) return "upcoming";
+  return null;
 }

@@ -95,6 +95,17 @@ export function DatePickerModal({
     onClose();
   };
 
+  // Sincroniza dia/mês/ano quando o modal abre com uma data diferente
+  useEffect(() => {
+    if (visible) {
+      const parsed = parseDate(selectedDate);
+      setDay(parsed.getDate());
+      setMonth(parsed.getMonth() + 1);
+      setYear(parsed.getFullYear());
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, selectedDate]);
+
   useEffect(() => {
     if (visible) {
       setTimeout(() => {

@@ -136,16 +136,28 @@ export default function TaskListScreen() {
     if (activeFilter === "ALL") return sortTasks(tasks, "date-desc");
     if (activeFilter === TaskFilter.UPCOMING) {
       const today = new Date();
-      const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const next15Days = new Date(today.getTime() + 15 * 24 * 60 * 60 * 1000);
       today.setHours(0, 0, 0, 0);
       const filtered = filterTasks({
         tasks,
         filters: {
           status: [TaskStatus.PENDING],
           dateFrom: today,
-          dateTo: nextWeek,
+          dateTo: next15Days,
           sortBy: "date-asc",
         },
+      });
+      return sortTasks(filtered, "date-asc");
+    }
+    if (activeFilter === TaskFilter.OVERDUE) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const filtered = tasks.filter((t) => {
+        if (t.status === TaskStatus.COMPLETED) return false;
+        if (!t.dueDate) return false;
+        const taskDate = new Date(t.dueDate);
+        taskDate.setHours(0, 0, 0, 0);
+        return taskDate < today;
       });
       return sortTasks(filtered, "date-asc");
     }
@@ -153,6 +165,7 @@ export default function TaskListScreen() {
       [TaskFilter.PENDING]: TaskStatus.PENDING,
       [TaskFilter.COMPLETED]: TaskStatus.COMPLETED,
       [TaskFilter.UPCOMING]: TaskStatus.PENDING,
+      [TaskFilter.OVERDUE]: TaskStatus.PENDING,
     };
     return sortTasks(
       filterTasks({
@@ -188,6 +201,11 @@ export default function TaskListScreen() {
       key: TaskFilter.UPCOMING,
       label: strings.upcomingFilterLabel,
       icon: "calendar-outline",
+    },
+    {
+      key: TaskFilter.OVERDUE,
+      label: strings.overdueFilterLabel,
+      icon: "alert-circle-outline",
     },
   ];
 

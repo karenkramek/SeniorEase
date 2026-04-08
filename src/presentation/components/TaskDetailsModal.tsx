@@ -44,15 +44,14 @@ export function TaskDetailsModal({
   const appTexts = useAppStrings();
   const strings = appTexts.taskDetails;
   const commonStrings = appTexts.common;
-  const { themeColors, isWeb } = useTheme();
+  const { themeColors } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
   const { preferences } = usePreferences();
   const buttonHeight = useButtonHeight();
 
-  // Web mobile: < 640px (sm breakpoint)
-  const isWebMobile = isWeb && windowWidth < 640;
-  // Responsive: Mobile < 640px (stacked), Tablet+ >= 640px (side-by-side)
-  const buttonLayoutIsRow = windowWidth >= 640;
+  // Responsive: < 640px (sm breakpoint) — modal é web-only
+  const isSmallScreen = windowWidth < 640;
+  const shouldStackButtons = isSmallScreen;
 
   const taskRepository = useTaskRepository();
   const completeTaskUseCase = useMemo(
@@ -75,12 +74,8 @@ export function TaskDetailsModal({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
+    if (!visible || !taskId) return;
     const load = async () => {
-      if (!taskId || !visible) {
-        setTask(null);
-        setLoading(false);
-        return;
-      }
       setLoading(true);
       const found = await taskRepository.findById(taskId);
       setTask(found);
@@ -159,7 +154,7 @@ export function TaskDetailsModal({
         style={{
           color: themeColors.text,
           flex: 1,
-          fontSize: (isWebMobile ? 18 : 20) * preferences.fontSizeMultiplier,
+          fontSize: (isSmallScreen ? 18 : 20) * preferences.fontSizeMultiplier,
         }}
         accessibilityLabel={`Título: ${task.title}`}
       >
@@ -219,7 +214,7 @@ export function TaskDetailsModal({
               style={{
                 color: themeColors.icon,
                 marginBottom: Spacing.small,
-                fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+                fontSize: (isSmallScreen ? 12 : 13) * preferences.fontSizeMultiplier,
               }}
               accessibilityLabel={strings.descriptionLabel}
             >
@@ -229,7 +224,7 @@ export function TaskDetailsModal({
               style={{
                 color: themeColors.text,
                 lineHeight: 22 * preferences.fontSizeMultiplier,
-                fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
+                fontSize: (isSmallScreen ? 14 : 15) * preferences.fontSizeMultiplier,
               }}
               accessibilityLabel={task.description}
             >
@@ -245,26 +240,27 @@ export function TaskDetailsModal({
               style={{
                 color: themeColors.icon,
                 marginBottom: Spacing.small,
-                fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+                fontSize: (isSmallScreen ? 12 : 13) * preferences.fontSizeMultiplier,
               }}
               accessibilityLabel={strings.dueDateLabel}
             >
               {strings.dueDateLabel}
             </AccessibleText>
-            <AccessibleText
-              style={{
-                color: themeColors.text,
-                fontSize: (isWebMobile ? 14 : 15) * preferences.fontSizeMultiplier,
-                marginBottom: 4,
-              }}
-              accessibilityLabel={formatDateLong(new Date(task.dueDate!))}
-            >
-              {formatDateLong(new Date(task.dueDate!))}
-            </AccessibleText>
-            <DueDateBadge
-              status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
-              size="md"
-            />
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+              <AccessibleText
+                style={{
+                  color: themeColors.text,
+                  fontSize: (isSmallScreen ? 14 : 15) * preferences.fontSizeMultiplier,
+                }}
+                accessibilityLabel={formatDateLong(new Date(task.dueDate!))}
+              >
+                {formatDateLong(new Date(task.dueDate!))}
+              </AccessibleText>
+              <DueDateBadge
+                status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
+                size="md"
+              />
+            </View>
           </View>
         )}
 
@@ -276,7 +272,7 @@ export function TaskDetailsModal({
 
         <View style={{ marginTop: Spacing.large }}>
           {task.status !== TaskStatus.COMPLETED ? (
-            <View style={{ flexDirection: buttonLayoutIsRow ? "row" : "column", gap: Spacing.medium, overflow: "visible", justifyContent: "center", alignItems: "center", marginHorizontal: "auto" }}>
+            <View style={{ flexDirection: shouldStackButtons ? "column" : "row", gap: Spacing.medium, overflow: "visible", justifyContent: "center", alignItems: "center", marginHorizontal: "auto" }}>
               <AccessibleButton
                 title={strings.completeButton}
                 icon={

@@ -32,6 +32,15 @@ export function CreateTaskForm({
   const buttonHeight = useButtonHeight();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  // Sugestões acadêmicas
+  const academicSuggestions = [
+    "Estudar para prova",
+    "Entregar trabalho",
+    "Ler capítulo do livro",
+    "Revisar anotações",
+    "Participar de grupo de estudos",
+    "Fazer exercícios da matéria"
+  ];
   const [dueDate, setDueDate] = useState(""); // Format: "dd/mm/yyyy"
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [titleError, setTitleError] = useState<string | null>(null);
@@ -93,6 +102,7 @@ export function CreateTaskForm({
           {strings.titleLabel}
         </AccessibleText>
       </View>
+
       <AccessibleFormField
         fieldId="taskTitle"
         accessibilityLabel={strings.titleFieldLabel}
@@ -116,6 +126,28 @@ export function CreateTaskForm({
           backgroundColor: themeColors.background,
         }}
       />
+
+      {/* Sugestões acadêmicas */}
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+        {academicSuggestions.map((suggestion) => (
+          <TouchableOpacity
+            key={suggestion}
+            onPress={() => setTitle(suggestion)}
+            style={{
+              backgroundColor: themeColors.icon + '10',
+              borderRadius: 8,
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              marginRight: 6,
+              marginBottom: 6,
+            }}
+            accessibilityRole="button"
+            accessibilityLabel={`Usar sugestão: ${suggestion}`}
+          >
+            <AccessibleText style={{ color: themeColors.text, fontSize: 13 }}>{suggestion}</AccessibleText>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <View style={{ marginBottom: 8, marginTop: 16 }}>
         <AccessibleText style={{ fontWeight: "bold", color: themeColors.text }}>
@@ -206,14 +238,6 @@ export function CreateTaskForm({
       >
         <AccessibleButton
           title={strings.createButton}
-          icon={
-            <MaterialIcons
-              name="add"
-              size={24}
-              color={themeColors.buttonText}
-              accessibilityLabel={appTexts.taskList.addIconA11y}
-            />
-          }
           onPress={handleCreate}
           accessibilityLabel={strings.createButtonA11y}
           style={[

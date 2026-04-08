@@ -177,14 +177,25 @@ export default function TaskDetailsScreen() {
               marginBottom: 4,
               fontSize: 13 * preferences.fontSizeMultiplier,
             }}
-            accessibilityLabel={`Prazo: ${formatDateLong(new Date(task.dueDate!))}`}
+            accessibilityLabel={strings.dueDateLabel}
           >
-            {strings.dueDateLabel}: {formatDateLong(new Date(task.dueDate!))}
+            {strings.dueDateLabel}
           </AccessibleText>
-          <DueDateBadge
-            status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
-            size="md"
-          />
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <AccessibleText
+              style={{
+                color: themeColors.text,
+                fontSize: 15 * preferences.fontSizeMultiplier,
+              }}
+              accessibilityLabel={`${strings.dueDateLabel}: ${formatDateLong(new Date(task.dueDate!))}`}
+            >
+              {formatDateLong(new Date(task.dueDate!))}
+            </AccessibleText>
+            <DueDateBadge
+              status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
+              size="md"
+            />
+          </View>
         </View>
       )}
 

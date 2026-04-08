@@ -5,7 +5,7 @@ import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { formatDateRelative, getDueDateStatus } from "@/presentation/utils/format";
+import { formatDateMedium, getDueDateStatus } from "@/presentation/utils/format";
 import { DueDateBadge } from "@/presentation/components/DueDateBadge";
 import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
@@ -143,13 +143,13 @@ export function TaskCard({
           </AccessibleText>
           {(task.dueDate || task.status === TaskStatus.COMPLETED) && (
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
-              {task.dueDate && (
+              {task.dueDate && task.status !== TaskStatus.COMPLETED && (
                 <AccessibleText
                   type="caption"
                   style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
-                  accessibilityLabel={`${taskCardTexts.dueDatePrefix}: ${formatDateRelative(new Date(task.dueDate))}`}
+                  accessibilityLabel={`${taskCardTexts.dueDatePrefix}: ${formatDateMedium(new Date(task.dueDate))}`}
                 >
-                  {taskCardTexts.dueDatePrefix}: {formatDateRelative(new Date(task.dueDate))}
+                  {taskCardTexts.dueDatePrefix}: {formatDateMedium(new Date(task.dueDate))}
                 </AccessibleText>
               )}
               <DueDateBadge
