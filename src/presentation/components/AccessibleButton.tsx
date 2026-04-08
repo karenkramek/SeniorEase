@@ -14,6 +14,7 @@ interface AccessibleButtonProps extends TouchableOpacityProps {
   title: string;
   icon?: React.ReactNode;
   textColor?: string;
+  variant?: "primary" | "secondary" | "destructive";
 }
 
 export const AccessibleButton = React.forwardRef<
@@ -29,6 +30,7 @@ export const AccessibleButton = React.forwardRef<
     onPress,
     style,
     textColor,
+    variant = "primary",
     accessibilityLabel,
     accessibilityRole = "button",
     ...rest
@@ -44,15 +46,43 @@ export const AccessibleButton = React.forwardRef<
     }
   };
 
+  // Determine button colors based on variant
+  const getVariantStyles = () => {
+    switch (variant) {
+      case "destructive":
+        return {
+          backgroundColor: themeColors.error,
+          textColor: themeColors.buttonText,
+        };
+      case "secondary":
+        return {
+          backgroundColor: "transparent",
+          textColor: themeColors.text,
+          borderWidth: 1,
+          borderColor: themeColors.icon,
+        };
+      case "primary":
+      default:
+        return {
+          backgroundColor: themeColors.tint,
+          textColor: themeColors.buttonText,
+        };
+    }
+  };
+
+  const variantStyles = getVariantStyles();
+
   const buttonStyle = {
-    backgroundColor: themeColors.tint,
+    backgroundColor: variantStyles.backgroundColor,
+    borderWidth: variantStyles.borderWidth ?? 0,
+    borderColor: variantStyles.borderColor ?? "transparent",
     padding: Spacing.medium * preferences.spacingMultiplier,
     borderRadius: 12,
-    alignItems: "center" as "center",
+    alignItems: "center" as const,
   };
 
   const textStyle = {
-    color: textColor || themeColors.buttonText,
+    color: textColor || variantStyles.textColor,
     fontWeight: "bold" as "bold",
   };
 

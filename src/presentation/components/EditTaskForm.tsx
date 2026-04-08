@@ -35,7 +35,7 @@ export function EditTaskForm({
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { editTask } = useTasks();
   const { showNotification } = useNotification();
-  const { themeColors } = useTheme();
+  const { themeColors, colorScheme } = useTheme();
 
   // Initialize form with task data
   useEffect(() => {
@@ -120,7 +120,7 @@ export function EditTaskForm({
           color: themeColors.text,
         }}
         inputContainerStyle={{
-          borderColor: titleError ? themeColors.error : themeColors.tint,
+          borderColor: titleError ? themeColors.error : undefined,
           backgroundColor: themeColors.background,
         }}
       />
@@ -146,7 +146,6 @@ export function EditTaskForm({
           textAlignVertical: "top" as "top",
         }}
         inputContainerStyle={{
-          borderColor: themeColors.tint,
           backgroundColor: themeColors.background,
           minHeight: 120,
           paddingVertical: 8,
@@ -168,7 +167,7 @@ export function EditTaskForm({
         accessibilityHint={`${strings.dueDateA11yHintSelected}: ${dueDate || strings.dueDateA11yHintNone}. ${strings.dueDateA11yHintAction}`}
         style={{
           borderWidth: 2,
-          borderColor: themeColors.tint,
+          borderColor: colorScheme === 'dark' ? '#FFFFFF' : themeColors.tint,
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 12,

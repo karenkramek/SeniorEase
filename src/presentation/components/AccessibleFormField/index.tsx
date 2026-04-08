@@ -12,16 +12,18 @@
  */
 
 import { ThemedText } from '@/presentation/components/ThemedText';
+import { useTheme } from '@/presentation/hooks/useTheme';
 import { A11yTokens } from '@/presentation/theme/a11y-tokens';
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo } from 'react';
 import {
-    AccessibilityRole,
-    Platform,
-    StyleSheet,
-    TextInput,
-    TextInputProps,
-    View,
-    ViewStyle,
+  AccessibilityRole,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle,
 } from 'react-native';
 
 interface AccessibleFormFieldProps extends TextInputProps {
@@ -76,7 +78,7 @@ interface AccessibleFormFieldProps extends TextInputProps {
 
   /**
    * Default border color when no error
-   * @default "#1F4E79"
+   * @default "#ffffff"
    */
   borderColorDefault?: string;
 
@@ -98,7 +100,6 @@ const AccessibleErrorMessage: React.FC<{ message: string; fieldId: string }> = (
     nativeID={`error-${fieldId}`}
     accessibilityRole="alert"
     accessible
-    // For web: these become standard ARIA attributes via react-native-web
     {...{
       'aria-live': 'assertive',
       'aria-atomic': 'true',
@@ -106,6 +107,7 @@ const AccessibleErrorMessage: React.FC<{ message: string; fieldId: string }> = (
     } as any}
     style={styles.errorContainer}
   >
+    <Ionicons name="alert-circle" size={16} color={A11yTokens.error.color} style={{ marginRight: 4 }} />
     <ThemedText style={styles.errorText}>
       {message}
     </ThemedText>
@@ -130,7 +132,7 @@ export const AccessibleFormField = React.forwardRef<
       labelComponent,
       inputContainerStyle,
       iconComponent,
-      borderColorDefault = "#1F4E79",
+      borderColorDefault,
       onFieldStateChange,
       style,
       onChangeText,
@@ -141,6 +143,14 @@ export const AccessibleFormField = React.forwardRef<
     },
     ref,
   ) => {
+    // Get theme to determine border color based on dark/light mode
+    const { themeColors, colorScheme } = useTheme();
+
+    // Determine default border color based on theme mode
+    // Dark mode: white (#FFFFFF)
+    // Light mode: green (project's tint color)
+    const defaultBorderColor = borderColorDefault ?? (colorScheme === 'dark' ? '#FFFFFF' : themeColors.tint);
+
     // Compute accessibility label with required indicator
     const computedA11yLabel = useMemo(() => {
       const label = accessibilityLabel;
@@ -178,7 +188,7 @@ export const AccessibleFormField = React.forwardRef<
     // Determine input container border color based on error state
     const inputContainerBorderColor = error
       ? A11yTokens.error.color
-      : borderColorDefault;
+      : defaultBorderColor;
 
     // Determine border radius - smaller for multiline inputs (textareas)
     const isMultiline = restProps.multiline || false;
@@ -248,7 +258,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 5,
     backgroundColor: '#F8F9FA',
-    minHeight: 48, // Touch target minimum 44x44
+    minHeight: 53,
     paddingVertical: 2,
   },
   inputContainerError: {
@@ -271,12 +281,13 @@ const styles = StyleSheet.create({
   },
   errorContainer: {
     marginTop: 8,
-    paddingHorizontal: 8,
+    paddingHorizontal: 0,
     paddingVertical: 6,
-    backgroundColor: '#FFF5F5',
-    borderLeftWidth: 4,
-    borderLeftColor: A11yTokens.error.color,
-    borderRadius: 12,
+    backgroundColor: 'transparent',
+    borderLeftWidth: 0,
+    borderRadius: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   errorText: {
     color: A11yTokens.error.color,

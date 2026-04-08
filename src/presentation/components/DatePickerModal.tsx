@@ -1,5 +1,6 @@
 import { AccessibleButton } from "@/presentation/components/AccessibleButton";
 import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { BaseModal } from "@/presentation/components/BaseModal";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
@@ -9,7 +10,6 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     FlatList,
-    Modal,
     TouchableOpacity,
     View,
     useWindowDimensions,
@@ -114,327 +114,321 @@ export function DatePickerModal({
     }
   }, [visible, day, month, year, startYear]);
 
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-      accessibilityViewIsModal
-    >
+  const header = (
+    <View>
       <View
         style={{
-          flex: 1,
-          justifyContent: "center",
+          flexDirection: "row",
+          justifyContent: "space-between",
           alignItems: "center",
-          backgroundColor: "rgba(0,0,0,0.5)",
-          padding: 20,
+          marginBottom: Spacing.medium,
         }}
       >
-        <View
+        <AccessibleText
+          type="h2"
           style={{
-            backgroundColor: themeColors.background,
-            borderRadius: 12,
-            width: "100%",
-            maxWidth: 500,
-            paddingHorizontal: 20,
-            paddingVertical: 20,
+            color: themeColors.text,
+            fontSize: isWebMobile ? 18 : 20,
           }}
+          accessibilityLabel={datePicker.title}
         >
-          {/* Header */}
-          <View
+          {datePicker.title}
+        </AccessibleText>
+
+        <TouchableOpacity
+          onPress={onClose}
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel={common.close}
+          hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+        >
+          <Ionicons
+            name="close"
+            size={24}
+            color={themeColors.icon}
+            accessibilityElementsHidden
+          />
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
+          height: 1,
+          backgroundColor: themeColors.icon + "20",
+          marginBottom: Spacing.medium,
+        }}
+      />
+    </View>
+  );
+
+  const footer = (
+    <>
+      {/* Preview */}
+      <View
+        style={{
+          backgroundColor: themeColors.tint + "15",
+          padding: 12,
+          borderRadius: 12,
+          marginBottom: Spacing.medium,
+          alignItems: "center",
+        }}
+      >
+        <AccessibleText
+          style={{
+            color: themeColors.text,
+            fontSize: isWebMobile ? 16 : 18,
+            fontWeight: "bold",
+          }}
+          accessibilityLabel={formatDate(new Date(year, month - 1, day))}
+        >
+          {String(day).padStart(2, "0")}/{String(month).padStart(2, "0")}/
+          {year}
+        </AccessibleText>
+      </View>
+
+      {/* Buttons */}
+      <View
+        style={{
+          flexDirection: "row",
+          gap: 12,
+          justifyContent: "center",
+        }}
+      >
+        <AccessibleButton
+          title={common.cancel}
+          onPress={onClose}
+          accessibilityLabel={datePicker.cancelA11y}
+          textColor={themeColors.text}
+          style={[
+            sharedStyles.secondaryButton,
+            {
+              flex: 1,
+              backgroundColor: "transparent",
+              borderColor: themeColors.icon,
+            },
+          ]}
+        />
+        <AccessibleButton
+          title={common.confirm}
+          onPress={handleConfirm}
+          accessibilityLabel={datePicker.confirmA11y}
+          style={{ flex: 1 }}
+        />
+      </View>
+    </>
+  );
+
+  return (
+    <BaseModal
+      visible={visible}
+      onClose={onClose}
+      maxWidth={500}
+      header={header}
+      footer={footer}
+    >
+      {/* Date Selectors */}
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-around",
+          marginBottom: Spacing.large,
+          gap: 12,
+        }}
+      >
+        {/* Days */}
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <AccessibleText
+            type="caption"
             style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: Spacing.medium,
+              color: themeColors.icon,
+              marginBottom: Spacing.small,
+              fontSize: isWebMobile ? 12 : 13,
+              fontWeight: "bold",
             }}
+            accessibilityLabel={datePicker.dayLabel}
           >
-            <AccessibleText
-              type="h2"
-              style={{
-                color: themeColors.text,
-                fontSize: isWebMobile ? 18 : 20,
-              }}
-              accessibilityLabel={datePicker.title}
-            >
-              {datePicker.title}
-            </AccessibleText>
-
-            <TouchableOpacity
-              onPress={onClose}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel={common.close}
-              hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-            >
-              <Ionicons
-                name="close"
-                size={24}
-                color={themeColors.icon}
-                accessibilityElementsHidden
-              />
-            </TouchableOpacity>
-          </View>
-
-          {/* Date Selectors */}
-          <View
+            {datePicker.dayLabel}
+          </AccessibleText>
+          <FlatList
+            ref={dayListRef}
+            data={days}
+            renderItem={({ item: dayNum }) => (
+              <TouchableOpacity
+                onPress={() => setDay(Math.min(dayNum, maxDays))}
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  backgroundColor:
+                    day === dayNum ? themeColors.tint : "transparent",
+                  borderRadius: 12,
+                  marginVertical: 2,
+                }}
+                accessible
+                accessibilityRole="radio"
+                accessibilityState={{
+                  selected: day === dayNum,
+                }}
+                accessibilityLabel={`${datePicker.dayLabel} ${dayNum}`}
+              >
+                <AccessibleText
+                  style={{
+                    color:
+                      day === dayNum
+                        ? themeColors.buttonText
+                        : themeColors.text,
+                    textAlign: "center",
+                    fontSize: isWebMobile ? 13 : 14,
+                  }}
+                >
+                  {String(dayNum).padStart(2, "0")}
+                </AccessibleText>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(dayNum) => `day-${dayNum}`}
             style={{
-              flexDirection: "row",
-              justifyContent: "space-around",
-              marginBottom: Spacing.large,
-              gap: 12,
-            }}
-          >
-            {/* Days */}
-            <View style={{ flex: 1, alignItems: "center" }}>
-              <AccessibleText
-                type="caption"
-                style={{
-                  color: themeColors.icon,
-                  marginBottom: Spacing.small,
-                  fontSize: isWebMobile ? 12 : 13,
-                  fontWeight: "bold",
-                }}
-                accessibilityLabel={datePicker.dayLabel}
-              >
-                {datePicker.dayLabel}
-              </AccessibleText>
-              <FlatList
-                ref={dayListRef}
-                data={days}
-                renderItem={({ item: dayNum }) => (
-                  <TouchableOpacity
-                    onPress={() => setDay(Math.min(dayNum, maxDays))}
-                    style={{
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      backgroundColor:
-                        day === dayNum ? themeColors.tint : "transparent",
-                      borderRadius: 12,
-                      marginVertical: 2,
-                    }}
-                    accessible
-                    accessibilityRole="radio"
-                    accessibilityState={{
-                      selected: day === dayNum,
-                    }}
-                    accessibilityLabel={`${datePicker.dayLabel} ${dayNum}`}
-                  >
-                    <AccessibleText
-                      style={{
-                        color:
-                          day === dayNum
-                            ? themeColors.buttonText
-                            : themeColors.text,
-                        textAlign: "center",
-                        fontSize: isWebMobile ? 13 : 14,
-                      }}
-                    >
-                      {String(dayNum).padStart(2, "0")}
-                    </AccessibleText>
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(dayNum) => `day-${dayNum}`}
-                style={{
-                  height: 150,
-                  borderWidth: 1,
-                  borderColor: themeColors.icon + "30",
-                  borderRadius: 12,
-                  backgroundColor: themeColors.background,
-                }}
-                contentContainerStyle={{ paddingVertical: 12 }}
-                scrollEnabled
-                nestedScrollEnabled
-                accessibilityLabel={datePicker.selectDayA11y}
-              />
-            </View>
-
-            {/* Months */}
-            <View style={{ flex: 1.2, alignItems: "center" }}>
-              <AccessibleText
-                type="caption"
-                style={{
-                  color: themeColors.icon,
-                  marginBottom: Spacing.small,
-                  fontSize: isWebMobile ? 12 : 13,
-                  fontWeight: "bold",
-                }}
-                accessibilityLabel={datePicker.monthLabel}
-              >
-                {datePicker.monthLabel}
-              </AccessibleText>
-              <FlatList
-                ref={monthListRef}
-                data={months}
-                renderItem={({ item: monthItem }) => (
-                  <TouchableOpacity
-                    onPress={() => setMonth(monthItem.value)}
-                    style={{
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      backgroundColor:
-                        month === monthItem.value
-                          ? themeColors.tint
-                          : "transparent",
-                      borderRadius: 12,
-                      marginVertical: 2,
-                    }}
-                    accessible
-                    accessibilityRole="radio"
-                    accessibilityState={{
-                      selected: month === monthItem.value,
-                    }}
-                    accessibilityLabel={monthItem.label}
-                  >
-                    <AccessibleText
-                      style={{
-                        color:
-                          month === monthItem.value
-                            ? themeColors.buttonText
-                            : themeColors.text,
-                        textAlign: "center",
-                        fontSize: isWebMobile ? 12 : 13,
-                      }}
-                    >
-                      {monthItem.label}
-                    </AccessibleText>
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(monthItem) => `month-${monthItem.value}`}
-                style={{
-                  height: 150,
-                  borderWidth: 1,
-                  borderColor: themeColors.icon + "30",
-                  borderRadius: 12,
-                  backgroundColor: themeColors.background,
-                }}
-                contentContainerStyle={{ paddingVertical: 12 }}
-                scrollEnabled
-                nestedScrollEnabled
-                accessibilityLabel={datePicker.selectMonthA11y}
-              />
-            </View>
-
-            {/* Years */}
-            <View style={{ flex: 1, alignItems: "center" }}>
-              <AccessibleText
-                type="caption"
-                style={{
-                  color: themeColors.icon,
-                  marginBottom: Spacing.small,
-                  fontSize: isWebMobile ? 12 : 13,
-                  fontWeight: "bold",
-                }}
-                accessibilityLabel={datePicker.yearLabel}
-              >
-                {datePicker.yearLabel}
-              </AccessibleText>
-              <FlatList
-                ref={yearListRef}
-                data={years}
-                renderItem={({ item: yearNum }) => (
-                  <TouchableOpacity
-                    onPress={() => setYear(yearNum)}
-                    style={{
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      backgroundColor:
-                        year === yearNum ? themeColors.tint : "transparent",
-                      borderRadius: 12,
-                      marginVertical: 2,
-                    }}
-                    accessible
-                    accessibilityRole="radio"
-                    accessibilityState={{
-                      selected: year === yearNum,
-                    }}
-                    accessibilityLabel={`${datePicker.yearLabel} ${yearNum}`}
-                  >
-                    <AccessibleText
-                      style={{
-                        color:
-                          year === yearNum
-                            ? themeColors.buttonText
-                            : themeColors.text,
-                        textAlign: "center",
-                        fontSize: isWebMobile ? 13 : 14,
-                      }}
-                    >
-                      {yearNum}
-                    </AccessibleText>
-                  </TouchableOpacity>
-                )}
-                keyExtractor={(yearNum) => `year-${yearNum}`}
-                style={{
-                  height: 150,
-                  borderWidth: 1,
-                  borderColor: themeColors.icon + "30",
-                  borderRadius: 12,
-                  backgroundColor: themeColors.background,
-                }}
-                contentContainerStyle={{ paddingVertical: 12 }}
-                scrollEnabled
-                nestedScrollEnabled
-                accessibilityLabel={datePicker.selectYearA11y}
-              />
-            </View>
-          </View>
-
-          {/* Preview */}
-          <View
-            style={{
-              backgroundColor: themeColors.tint + "15",
-              padding: 12,
+              height: 150,
+              borderWidth: 1,
+              borderColor: themeColors.icon + "30",
               borderRadius: 12,
-              marginBottom: Spacing.medium,
-              alignItems: "center",
+              backgroundColor: themeColors.background,
             }}
-          >
-            <AccessibleText
-              style={{
-                color: themeColors.text,
-                fontSize: isWebMobile ? 16 : 18,
-                fontWeight: "bold",
-              }}
-              accessibilityLabel={formatDate(new Date(year, month - 1, day))}
-            >
-              {String(day).padStart(2, "0")}/{String(month).padStart(2, "0")}/
-              {year}
-            </AccessibleText>
-          </View>
+            contentContainerStyle={{ paddingVertical: 12 }}
+            scrollEnabled
+            nestedScrollEnabled
+            accessibilityLabel={datePicker.selectDayA11y}
+          />
+        </View>
 
-          {/* Buttons */}
-          <View
+        {/* Months */}
+        <View style={{ flex: 1.2, alignItems: "center" }}>
+          <AccessibleText
+            type="caption"
             style={{
-              flexDirection: "row",
-              gap: 12,
-              justifyContent: "center",
+              color: themeColors.icon,
+              marginBottom: Spacing.small,
+              fontSize: isWebMobile ? 12 : 13,
+              fontWeight: "bold",
             }}
+            accessibilityLabel={datePicker.monthLabel}
           >
-            <AccessibleButton
-              title={common.cancel}
-              onPress={onClose}
-              accessibilityLabel={datePicker.cancelA11y}
-              textColor={themeColors.text}
-              style={[
-                sharedStyles.secondaryButton,
-                {
-                  flex: 1,
-                  backgroundColor: "transparent",
-                  borderColor: themeColors.icon,
-                },
-              ]}
-            />
-            <AccessibleButton
-              title={common.confirm}
-              onPress={handleConfirm}
-              accessibilityLabel={datePicker.confirmA11y}
-              style={{ flex: 1 }}
-            />
-          </View>
+            {datePicker.monthLabel}
+          </AccessibleText>
+          <FlatList
+            ref={monthListRef}
+            data={months}
+            renderItem={({ item: monthItem }) => (
+              <TouchableOpacity
+                onPress={() => setMonth(monthItem.value)}
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  backgroundColor:
+                    month === monthItem.value
+                      ? themeColors.tint
+                      : "transparent",
+                  borderRadius: 12,
+                  marginVertical: 2,
+                }}
+                accessible
+                accessibilityRole="radio"
+                accessibilityState={{
+                  selected: month === monthItem.value,
+                }}
+                accessibilityLabel={monthItem.label}
+              >
+                <AccessibleText
+                  style={{
+                    color:
+                      month === monthItem.value
+                        ? themeColors.buttonText
+                        : themeColors.text,
+                    textAlign: "center",
+                    fontSize: isWebMobile ? 12 : 13,
+                  }}
+                >
+                  {monthItem.label}
+                </AccessibleText>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(monthItem) => `month-${monthItem.value}`}
+            style={{
+              height: 150,
+              borderWidth: 1,
+              borderColor: themeColors.icon + "30",
+              borderRadius: 12,
+              backgroundColor: themeColors.background,
+            }}
+            contentContainerStyle={{ paddingVertical: 12 }}
+            scrollEnabled
+            nestedScrollEnabled
+            accessibilityLabel={datePicker.selectMonthA11y}
+          />
+        </View>
+
+        {/* Years */}
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <AccessibleText
+            type="caption"
+            style={{
+              color: themeColors.icon,
+              marginBottom: Spacing.small,
+              fontSize: isWebMobile ? 12 : 13,
+              fontWeight: "bold",
+            }}
+            accessibilityLabel={datePicker.yearLabel}
+          >
+            {datePicker.yearLabel}
+          </AccessibleText>
+          <FlatList
+            ref={yearListRef}
+            data={years}
+            renderItem={({ item: yearNum }) => (
+              <TouchableOpacity
+                onPress={() => setYear(yearNum)}
+                style={{
+                  paddingVertical: 8,
+                  paddingHorizontal: 12,
+                  backgroundColor:
+                    year === yearNum ? themeColors.tint : "transparent",
+                  borderRadius: 12,
+                  marginVertical: 2,
+                }}
+                accessible
+                accessibilityRole="radio"
+                accessibilityState={{
+                  selected: year === yearNum,
+                }}
+                accessibilityLabel={`${datePicker.yearLabel} ${yearNum}`}
+              >
+                <AccessibleText
+                  style={{
+                    color:
+                      year === yearNum
+                        ? themeColors.buttonText
+                        : themeColors.text,
+                    textAlign: "center",
+                    fontSize: isWebMobile ? 13 : 14,
+                  }}
+                >
+                  {yearNum}
+                </AccessibleText>
+              </TouchableOpacity>
+            )}
+            keyExtractor={(yearNum) => `year-${yearNum}`}
+            style={{
+              height: 150,
+              borderWidth: 1,
+              borderColor: themeColors.icon + "30",
+              borderRadius: 12,
+              backgroundColor: themeColors.background,
+            }}
+            contentContainerStyle={{ paddingVertical: 12 }}
+            scrollEnabled
+            nestedScrollEnabled
+            accessibilityLabel={datePicker.selectYearA11y}
+          />
         </View>
       </View>
-    </Modal>
+    </BaseModal>
   );
 }

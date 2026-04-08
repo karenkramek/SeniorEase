@@ -159,12 +159,17 @@ export function TaskCard({
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              paddingHorizontal: 10,
-              paddingVertical: 10,
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+              backgroundColor: themeColors.error + "10",
+              borderRadius: 8,
+              borderWidth: 1,
+              borderColor: themeColors.error + "30",
             },
           ]}
           accessibilityLabel={`${taskCardTexts.deleteTaskA11yPrefix}: ${task.title}`}
           accessibilityRole="button"
+          accessibilityHint={`${taskCardTexts.deleteTaskA11yPrefix}. ${appTexts.common.deleteAction}`}
         >
           <Ionicons
             name="trash"

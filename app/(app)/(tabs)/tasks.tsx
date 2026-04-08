@@ -390,6 +390,7 @@ export default function TaskListScreen() {
           message={options?.message ?? ""}
           confirmText={options?.confirmText}
           cancelText={options?.cancelText}
+          isDestructive={options?.isDangerous}
           onConfirm={handleConfirm}
           onCancel={handleCancel}
         />

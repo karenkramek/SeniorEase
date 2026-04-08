@@ -5,15 +5,16 @@ import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
-    Dimensions,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { z } from "zod";
 
@@ -43,6 +44,10 @@ export default function RegisterScreen() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const windowWidth = Dimensions.get("window").width;
   const isDesktop = windowWidth >= 768;
+
+  const navigateHome = () => {
+    router.push("/(public)/home");
+  };
 
   const registerSchema = React.useMemo(
     () =>
@@ -114,23 +119,23 @@ export default function RegisterScreen() {
             isDesktop && styles.contentWrapperDesktop,
           ]}
         >
-          {Platform.OS === "web" && (
-            <TouchableOpacity
-              onPress={() => router.push("/(public)/home")}
-              style={styles.backButton}
-              accessible
-              accessibilityRole="button"
-              accessibilityLabel="Voltar para home"
+          {Platform.OS === "web" ? (
+            <Pressable
+              style={styles.header}
+              onPress={navigateHome}
+              accessible={true}
+              accessibilityRole="link"
+              accessibilityLabel={`Ir para ${commonStrings.appTitle}`}
             >
-              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-              <Text style={styles.backButtonText}>Voltar</Text>
-            </TouchableOpacity>
+              <Ionicons name="finger-print" size={60} color="#FFFFFF" />
+              <Text style={styles.title}>{commonStrings.appTitle}</Text>
+            </Pressable>
+          ) : (
+            <View style={styles.header}>
+              <Ionicons name="finger-print" size={60} color="#FFFFFF" />
+              <Text style={styles.title}>{commonStrings.appTitle}</Text>
+            </View>
           )}
-
-          <View style={styles.header}>
-            <Ionicons name="person-add-outline" size={60} color="#FFFFFF" />
-            <Text style={styles.title}>{commonStrings.appTitle}</Text>
-          </View>
 
           <View style={styles.form}>
             <Text style={styles.formTitle}>{strings.formTitle}</Text>
@@ -208,7 +213,7 @@ export default function RegisterScreen() {
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
-                    style={styles.eyeIcon}
+                    style={[styles.eyeIcon, { top: Platform.OS === "web" ? 2 : 5 }]}
                     accessible
                     accessibilityRole="button"
                     accessibilityLabel={showPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
@@ -248,7 +253,7 @@ export default function RegisterScreen() {
                   />
                   <TouchableOpacity
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={styles.eyeIcon}
+                    style={[styles.eyeIcon, { top: Platform.OS === "web" ? 2 : 5 }]}
                     accessible
                     accessibilityRole="button"
                     accessibilityLabel={showConfirmPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
@@ -265,7 +270,7 @@ export default function RegisterScreen() {
             />
 
             {loading ? (
-              <ActivityIndicator size="large" style={styles.registerButton} />
+              <ActivityIndicator size="large" color="#D3D3D3" style={styles.registerButton} />
             ) : (
               <TouchableOpacity
                 style={styles.registerButton}
@@ -314,18 +319,6 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "center",
   },
-  backButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 24,
-    paddingVertical: 8,
-  },
-  backButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "600",
-  },
   header: {
     alignItems: "center",
     marginBottom: 40,
@@ -354,12 +347,11 @@ const styles = StyleSheet.create({
   },
   passwordFieldWrapper: {
     position: 'relative' as const,
-    marginBottom: 16,
   },
   eyeIcon: {
     position: 'absolute' as const,
     right: 16,
-    top: 0,
+    top: 2,
     height: 48,
     padding: 8,
     minWidth: 44,

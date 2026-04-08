@@ -32,7 +32,7 @@ export function CreateTaskForm({
   const [submissionError, setSubmissionError] = useState<string | null>(null);
   const { createTask } = useTasks();
   const { showNotification } = useNotification();
-  const { themeColors } = useTheme();
+  const { themeColors, colorScheme } = useTheme();
 
   const handleCreate = async () => {
     setSubmissionError(null);
@@ -102,7 +102,7 @@ export function CreateTaskForm({
           color: themeColors.text,
         }}
         inputContainerStyle={{
-          borderColor: titleError ? themeColors.error : themeColors.tint,
+          borderColor: titleError ? themeColors.error : undefined,
           backgroundColor: themeColors.background,
         }}
       />
@@ -128,7 +128,6 @@ export function CreateTaskForm({
           textAlignVertical: "top" as "top",
         }}
         inputContainerStyle={{
-          borderColor: themeColors.tint,
           backgroundColor: themeColors.background,
           minHeight: 120,
           paddingVertical: 8,
@@ -150,7 +149,7 @@ export function CreateTaskForm({
         accessibilityHint={`${strings.dueDateA11yHintSelected}: ${dueDate || strings.dueDateA11yHintNone}. ${strings.dueDateA11yHintAction}`}
         style={{
           borderWidth: 2,
-          borderColor: themeColors.tint,
+          borderColor: colorScheme === 'dark' ? '#FFFFFF' : themeColors.tint,
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 12,

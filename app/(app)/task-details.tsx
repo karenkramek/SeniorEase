@@ -239,6 +239,7 @@ export default function TaskDetailsScreen() {
         message={options?.message ?? ""}
         confirmText={options?.confirmText}
         cancelText={options?.cancelText}
+        isDestructive={options?.isDangerous}
         onConfirm={handleConfirm}
         onCancel={handleCancel}
       />
