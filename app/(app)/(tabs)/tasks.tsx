@@ -397,6 +397,7 @@ export default function TaskListScreen() {
         <CreateTaskModal
           visible={isCreateModalOpen && isWeb}
           onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={() => refreshTasks()}
         />
 
         <TaskDetailsModal

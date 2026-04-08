@@ -9,14 +9,16 @@ import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 interface CreateTaskModalProps {
   visible: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export function CreateTaskModal({ visible, onClose }: CreateTaskModalProps) {
+export function CreateTaskModal({ visible, onClose, onSuccess }: CreateTaskModalProps) {
   const { themeColors } = useTheme();
   const appTexts = useAppStrings();
   const strings = appTexts.createTask;
 
   const handleSuccess = () => {
+    onSuccess?.();
     onClose();
   };
 
