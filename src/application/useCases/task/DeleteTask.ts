@@ -1,3 +1,4 @@
+import { TaskNotFoundException } from "@/domain/exceptions";
 import { ITaskRepository } from "@/domain/repositories/ITaskRepository";
 
 export class DeleteTask {
@@ -7,7 +8,7 @@ export class DeleteTask {
     const task = await this.taskRepository.findById(taskId);
 
     if (!task) {
-      throw new Error("Tarefa não encontrada.");
+      throw new TaskNotFoundException();
     }
 
     await this.taskRepository.delete(taskId);

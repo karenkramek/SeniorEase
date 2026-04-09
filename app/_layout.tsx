@@ -1,4 +1,5 @@
-import { GlobalNotification } from "@/presentation/components/GlobalNotification";
+import { ErrorBoundaryFallback } from "@/presentation/components/ui/common/ErrorBoundaryFallback";
+import { GlobalNotification } from "@/presentation/components/ui/common/GlobalNotification";
 import { NotificationProvider } from "@/presentation/contexts/NotificationContext";
 import { PreferencesProvider } from "@/presentation/contexts/PreferencesContext";
 import { usePageTitle } from "@/presentation/hooks/usePageTitle";
@@ -8,9 +9,19 @@ import { ActivityIndicator, Platform, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import {
-  AuthProvider,
-  useAuth,
+    AuthProvider,
+    useAuth,
 } from "../src/presentation/contexts/AuthContext";
+
+export function ErrorBoundary({
+  error,
+  retry,
+}: {
+  error: Error;
+  retry: () => void;
+}) {
+  return <ErrorBoundaryFallback error={error} retry={retry} />;
+}
 
 function InitialLayout() {
   const { isAuthenticated, loading } = useAuth();

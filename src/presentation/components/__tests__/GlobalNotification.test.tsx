@@ -1,6 +1,6 @@
 /// <reference types="jest" />
+import { GlobalNotification } from "@/presentation/components/ui/common/GlobalNotification";
 import type { AppNotification } from "@/presentation/contexts/NotificationContext";
-import { GlobalNotification } from "@/presentation/components/GlobalNotification";
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { Animated } from "react-native";
@@ -32,8 +32,8 @@ jest.mock("@/presentation/hooks/useTheme", () => ({
       fontSizeMultiplier: 1,
       isHighContrast: false,
       spacingMultiplier: 1,
-      isSimplifiedMode: false,
       useExtraConfirmation: false,
+      confirmOnComplete: false,
       theme: "light",
     },
     isWeb: false,

@@ -1,5 +1,5 @@
-import { AccessibleButton } from "@/presentation/components/AccessibleButton";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
@@ -24,17 +24,21 @@ export default function ProfileScreen() {
     <View
       style={[
         sharedStyles.container,
-        { backgroundColor: themeColors.background, paddingTop: insets.top },
+        {
+          backgroundColor: themeColors.background,
+          paddingTop: insets.top + Spacing.medium,
+        },
       ]}
     >
-        <View
-          style={[
-            sharedStyles.titleContainer,
-          ]}
-        >
-          <AccessibleText
+      <View style={[sharedStyles.titleContainer]}>
+        <AccessibleText
           type="h1"
-          style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
+          style={{
+            textAlign: "center",
+            fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32,
+            paddingTop: 0,
+            paddingBottom: 32,
+          }}
           accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${appTexts.navigation.profileTabTitle}`}
         >
           {appTexts.navigation.profileTabTitle}

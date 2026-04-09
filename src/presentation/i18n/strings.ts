@@ -31,7 +31,7 @@ export const ptBRStrings = {
     profileTabTitle: "Perfil",
     profileTabA11y: "Aba de perfil do usuário",
     modalHeaderTitle: "Modal",
-    createTaskHeaderTitle: "Nova Tarefa",
+    createTaskHeaderTitle: "Adicionar Tarefa",
     taskDetailsHeaderTitle: "Detalhes da Tarefa",
     menuOpenA11y: "Abrir menu",
     menuCloseA11y: "Fechar menu",
@@ -43,7 +43,7 @@ export const ptBRStrings = {
     goHomeButtonA11y: "Botão para ir para a tela inicial",
   },
   createTask: {
-    screenLabel: "Nova tarefa",
+    screenLabel: "Adicionar Tarefa",
     titleLabel: "Título da tarefa *",
     titleFieldLabel: "Título da tarefa",
     titleFieldA11yHint: "Digite o título da tarefa, este campo é obrigatório",
@@ -52,8 +52,8 @@ export const ptBRStrings = {
     descriptionPlaceholder: "Descrição (opcional)",
     descriptionFieldA11yLabel: "Descrição da tarefa",
     descriptionFieldA11yHint: "Digite detalhes opcionais sobre a tarefa",
-    createButton: "Criar Tarefa",
-    createButtonA11y: "Botão para criar tarefa",
+    createButton: "Adicionar Tarefa",
+    createButtonA11y: "Botão para adicionar tarefa",
     cancelButton: "Cancelar",
     titleRequiredError: "Informe um título para criar a tarefa.",
     createSuccess: "Tarefa criada com sucesso.",
@@ -101,10 +101,9 @@ export const ptBRStrings = {
     pendingFilterLabel: "Pendentes",
     completedFilterLabel: "Concluídas",
     upcomingFilterLabel: "Próximas",
+    overdueFilterLabel: "Vencidas",
     listLabel: "Lista de tarefas",
-    noTasks: "Nenhuma tarefa encontrada.",
-    noTasksHint: "Crie uma nova tarefa para começar!",
-    noTasksHintA11y: "Crie uma nova tarefa para começar",
+    noTasks: "Nenhuma tarefa encontrada",
     newTaskButtonA11y: "Botão para criar nova tarefa",
     addIconA11y: "Ícone de adicionar",
     taskCompleted: "Tarefa concluída!",
@@ -119,7 +118,8 @@ export const ptBRStrings = {
     confirmCompleteAction: "Concluir",
   },
   taskDetails: {
-    dueDateLabel: "Prazo",
+    dueDateLabel: "Data de Vencimento",
+    statusLabel: "Status",
     notFound: "Tarefa não encontrada.",
     stepsLabel: "Etapas",
     completeButton: "Concluír Tarefa",
@@ -149,7 +149,7 @@ export const ptBRStrings = {
   },
   authRegister: {
     formTitle: "Crie sua conta",
-    nameFieldHint: "Digite seu nome completo com no mínimo 3 caracteres",
+    nameFieldHint: "Digite seu nome e sobrenome",
     emailFieldHint: "Digite um e-mail válido para criar sua conta",
     passwordFieldHint: "Digite uma senha com no mínimo 6 caracteres",
     confirmPasswordPlaceholder: "Confirme a senha",
@@ -158,11 +158,13 @@ export const ptBRStrings = {
     toggleConfirmPasswordHint: "Alternar visibilidade da confirmação de senha",
     submitButton: "Cadastrar",
     loginLink: "Já tem uma conta? Faça login",
-    successTitle: "Cadastro Realizado!",
+    successTitle: "Bem Vindo!",
     successBody:
-      "Sua conta foi criada com sucesso. Você será redirecionado para o login.",
+      "Sua conta foi criada com sucesso. Crie tarefas e personalize sua experiência.",
     registerErrorTitle: "Erro no Cadastro",
+    emailAlreadyInUseError: "Este e-mail já está cadastrado.",
     nameMinError: "O nome deve ter pelo menos 3 caracteres.",
+    nameFullError: "Informe nome e sobrenome.",
     confirmPasswordRequiredError: "A confirmação de senha é necessária.",
     passwordMismatchError: "As senhas não coincidem.",
   },
@@ -176,6 +178,18 @@ export const ptBRStrings = {
     selectYearA11y: "Selecionar ano",
     cancelA11y: "Cancelar seleção de data",
     confirmA11y: "Confirmar data selecionada",
+    selectButton: "Selecionar",
+    selectButtonA11y: "Selecionar data",
+  },
+  dueDateStatus: {
+    overdueLabel: "Vencida",
+    overdueA11y: "Tarefa vencida",
+    todayLabel: "Vence hoje",
+    todayA11y: "Tarefa vence hoje",
+    soonLabel: "A vencer",
+    soonA11y: "Tarefa a vencer",
+    completedLabel: "Concluída",
+    completedA11y: "Tarefa concluída",
   },
   preferences: {
     loadError: "Não foi possível carregar as preferências.",
@@ -219,26 +233,27 @@ export const ptBRStrings = {
   },
   help: {
     screenLabel: "Tela de ajuda",
-    title: "Ajuda e Dicas",
-    intro: "Dúvidas sobre o app? Veja como usar:",
-    guideTitle: "Como usar o SeniorEase",
-    guideAddTask: "• Adicione tarefas com o botão Nova Tarefa.",
-    guideCompleteTask: "• Complete tarefas.",
-    guideFilterTask:
-      "• Filtre tarefas para ver as mais importantes ou pendentes.",
-    guidePreferences:
-      "• Personalize o app nas preferências: fonte, contraste, espaçamento.",
-    a11yTitle: "Recursos de acessibilidade",
-    a11yFontContrast: "• Fonte grande e alto contraste: ative em Preferências.",
-    a11yConfirmations:
-      "• Confirmações extras: evite ações acidentais ao excluir ou concluir.",
-    a11yWebKeyboard:
-      "• Web: use Tab para navegar, Enter ou Espaço para acionar botões.",
-    a11yMobileReader:
-      "• Mobile: VoiceOver (iOS) e TalkBack (Android) leem labels e estados.",
-    a11yAnnouncements:
-      "• Notificações e mensagens de erro são anunciadas com prioridade de acessibilidade.",
-    footer: "Qualquer dúvida, estamos aqui para ajudar!",
+    title: "Ajuda",
+    addTaskTitle: "Adicionar Tarefa",
+    addTaskDescription: "Toque em Adicionar Tarefa, informe o título e salve.",
+    editTaskTitle: "Editar Tarefa",
+    editTaskDescription:
+      "Toque em uma tarefa e selecione Editar Tarefa para alterar os dados.",
+    filterTaskTitle: "Filtrar Tarefas",
+    filterTaskDescription:
+      "Use os filtros para exibir tarefas pendentes, concluídas, próximas, vencidas ou todas.",
+    completeTaskTitle: "Concluir Tarefa",
+    completeTaskDescription:
+      "Toque no círculo ao lado esquerdo da tarefa para marcá-la como concluída.",
+    preferencesTitle: "Preferências",
+    preferencesDescription:
+      "Use as preferências para personalizar o tema, fonte, alto contraste e deixar o SeniorEase do seu jeito.",
+  },
+  errorBoundary: {
+    title: "Algo deu errado",
+    message: "Ocorreu um erro inesperado. Tente novamente.",
+    retryButton: "Tentar novamente",
+    retryA11y: "Botão para tentar novamente",
   },
   homepage: {
     tagline: "Organize suas tarefas e viva com mais qualidade",
@@ -251,9 +266,11 @@ export const ptBRStrings = {
   },
   about: {
     title: "Sobre o SeniorEase",
-    intro: "SeniorEase é um aplicativo inovador e acessível desenvolvido com o objetivo de simplificar o gerenciamento de tarefas para pessoas idosas, permitindo que vivam com mais qualidade, autonomia e foco no que realmente importa.",
+    intro:
+      "SeniorEase é um aplicativo inovador e acessível desenvolvido com o objetivo de simplificar o gerenciamento de tarefas para pessoas idosas, permitindo que vivam com mais qualidade, autonomia e foco no que realmente importa.",
     projectSection: "Projeto Hackaton",
-    projectDescription: "O SeniorEase é um projeto educacional desenvolvido por 3 alunas da Pós-Graduação em Front-End Engineering para a Hackaton. Nós acreditamos que a tecnologia deve ser inclusiva e acessível para todos, independente da idade ou habilidades técnicas.",
+    projectDescription:
+      "O SeniorEase é um projeto educacional desenvolvido por 3 alunas da Pós-Graduação em Front-End Engineering para a Hackaton. Nós acreditamos que a tecnologia deve ser inclusiva e acessível para todos, independente da idade ou habilidades técnicas.",
     studentsLabel: "Desenvolvedoras",
     features: "Funcionalidades Principais",
     feature1: "Interface intuitiva e fácil de usar",

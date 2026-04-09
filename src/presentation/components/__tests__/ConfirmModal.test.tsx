@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { ConfirmModal } from "@/presentation/components/ConfirmModal";
+import { ConfirmModal } from "@/presentation/components/ui/modals/ConfirmModal";
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
@@ -19,8 +19,8 @@ jest.mock("@/presentation/hooks/useTheme", () => ({
       fontSizeMultiplier: 1,
       isHighContrast: false,
       spacingMultiplier: 1,
-      isSimplifiedMode: false,
       useExtraConfirmation: false,
+      confirmOnComplete: false,
       theme: "light",
     },
     isWeb: false,

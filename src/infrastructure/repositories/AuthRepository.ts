@@ -89,7 +89,7 @@ export class AuthRepository implements IAuthRepository {
     try {
       await updateProfile(userCredential.user, { displayName: name });
 
-      const user = new User(userCredential.user.uid, email, name);
+      const user: User = { id: userCredential.user.uid, email, name };
 
       await setDoc(doc(db, "users", user.id), {
         id: user.id,
@@ -104,8 +104,8 @@ export class AuthRepository implements IAuthRepository {
         fontSizeMultiplier: 1,
         isHighContrast: false,
         spacingMultiplier: 1,
-        isSimplifiedMode: false,
         useExtraConfirmation: false,
+        confirmOnComplete: false,
       });
 
       return user;
@@ -134,7 +134,7 @@ export class AuthRepository implements IAuthRepository {
 
     if (userDoc.exists()) {
       const data = userDoc.data() as any;
-      return new User(userDoc.id, data.email, data.name);
+      return { id: userDoc.id, email: data.email, name: data.name };
     }
 
     // Fallback: se não existir no Firestore, usar dados do Authentication

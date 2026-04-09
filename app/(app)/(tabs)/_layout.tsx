@@ -1,15 +1,21 @@
 import { Ionicons } from "@expo/vector-icons";
-import { BottomTabBar, type BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import {
+  BottomTabBar,
+  type BottomTabBarProps,
+} from "@react-navigation/bottom-tabs";
 import { Tabs } from "expo-router";
 import React, { useState } from "react";
 import { Platform, View, useWindowDimensions } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
-import { AppHeader } from "@/presentation/components/AppHeader";
-import { HapticTab } from "@/presentation/components/HapticTab";
-import { MobileMenuDrawer } from "@/presentation/components/MobileMenuDrawer";
-import { NavigationMenu } from "@/presentation/components/NavigationMenu";
-import { WebSidebar } from "@/presentation/components/WebSidebar";
+import { AppHeader } from "@/presentation/components/shared/AppHeader";
+import { NavigationMenu } from "@/presentation/components/shared/NavigationMenu";
+import { WebSidebar } from "@/presentation/components/shared/WebSidebar";
+import { HapticTab } from "@/presentation/components/ui/common/HapticTab";
+import { MobileMenuDrawer } from "@/presentation/components/ui/drawers/MobileMenuDrawer";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { isWebPlatform, resolveThemeColors } from "@/presentation/theme/colors";
@@ -19,8 +25,15 @@ function TabBarForPlatform(props: BottomTabBarProps) {
   if (Platform.OS === "web") {
     return null;
   }
-  const tabBarStyle = props.descriptors[props.state.routes[props.state.index].key]?.options?.tabBarStyle;
-  const bgColor = (tabBarStyle && typeof tabBarStyle === "object" && "backgroundColor" in tabBarStyle && (tabBarStyle.backgroundColor as string)) || "#fff";
+  const tabBarStyle =
+    props.descriptors[props.state.routes[props.state.index].key]?.options
+      ?.tabBarStyle;
+  const bgColor =
+    (tabBarStyle &&
+      typeof tabBarStyle === "object" &&
+      "backgroundColor" in tabBarStyle &&
+      (tabBarStyle.backgroundColor as string)) ||
+    "#fff";
   return (
     <SafeAreaView edges={["bottom"]} style={{ backgroundColor: bgColor }}>
       <BottomTabBar {...props} />
@@ -72,16 +85,18 @@ export default function TabLayout() {
           height: showBottomTabBar ? 65 : 60,
           paddingBottom: tabBarBottomInset,
           elevation: 0,
-          shadowColor: 'transparent',
+          shadowColor: "transparent",
         },
-        tabBarLabelStyle: showBottomTabBar ? {
-          fontSize: 12,
-          paddingBottom: 2,
-          paddingTop: 0,
-          margin: 0,
-        } : {
-          fontSize: 12,
-        },
+        tabBarLabelStyle: showBottomTabBar
+          ? {
+              fontSize: 12,
+              paddingBottom: 2,
+              paddingTop: 0,
+              margin: 0,
+            }
+          : {
+              fontSize: 12,
+            },
       }}
     >
       <Tabs.Screen
@@ -151,7 +166,13 @@ export default function TabLayout() {
     // Mobile web (small screen < 640px): usar BottomTabBar
     if (showBottomTabBar) {
       return (
-        <View style={{ flex: 1, width: "100%", backgroundColor: themeColors.background }}>
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            backgroundColor: themeColors.background,
+          }}
+        >
           <AppHeader />
           {tabs}
         </View>
@@ -161,7 +182,13 @@ export default function TabLayout() {
     // Tablet web (medium screen 640px-1023px): usar drawer menu com hamburger
     if (showDrawerMenu) {
       return (
-        <View style={{ flex: 1, width: "100%", backgroundColor: themeColors.background }}>
+        <View
+          style={{
+            flex: 1,
+            width: "100%",
+            backgroundColor: themeColors.background,
+          }}
+        >
           {/* Header - full width */}
           <AppHeader
             menuOpen={isMenuOpen}
@@ -204,7 +231,13 @@ export default function TabLayout() {
 
     // Desktop web (large screen >= 1024px): usar sidebar permanente
     return (
-      <View style={{ flex: 1, width: "100%", backgroundColor: themeColors.background }}>
+      <View
+        style={{
+          flex: 1,
+          width: "100%",
+          backgroundColor: themeColors.background,
+        }}
+      >
         {/* Header - full width */}
         <AppHeader />
 

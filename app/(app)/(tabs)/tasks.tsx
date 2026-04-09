@@ -1,15 +1,16 @@
 import { TaskFilter } from "@/domain/enums/TaskFilter";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
-import { AccessibleButton } from "@/presentation/components/AccessibleButton";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { ConfirmModal } from "@/presentation/components/ConfirmModal";
-import { CreateTaskModal } from "@/presentation/components/CreateTaskModal";
-import { TaskCard } from "@/presentation/components/TaskCard";
-import { TaskDetailsModal } from "@/presentation/components/TaskDetailsModal";
+import { TaskCard } from "@/presentation/components/task/TaskCard";
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { ConfirmModal } from "@/presentation/components/ui/modals/ConfirmModal";
+import { TaskDetailsModal } from "@/presentation/components/ui/modals/TaskDetailsModal";
+import { TaskFormModal } from "@/presentation/components/ui/modals/TaskFormModal";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
-import { useTasks } from "@/presentation/hooks/useTasks";
+import { useTaskActions } from "@/presentation/hooks/useTaskActions";
+import { useTaskList } from "@/presentation/hooks/useTaskList";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
@@ -19,11 +20,11 @@ import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import {
-    ActivityIndicator,
-    FlatList,
-    ScrollView,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  ScrollView,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -34,14 +35,9 @@ export default function TaskListScreen() {
   const router = useRouter();
   const { themeColors, preferences, isWeb } = useTheme();
   const buttonHeight = useButtonHeight();
-  const {
-    tasks,
-    isLoading,
-    refreshTasks,
-    completeTask,
-    uncompleteTask,
-    deleteTask,
-  } = useTasks();
+  const { tasks, isLoading, refreshTasks } = useTaskList();
+  const { completeTask, uncompleteTask, deleteTask } =
+    useTaskActions(refreshTasks);
 
   const {
     isOpen,
@@ -136,16 +132,28 @@ export default function TaskListScreen() {
     if (activeFilter === "ALL") return sortTasks(tasks, "date-desc");
     if (activeFilter === TaskFilter.UPCOMING) {
       const today = new Date();
-      const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const next10Days = new Date(today.getTime() + 10 * 24 * 60 * 60 * 1000);
       today.setHours(0, 0, 0, 0);
       const filtered = filterTasks({
         tasks,
         filters: {
           status: [TaskStatus.PENDING],
           dateFrom: today,
-          dateTo: nextWeek,
+          dateTo: next10Days,
           sortBy: "date-asc",
         },
+      });
+      return sortTasks(filtered, "date-asc");
+    }
+    if (activeFilter === TaskFilter.OVERDUE) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const filtered = tasks.filter((t) => {
+        if (t.status === TaskStatus.COMPLETED) return false;
+        if (!t.dueDate) return false;
+        const taskDate = new Date(t.dueDate);
+        taskDate.setHours(0, 0, 0, 0);
+        return taskDate < today;
       });
       return sortTasks(filtered, "date-asc");
     }
@@ -153,6 +161,7 @@ export default function TaskListScreen() {
       [TaskFilter.PENDING]: TaskStatus.PENDING,
       [TaskFilter.COMPLETED]: TaskStatus.COMPLETED,
       [TaskFilter.UPCOMING]: TaskStatus.PENDING,
+      [TaskFilter.OVERDUE]: TaskStatus.PENDING,
     };
     return sortTasks(
       filterTasks({
@@ -188,6 +197,11 @@ export default function TaskListScreen() {
       key: TaskFilter.UPCOMING,
       label: strings.upcomingFilterLabel,
       icon: "calendar-outline",
+    },
+    {
+      key: TaskFilter.OVERDUE,
+      label: strings.overdueFilterLabel,
+      icon: "alert-circle-outline",
     },
   ];
 
@@ -328,12 +342,6 @@ export default function TaskListScreen() {
             <AccessibleText accessibilityLabel={strings.noTasks}>
               {strings.noTasks}
             </AccessibleText>
-            <AccessibleText
-              type="caption"
-              accessibilityLabel={strings.noTasksHintA11y}
-            >
-              {strings.noTasksHint}
-            </AccessibleText>
           </View>
         ) : (
           <FlatList
@@ -397,9 +405,10 @@ export default function TaskListScreen() {
           onCancel={handleCancel}
         />
 
-        <CreateTaskModal
+        <TaskFormModal
           visible={isCreateModalOpen && isWeb}
           onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={() => refreshTasks()}
         />
 
         <TaskDetailsModal

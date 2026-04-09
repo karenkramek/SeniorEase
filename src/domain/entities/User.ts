@@ -1,7 +1,5 @@
-export class User {
-  constructor(
-    public id: string,
-    public email: string,
-    public name?: string,
-  ) {}
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
 }

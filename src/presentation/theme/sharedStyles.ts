@@ -81,8 +81,6 @@ export const sharedStyles = StyleSheet.create({
     paddingHorizontal: 5,
     marginBottom: Spacing.large,
     fontSize: 20,
-    backgroundColor: "#FFF",
-    borderColor: "#1A237E",
   },
   buttonLink: {
     marginTop: 15,

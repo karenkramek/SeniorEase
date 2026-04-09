@@ -44,13 +44,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           } catch {
             // Firestore offline ou documento ainda não criado (race condition no cadastro):
             // usa os dados já disponíveis no Firebase Auth como fallback
-            setUser(
-              new User(
-                firebaseUser.uid,
-                firebaseUser.email!,
-                firebaseUser.displayName ?? undefined,
-              ),
-            );
+            setUser({
+              id: firebaseUser.uid,
+              email: firebaseUser.email!,
+              name: firebaseUser.displayName ?? undefined,
+            });
           }
         } else {
           setUser(null);

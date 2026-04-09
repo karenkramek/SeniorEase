@@ -1,7 +1,7 @@
 /// <reference types="jest" />
 import type { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
-import { TaskCard } from "@/presentation/components/TaskCard";
+import { TaskCard } from "@/presentation/components/task/TaskCard";
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 import { Animated } from "react-native";
@@ -22,8 +22,8 @@ jest.mock("@/presentation/hooks/useTheme", () => ({
       fontSizeMultiplier: 1,
       isHighContrast: false,
       spacingMultiplier: 1,
-      isSimplifiedMode: false,
       useExtraConfirmation: false,
+      confirmOnComplete: false,
       theme: "light",
     },
     isWeb: false,
@@ -47,6 +47,17 @@ jest.mock("@/presentation/hooks/useAppStrings", () => ({
       titleLabelPrefix: "Título da tarefa",
       dueDatePrefix: "Vencimento",
       deleteTaskA11yPrefix: "Excluir tarefa",
+      viewDetailsA11yPrefix: "Ver detalhes da tarefa",
+    },
+    dueDateStatus: {
+      completedLabel: "Concluída",
+      completedA11y: "Tarefa concluída",
+      overdueLabel: "Vencida",
+      overdueA11y: "Tarefa vencida",
+      todayLabel: "Vence hoje",
+      todayA11y: "Tarefa vence hoje",
+      soonLabel: "A vencer",
+      soonA11y: "Tarefa a vencer",
     },
   }),
 }));
@@ -81,7 +92,11 @@ describe("TaskCard", () => {
     const onDelete = jest.fn();
 
     const { getByLabelText } = render(
-      <TaskCard task={task} onToggleComplete={onToggleComplete} onDelete={onDelete} />,
+      <TaskCard
+        task={task}
+        onToggleComplete={onToggleComplete}
+        onDelete={onDelete}
+      />,
     );
 
     fireEvent.press(getByLabelText("Marcar como concluída"));

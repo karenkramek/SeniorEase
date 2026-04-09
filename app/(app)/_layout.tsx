@@ -45,6 +45,10 @@ function AppLayout() {
               name="task-details"
               options={{ title: appTexts.navigation.taskDetailsHeaderTitle }}
             />
+            <Stack.Screen
+              name="edit-task"
+              options={{ title: appTexts.editTask.screenLabel }}
+            />
           </Stack>
         </TaskRepositoryProvider>
       </AuthGuard>

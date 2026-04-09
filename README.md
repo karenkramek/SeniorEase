@@ -128,28 +128,43 @@ e o projeto executa uma checagem do Gitleaks no `postinstall`.
 
 ```
 app/                        # Roteamento Expo Router
-├── (auth)/                 # Telas públicas: login e cadastro
+├── (public)/               # Telas públicas: home e sobre
+│   ├── home.tsx
+│   └── about.tsx
+├── (auth)/                 # Autenticação: login e cadastro
+│   ├── login.tsx
+│   └── register.tsx
 └── (app)/
     ├── (tabs)/             # Tarefas, Preferências, Ajuda, Perfil
+    │   ├── tasks.tsx
+    │   ├── preferences.tsx
+    │   ├── help.tsx
+    │   └── profile.tsx
     ├── create-task.tsx     # Criação de tarefa
-    └── task-details.tsx    # Detalhes de uma tarefa
+    ├── edit-task.tsx       # Edição de tarefa
+    ├── task-details.tsx    # Detalhes de uma tarefa
+    └── modal.tsx           # Modal genérico
 src/
 ├── domain/                 # Regras de negócio puras
 │   ├── entities/           # Task, User, Preferences
 │   ├── enums/              # TaskStatus, TaskFilter
+│   ├── exceptions/         # Exceções de domínio
 │   └── repositories/       # Interfaces IAuthRepository, ITaskRepository, IPreferencesRepository
 ├── application/
 │   └── useCases/           # Casos de uso: tarefas (criar, concluir, excluir...) e preferências
 ├── infrastructure/
 │   ├── mappers/            # TaskMapper, UserMapper
-│   └── repositories/       # Implementações Firebase: Auth, Task, Preferences
+│   ├── repositories/       # Implementações Firebase: Auth, Task, Preferences
+│   └── utils/              # Utilitários de infraestrutura
 ├── lib/
 │   └── firebase.ts         # Configuração Firebase (Auth + Firestore)
 └── presentation/
-    ├── components/         # AccessibleButton, AccessibleText, TaskCard, ConfirmModal, AuthGuard...
-    ├── contexts/           # AuthContext, PreferencesContext, TaskRepositoryContext
-    ├── hooks/              # useAuth, useTasks, useTheme, usePreferences...
-    ├── theme/              # colors.ts, sharedStyles.ts, spacing.ts, typography.ts
+    ├── components/         # Componentes por domínio: auth, home, pages, shared, task, ui
+    ├── constants/          # Constantes de apresentação
+    ├── contexts/           # AuthContext, PreferencesContext, TaskRepositoryContext, NotificationContext
+    ├── hooks/              # useAuth, useTaskList, useTheme, usePreferences, useNotification...
+    ├── i18n/               # strings.ts — internacionalização
+    ├── theme/              # colors.ts, sharedStyles.ts, spacing.ts, typography.ts, a11y-tokens.ts...
     └── utils/              # alert, format, helpers, icons, filterLabels, taskFilters
 docs/firebase/              # firestore.rules e firestore.indexes.json
 assets/images/              # Ícones e imagens do app

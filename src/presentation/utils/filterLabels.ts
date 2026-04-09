@@ -4,4 +4,5 @@ export const FILTER_LABELS: Record<TaskFilter, string> = {
   PENDING: "Pendentes",
   COMPLETED: "Concluídas",
   UPCOMING: "Prazos próximos",
+  OVERDUE: "Vencidas",
 };

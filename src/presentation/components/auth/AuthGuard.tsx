@@ -1,4 +1,4 @@
-import { ThemedView } from "@/presentation/components/ThemedView";
+import { ThemedView } from "@/presentation/components/ui/text/ThemedView";
 import { useRequireAuth } from "@/presentation/hooks/useRequireAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import React from "react";
