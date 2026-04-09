@@ -7,6 +7,7 @@ import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface TaskFormModalProps {
   visible: boolean;
@@ -22,9 +23,20 @@ export function TaskFormModal({
   onSuccess,
 }: TaskFormModalProps) {
   const isEditMode = !!task;
-  const { themeColors, isWeb } = useTheme();
+  const { themeColors, isWeb, colorScheme, preferences } = useTheme();
+  const insets = useSafeAreaInsets();
+  const bottomSafeSpace = Math.max(
+    insets.bottom,
+    Spacing.xlarge + Spacing.small,
+  );
   const appTexts = useAppStrings();
   const strings = isEditMode ? appTexts.editTask : appTexts.createTask;
+
+  const modalBackdropColor = preferences.isHighContrast
+    ? "rgba(255,255,255,0.30)"
+    : colorScheme === "dark"
+      ? "rgba(0,0,0,0.72)"
+      : "rgba(0,0,0,0.45)";
 
   const handleSuccess = () => {
     onSuccess?.();
@@ -51,7 +63,7 @@ export function TaskFormModal({
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
+            backgroundColor: modalBackdropColor,
             padding: 20,
           }}
         >
@@ -59,6 +71,8 @@ export function TaskFormModal({
             style={{
               backgroundColor: themeColors.background,
               borderRadius: 12,
+              borderWidth: preferences.isHighContrast ? 2 : 1,
+              borderColor: themeColors.icon,
               maxHeight: "90%",
               width: "100%",
               maxWidth: 600,
@@ -110,7 +124,7 @@ export function TaskFormModal({
                 padding: 20,
                 paddingBottom: 32,
               }}
-              keyboardShouldPersistTaps="handled"
+              keyboardShouldPersistTaps="always"
               showsVerticalScrollIndicator={false}
             >
               <TaskForm
@@ -133,7 +147,8 @@ export function TaskFormModal({
               justifyContent: "space-between",
               alignItems: "center",
               paddingHorizontal: Spacing.large,
-              paddingVertical: Spacing.medium,
+              paddingTop: insets.top + Spacing.small,
+              paddingBottom: Spacing.medium,
               borderBottomWidth: 1,
               borderBottomColor: themeColors.icon + "20",
             }}
@@ -169,10 +184,10 @@ export function TaskFormModal({
           <ScrollView
             contentContainerStyle={{
               padding: Spacing.large,
-              paddingBottom: Spacing.large,
+              paddingBottom: bottomSafeSpace + Spacing.xlarge,
               flexGrow: 1,
             }}
-            keyboardShouldPersistTaps="handled"
+            keyboardShouldPersistTaps="always"
             showsVerticalScrollIndicator={false}
           >
             <TaskForm

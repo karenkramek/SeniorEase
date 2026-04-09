@@ -3,16 +3,16 @@ import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
-  Text,
-  TextInput,
-  TouchableOpacity,
+    ActivityIndicator,
+    Text,
+    TextInput,
+    TouchableOpacity,
 } from "react-native";
 import { z } from "zod";
 
 import {
-  AuthLayout,
-  authStyles,
+    AuthLayout,
+    authStyles,
 } from "@/presentation/components/auth/AuthLayout";
 import { PasswordField } from "@/presentation/components/auth/PasswordField";
 import { AccessibleFormField } from "@/presentation/components/shared/AccessibleFormField";
@@ -92,7 +92,7 @@ export default function LoginScreen() {
             value={value}
             keyboardType="email-address"
             autoCapitalize="none"
-            placeholderTextColor="#999"
+            placeholderTextColor={themeColors.icon}
             editable={!loading}
             returnKeyType="next"
             onSubmitEditing={() => passwordRef.current?.focus()}
@@ -148,7 +148,12 @@ export default function LoginScreen() {
           ]}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text style={authStyles.submitButtonText}>
+          <Text
+            style={[
+              authStyles.submitButtonText,
+              { color: themeColors.buttonText },
+            ]}
+          >
             {strings.submitButton}
           </Text>
         </TouchableOpacity>

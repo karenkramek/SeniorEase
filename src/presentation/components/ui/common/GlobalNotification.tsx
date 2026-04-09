@@ -168,7 +168,8 @@ export function GlobalNotification() {
             hitSlop={{ top: 12, right: 12, bottom: 12, left: 12 }}
             style={{
               marginTop: 2,
-              minHeight: 40,
+              minHeight: 44,
+              minWidth: 44,
               alignItems: "center",
               justifyContent: "center",
             }}

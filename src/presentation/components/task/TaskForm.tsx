@@ -9,15 +9,18 @@ import { useNotification } from "@/presentation/hooks/useNotification";
 import { useTaskActions } from "@/presentation/hooks/useTaskActions";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { isWebPlatform } from "@/presentation/theme/colors";
-import { sharedStyles } from "@/presentation/theme/sharedStyles";
+import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
+  Platform,
   ScrollView,
   TouchableOpacity,
   View,
+  ViewStyle,
   useWindowDimensions,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface TaskFormProps {
   task?: Task; // undefined = modo criar, Task = modo editar
@@ -46,10 +49,27 @@ export function TaskForm({
   const { showNotification } = useNotification();
   const buttonHeight = useButtonHeight();
   const { width: screenWidth } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const minimumBottomSafeSpace =
+    Platform.OS === "android" && isModal ? Spacing.xlarge * 2 : Spacing.large;
+  const bottomSafeSpace = Math.max(insets.bottom, minimumBottomSafeSpace);
+  const actionAreaBottomPadding = isModal
+    ? bottomSafeSpace + Spacing.small
+    : Spacing.small;
+  const formScrollBottomPadding = isModal
+    ? bottomSafeSpace + 64
+    : bottomSafeSpace + 24;
 
   const isWeb = isWebPlatform();
   const isSmallScreen = screenWidth < 640;
   const shouldStackButtons = !isWeb || isSmallScreen;
+  const actionButtonSizingStyle: ViewStyle = shouldStackButtons
+    ? {
+        width: "100%",
+      }
+    : {
+        flex: 1,
+      };
   const [title, setTitle] = useState(() => task?.title ?? "");
   const [description, setDescription] = useState(() => task?.description ?? "");
   const [dueDate, setDueDate] = useState(() =>
@@ -325,10 +345,11 @@ export function TaskForm({
       <View
         style={{
           marginTop: 24,
-          marginBottom: isModal ? 0 : 8,
+          marginBottom: Spacing.small,
+          paddingBottom: actionAreaBottomPadding,
           gap: 12,
           flexDirection: shouldStackButtons ? "column" : "row",
-          alignItems: "center",
+          alignItems: "stretch",
           justifyContent: "center",
           width: "100%",
         }}
@@ -346,12 +367,14 @@ export function TaskForm({
               : appTexts.createTask.createButtonA11y
           }
           style={[
-            sharedStyles.secondaryButton,
             {
               height: buttonHeight,
+              borderRadius: 12,
+              paddingHorizontal: 24,
               backgroundColor: themeColors.tint,
               borderWidth: 0,
               borderColor: "transparent",
+              ...actionButtonSizingStyle,
             },
           ]}
         />
@@ -360,13 +383,17 @@ export function TaskForm({
             title={appTexts.common.cancel}
             onPress={onCancel}
             accessibilityLabel={appTexts.common.cancel}
+            hitSlop={{ top: 8, right: 8, bottom: 8, left: 8 }}
             textColor={themeColors.text}
             style={[
-              sharedStyles.secondaryButton,
               {
                 height: buttonHeight,
+                borderRadius: 12,
+                paddingHorizontal: 24,
+                borderWidth: 1.5,
                 backgroundColor: "transparent",
                 borderColor: themeColors.icon,
+                ...actionButtonSizingStyle,
               },
             ]}
           />
@@ -379,7 +406,17 @@ export function TaskForm({
 
   return (
     <ScrollView
-      contentContainerStyle={[sharedStyles.container, { paddingBottom: 32 }]}
+      style={{ flex: 1 }}
+      contentContainerStyle={{
+        alignItems: "stretch",
+        justifyContent: "flex-start",
+        padding: Spacing.large,
+        paddingBottom: formScrollBottomPadding,
+      }}
+      scrollEnabled
+      nestedScrollEnabled
+      contentInsetAdjustmentBehavior="always"
+      scrollIndicatorInsets={{ bottom: bottomSafeSpace }}
       keyboardShouldPersistTaps="handled"
     >
       {content}

@@ -1,11 +1,11 @@
 import { useTheme } from "@/presentation/hooks/useTheme";
 import React from "react";
 import {
-  Modal,
-  Platform,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
+    Modal,
+    Platform,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -32,10 +32,16 @@ export function BaseModal({
   onShow,
   restoreFocusRef,
 }: BaseModalProps) {
-  const { themeColors } = useTheme();
+  const { themeColors, colorScheme, preferences } = useTheme();
   const insets = useSafeAreaInsets();
   const { height: screenHeight } = useWindowDimensions();
   const wasVisibleRef = React.useRef(false);
+
+  const modalBackdropColor = preferences.isHighContrast
+    ? "rgba(255,255,255,0.30)"
+    : colorScheme === "dark"
+      ? "rgba(0,0,0,0.72)"
+      : "rgba(0,0,0,0.45)";
 
   React.useEffect(() => {
     if (visible) {
@@ -72,7 +78,7 @@ export function BaseModal({
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          backgroundColor: "rgba(0,0,0,0.5)",
+          backgroundColor: modalBackdropColor,
           maxHeight: overlayMaxHeight,
         }}
       >
@@ -83,7 +89,7 @@ export function BaseModal({
             borderRadius: 12,
             padding: 24,
             backgroundColor: themeColors.background,
-            borderWidth: 1,
+            borderWidth: preferences.isHighContrast ? 2 : 1,
             borderColor: themeColors.icon,
             gap: 12,
             marginHorizontal: 20,

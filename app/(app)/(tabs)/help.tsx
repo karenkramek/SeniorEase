@@ -51,11 +51,22 @@ export default function HelpScreen() {
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={[
-          sharedStyles.container,
+          {
+            alignItems: "stretch",
+            justifyContent: "flex-start",
+            padding: Spacing.large,
+          },
           getWebContentShellStyle(),
           isWeb && { paddingHorizontal: 28, paddingBottom: 32 },
-          { paddingTop: insets.top + Spacing.medium },
+          {
+            paddingTop: insets.top + Spacing.medium,
+            paddingBottom: insets.bottom + Spacing.large,
+          },
         ]}
+        scrollEnabled
+        nestedScrollEnabled
+        contentInsetAdjustmentBehavior="always"
+        scrollIndicatorInsets={{ bottom: insets.bottom + Spacing.medium }}
         accessibilityLabel={strings.screenLabel}
       >
         <View style={sharedStyles.titleContainer}>

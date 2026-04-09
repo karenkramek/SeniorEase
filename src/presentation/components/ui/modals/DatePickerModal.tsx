@@ -219,8 +219,16 @@ export function DatePickerModal({
               backgroundColor: themeColors.tint,
               borderWidth: 0,
               borderColor: "transparent",
-              minWidth: 200,
-              maxWidth: 230,
+              ...(shouldStackButtons
+                ? {
+                    width: "100%",
+                    minWidth: 0,
+                    maxWidth: "100%",
+                  }
+                : {
+                    minWidth: 200,
+                    maxWidth: 230,
+                  }),
             },
           ]}
         />
@@ -235,8 +243,16 @@ export function DatePickerModal({
               height: buttonHeight,
               backgroundColor: "transparent",
               borderColor: themeColors.icon,
-              minWidth: 200,
-              maxWidth: 230,
+              ...(shouldStackButtons
+                ? {
+                    width: "100%",
+                    minWidth: 0,
+                    maxWidth: "100%",
+                  }
+                : {
+                    minWidth: 200,
+                    maxWidth: 230,
+                  }),
             },
           ]}
         />

@@ -5,11 +5,12 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  View,
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
+    View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function EditTaskScreen() {
   const { themeColors } = useTheme();
@@ -54,16 +55,22 @@ export default function EditTaskScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView
+      edges={["bottom"]}
       style={{ flex: 1, backgroundColor: themeColors.background }}
     >
-      <TaskForm
-        task={task ?? undefined}
-        onSuccess={handleSuccess}
-        onCancel={handleSuccess}
-        showScrollView={true}
-      />
-    </KeyboardAvoidingView>
+      <KeyboardAvoidingView
+        enabled={Platform.OS === "ios"}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1, backgroundColor: themeColors.background }}
+      >
+        <TaskForm
+          task={task ?? undefined}
+          onSuccess={handleSuccess}
+          onCancel={handleSuccess}
+          showScrollView={true}
+        />
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

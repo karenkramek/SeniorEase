@@ -7,8 +7,8 @@ import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import { z } from "zod";
 
 import {
-  AuthLayout,
-  authStyles,
+    AuthLayout,
+    authStyles,
 } from "@/presentation/components/auth/AuthLayout";
 import { PasswordField } from "@/presentation/components/auth/PasswordField";
 import { AccessibleFormField } from "@/presentation/components/shared/AccessibleFormField";
@@ -122,7 +122,7 @@ export default function RegisterScreen() {
             onChangeText={onChange}
             value={value}
             autoCapitalize="words"
-            placeholderTextColor="#999"
+            placeholderTextColor={themeColors.icon}
             editable={!loading}
             error={errors.name?.message}
             iconComponent={
@@ -151,7 +151,7 @@ export default function RegisterScreen() {
             value={value}
             keyboardType="email-address"
             autoCapitalize="none"
-            placeholderTextColor="#999"
+            placeholderTextColor={themeColors.icon}
             editable={!loading}
             error={errors.email?.message}
             iconComponent={
@@ -219,7 +219,12 @@ export default function RegisterScreen() {
           ]}
           onPress={handleSubmit(onSubmit)}
         >
-          <Text style={authStyles.submitButtonText}>
+          <Text
+            style={[
+              authStyles.submitButtonText,
+              { color: themeColors.buttonText },
+            ]}
+          >
             {strings.submitButton}
           </Text>
         </TouchableOpacity>
