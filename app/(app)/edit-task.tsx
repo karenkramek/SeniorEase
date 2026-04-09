@@ -5,10 +5,10 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  View,
 } from "react-native";
 
 export default function EditTaskScreen() {
@@ -21,14 +21,18 @@ export default function EditTaskScreen() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!taskId) return;
     const load = async () => {
-      if (!taskId) return;
-      const found = await taskRepository.findById(taskId);
-      setTask(found);
-      setLoading(false);
+      try {
+        const found = await taskRepository.findById(taskId);
+        setTask(found);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
-  }, [taskId, taskRepository]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId]); // taskRepository is a stable singleton from context
 
   const handleSuccess = () => {
     if (router.canGoBack()) router.back();

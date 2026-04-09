@@ -24,11 +24,20 @@ jest.mock("expo-router", () => ({
   useLocalSearchParams: () => ({ taskId: "t1" }),
 }));
 
-jest.mock("@/presentation/contexts/TaskRepositoryContext", () => ({
-  useTaskRepository: () => ({
-    findById: jest.fn().mockResolvedValue(mockExistingTask),
-  }),
-}));
+jest.mock("@/presentation/contexts/TaskRepositoryContext", () => {
+  const repo = {
+    findById: jest.fn().mockResolvedValue({
+      id: "t1",
+      userId: "u1",
+      title: "Consulta médica",
+      description: "Levar exames",
+      status: "PENDING",
+      createdAt: "2026-01-01T00:00:00.000Z",
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    }),
+  };
+  return { useTaskRepository: () => repo };
+});
 
 jest.mock("@/presentation/hooks/useTaskActions", () => ({
   useTaskActions: () => ({
