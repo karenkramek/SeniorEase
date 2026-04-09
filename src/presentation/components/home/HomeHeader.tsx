@@ -1,3 +1,5 @@
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -6,8 +8,6 @@ import { useRouter } from "expo-router";
 import React from "react";
 import { Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AccessibleButton } from "./AccessibleButton";
-import { AccessibleText } from "./AccessibleText";
 
 export function HomeHeader() {
   const { themeColors } = useTheme();

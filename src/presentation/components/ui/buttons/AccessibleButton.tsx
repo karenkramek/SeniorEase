@@ -1,4 +1,4 @@
-import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
 import * as Haptics from "expo-haptics";
@@ -98,7 +98,13 @@ export const AccessibleButton = React.forwardRef<
       accessibilityRole={accessibilityRole}
       {...rest}
     >
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         {icon && <View style={{ marginRight: 12 }}>{icon}</View>}
         <AccessibleText
           style={textStyle}

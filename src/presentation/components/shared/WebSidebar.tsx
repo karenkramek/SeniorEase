@@ -1,9 +1,9 @@
+import { NavigationMenu } from "@/presentation/components/shared/NavigationMenu";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { getColorWithOpacity } from "@/presentation/theme/colors";
 import React from "react";
 import { View } from "react-native";
-import { NavigationMenu } from "./NavigationMenu";
 
 export function WebSidebar() {
   const { themeColors } = useTheme();

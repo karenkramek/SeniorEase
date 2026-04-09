@@ -30,6 +30,19 @@ export const formatDateLong = (date: Date): string => {
   }
 };
 
+// Formata data + hora (ex: "15 de janeiro de 2024 às 14:30")
+export const formatDateWithTime = (date: Date): string => {
+  if (!date || !isValid(date)) {
+    return "";
+  }
+  try {
+    return format(date, "dd 'de' MMMM 'de' yyyy 'às' HH:mm", { locale: ptBR });
+  } catch (error) {
+    console.warn("Erro ao formatar data com hora:", error);
+    return "";
+  }
+};
+
 // Retorna "Hoje", "Ontem" ou data por extenso (ex: "8 de janeiro")
 export const formatDateRelative = (date: Date): string => {
   if (!date || !isValid(date)) {
@@ -83,7 +96,7 @@ export const formatDateMedium = (date: Date): string => {
 };
 
 // Status da data de vencimento (timezone-safe, usa componentes locais)
-export type DueDateStatus = "overdue" | "today" | "soon" | "upcoming" | null;
+export type DueDateStatus = "overdue" | "today" | "soon" | null;
 
 export function getDueDateStatus(dueDate?: string): DueDateStatus {
   if (!dueDate) return null;
@@ -103,12 +116,10 @@ export function getDueDateStatus(dueDate?: string): DueDateStatus {
   // Compara apenas a parte da data (ignora horário)
   const todayStart = new Date(todayY, todayM, todayD).getTime();
   const dueStart = new Date(dueY, dueM, dueD).getTime();
-  const soonLimit = new Date(todayY, todayM, todayD + 3).getTime();
-  const upcomingLimit = new Date(todayY, todayM, todayD + 15).getTime();
+  const soonLimit = new Date(todayY, todayM, todayD + 6).getTime();
 
   if (dueStart < todayStart) return "overdue";
   if (dueStart === todayStart) return "today";
   if (dueStart <= soonLimit) return "soon";
-  if (dueStart <= upcomingLimit) return "upcoming";
   return null;
 }

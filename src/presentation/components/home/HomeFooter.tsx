@@ -1,10 +1,10 @@
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
 import React from "react";
 import { View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AccessibleText } from "./AccessibleText";
 
 export function HomeFooter() {
   const { themeColors } = useTheme();
@@ -15,7 +15,7 @@ export function HomeFooter() {
   const currentYear = new Date().getFullYear();
   const copyrightText = homepage.footerCopyright.replace(
     "{year}",
-    currentYear.toString()
+    currentYear.toString(),
   );
 
   // Responsive padding based on screen size

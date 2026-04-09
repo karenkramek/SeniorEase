@@ -1,3 +1,6 @@
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { HamburgerMenuButton } from "@/presentation/components/ui/common/HamburgerMenuButton";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
@@ -7,9 +10,6 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { AccessibleButton } from "./AccessibleButton";
-import { AccessibleText } from "./AccessibleText";
-import { HamburgerMenuButton } from "./HamburgerMenuButton";
 
 interface AppHeaderProps {
   menuOpen?: boolean;
@@ -27,7 +27,8 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
   const isSmallScreen = screenWidth < 640; // Mobile web
   const showHamburgerMenu = screenWidth < 1024; // Tablet e mobile web
 
-  const userName = user?.name || user?.email?.split("@")[0] || profile.userLabel;
+  const userName =
+    user?.name || user?.email?.split("@")[0] || profile.userLabel;
 
   return (
     <View
@@ -49,13 +50,21 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
         }}
       >
         {/* Hamburger Menu + Logo (esquerda) */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: Spacing.medium }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: Spacing.medium,
+          }}
+        >
           {/* Hamburger button - só aparece em telas menores (< lg) */}
           {isWeb && onMenuToggle && showHamburgerMenu && (
             <HamburgerMenuButton
               isOpen={menuOpen}
               onPress={onMenuToggle}
-              accessibilityLabel={menuOpen ? navigation.menuCloseA11y : navigation.menuOpenA11y}
+              accessibilityLabel={
+                menuOpen ? navigation.menuCloseA11y : navigation.menuOpenA11y
+              }
             />
           )}
 

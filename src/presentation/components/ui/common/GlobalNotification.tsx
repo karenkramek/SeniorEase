@@ -1,4 +1,4 @@
-import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useNotification } from "@/presentation/contexts/NotificationContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";

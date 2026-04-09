@@ -1,10 +1,15 @@
-import { TaskForm } from "@/presentation/components/TaskForm";
+import { Task } from "@/domain/entities/Task";
+import { TaskForm } from "@/presentation/components/task/TaskForm";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, View } from "react-native";
-import { Task } from "@/domain/entities/Task";
+import {
+    ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
+    View,
+} from "react-native";
 
 export default function EditTaskScreen() {
   const { themeColors } = useTheme();
@@ -31,7 +36,14 @@ export default function EditTaskScreen() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: themeColors.background }}>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: themeColors.background,
+        }}
+      >
         <ActivityIndicator size="large" color={themeColors.tint} />
       </View>
     );

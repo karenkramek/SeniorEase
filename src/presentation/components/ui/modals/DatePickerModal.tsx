@@ -1,6 +1,6 @@
-import { AccessibleButton } from "@/presentation/components/AccessibleButton";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { BaseModal } from "@/presentation/components/BaseModal";
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { BaseModal } from "@/presentation/components/ui/modals/BaseModal";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
@@ -55,7 +55,12 @@ export function DatePickerModal({
   const isSmallScreen = windowWidth < 640;
   const shouldStackButtons = !isWeb || (isWeb && isSmallScreen);
 
-  const today = useMemo(() => new Date(), []);
+  const today = useMemo(() => {
+    const now = new Date();
+    // Reset time to midnight to ensure consistent date (regardless of timezone)
+    now.setHours(0, 0, 0, 0);
+    return now;
+  }, [visible]);
 
   const parseDate = (dateStr?: string): Date => {
     if (!dateStr) return today;
@@ -103,7 +108,7 @@ export function DatePickerModal({
       setMonth(parsed.getMonth() + 1);
       setYear(parsed.getFullYear());
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, selectedDate]);
 
   useEffect(() => {
@@ -188,8 +193,7 @@ export function DatePickerModal({
           }}
           accessibilityLabel={formatDate(new Date(year, month - 1, day))}
         >
-          {String(day).padStart(2, "0")}/{String(month).padStart(2, "0")}/
-          {year}
+          {String(day).padStart(2, "0")}/{String(month).padStart(2, "0")}/{year}
         </AccessibleText>
       </View>
 
@@ -264,7 +268,8 @@ export function DatePickerModal({
             style={{
               color: themeColors.icon,
               marginBottom: Spacing.small,
-              fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+              fontSize:
+                (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
               fontWeight: "bold",
             }}
             accessibilityLabel={datePicker.dayLabel}
@@ -299,7 +304,8 @@ export function DatePickerModal({
                         ? themeColors.buttonText
                         : themeColors.text,
                     textAlign: "center",
-                    fontSize: (isWebMobile ? 13 : 14) * preferences.fontSizeMultiplier,
+                    fontSize:
+                      (isWebMobile ? 13 : 14) * preferences.fontSizeMultiplier,
                   }}
                 >
                   {String(dayNum).padStart(2, "0")}
@@ -328,7 +334,8 @@ export function DatePickerModal({
             style={{
               color: themeColors.icon,
               marginBottom: Spacing.small,
-              fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+              fontSize:
+                (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
               fontWeight: "bold",
             }}
             accessibilityLabel={datePicker.monthLabel}
@@ -365,7 +372,8 @@ export function DatePickerModal({
                         ? themeColors.buttonText
                         : themeColors.text,
                     textAlign: "center",
-                    fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+                    fontSize:
+                      (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
                   }}
                 >
                   {monthItem.label}
@@ -394,7 +402,8 @@ export function DatePickerModal({
             style={{
               color: themeColors.icon,
               marginBottom: Spacing.small,
-              fontSize: (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
+              fontSize:
+                (isWebMobile ? 12 : 13) * preferences.fontSizeMultiplier,
               fontWeight: "bold",
             }}
             accessibilityLabel={datePicker.yearLabel}
@@ -429,7 +438,8 @@ export function DatePickerModal({
                         ? themeColors.buttonText
                         : themeColors.text,
                     textAlign: "center",
-                    fontSize: (isWebMobile ? 13 : 14) * preferences.fontSizeMultiplier,
+                    fontSize:
+                      (isWebMobile ? 13 : 14) * preferences.fontSizeMultiplier,
                   }}
                 >
                   {yearNum}

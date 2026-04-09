@@ -1,21 +1,8 @@
-/**
- * AccessibleFormField Component
- *
- * Wraps form inputs with full WCAG 2.2 AA accessibility semantics:
- * - Semantic HTML for web (aria-invalid, aria-describedby, aria-required)
- * - Native screen reader labels (accessibilityLabel, accessibilityHint)
- * - Error messages with alert role for live announcements
- * - Touch target size validation (44x44 minimum)
- * - Focus outline styling
- *
- * Supports both mobile native (iOS/Android) and web (react-native-web) with consistent semantics
- */
-
-import { ThemedText } from '@/presentation/components/ThemedText';
-import { useTheme } from '@/presentation/hooks/useTheme';
-import { A11yTokens } from '@/presentation/theme/a11y-tokens';
-import { Ionicons } from '@expo/vector-icons';
-import React, { useMemo } from 'react';
+import { ThemedText } from "@/presentation/components/ui/text/ThemedText";
+import { useTheme } from "@/presentation/hooks/useTheme";
+import { A11yTokens } from "@/presentation/theme/a11y-tokens";
+import { Ionicons } from "@expo/vector-icons";
+import React, { useMemo } from "react";
 import {
   AccessibilityRole,
   Platform,
@@ -24,93 +11,44 @@ import {
   TextInputProps,
   View,
   ViewStyle,
-} from 'react-native';
+} from "react-native";
 
 interface AccessibleFormFieldProps extends TextInputProps {
-  /**
-   * Unique field identifier (email, password, etc)
-   */
   fieldId: string;
-
-  /**
-   * Human-readable label for screen readers
-   * @example "Email address for login"
-   */
   accessibilityLabel: string;
-
-  /**
-   * Additional hint for screen reader users
-   * @example "Use your registered email address"
-   */
   accessibilityHint?: string;
-
-  /**
-   * Error message to display and announce
-   */
   error?: string;
-
-  /**
-   * Is this field required?
-   */
   required?: boolean;
-
-  /**
-   * Container style for layout flexibility
-   */
   containerStyle?: ViewStyle;
-
-  /**
-   * Visual label component to render above input
-   * @example <Text>Email</Text>
-   */
   labelComponent?: React.ReactNode;
-
-  /**
-   * Icon component to display inside input container
-   * @example <Ionicons name="mail" />
-   */
   iconComponent?: React.ReactNode;
-
-  /**
-   * Input container style (for borders, padding, etc)
-   */
   inputContainerStyle?: ViewStyle;
-
-  /**
-   * Default border color when no error
-   * @default "#ffffff"
-   */
   borderColorDefault?: string;
-
-  /**
-   * Callback when field state changes (for tracking dirty state)
-   */
   onFieldStateChange?: (isDirty: boolean, isValid: boolean) => void;
 }
 
-/**
- * Error message component with alert role
- * Announces errors to screen readers automatically
- */
-const AccessibleErrorMessage: React.FC<{ message: string; fieldId: string }> = ({
-  message,
-  fieldId,
-}) => (
+const AccessibleErrorMessage: React.FC<{
+  message: string;
+  fieldId: string;
+}> = ({ message, fieldId }) => (
   <View
     nativeID={`error-${fieldId}`}
     accessibilityRole="alert"
     accessible
-    {...{
-      'aria-live': 'assertive',
-      'aria-atomic': 'true',
-      role: 'alert',
-    } as any}
+    {...({
+      "aria-live": "assertive",
+      "aria-atomic": "true",
+      role: "alert",
+    } as any)}
     style={styles.errorContainer}
   >
-    <Ionicons name="alert-circle" size={16} color={A11yTokens.error.color} style={{ marginRight: 4 }} />
-    <ThemedText style={styles.errorText}>
-      {message}
-    </ThemedText>
+    <Ionicons
+      name="alert-circle"
+      size={16}
+      color={A11yTokens.error.color}
+      style={{ marginRight: 4 }}
+    />
+    <ThemedText style={styles.errorText}>{message}</ThemedText>
   </View>
 );
 
@@ -149,13 +87,15 @@ export const AccessibleFormField = React.forwardRef<
     // Determine default border color based on theme mode
     // Dark mode: white (#FFFFFF)
     // Light mode: green (project's tint color)
-    const defaultBorderColor = borderColorDefault ?? (colorScheme === 'dark' ? '#FFFFFF' : themeColors.tint);
+    const defaultBorderColor =
+      borderColorDefault ??
+      (colorScheme === "dark" ? "#FFFFFF" : themeColors.tint);
 
     // Compute accessibility label with required indicator
     const computedA11yLabel = useMemo(() => {
       const label = accessibilityLabel;
-      const requiredSuffix = required ? ', required' : '';
-      const errorSuffix = error ? `, error: ${error}` : '';
+      const requiredSuffix = required ? ", required" : "";
+      const errorSuffix = error ? `, error: ${error}` : "";
       return `${label}${requiredSuffix}${errorSuffix}`;
     }, [accessibilityLabel, required, error]);
 
@@ -164,8 +104,8 @@ export const AccessibleFormField = React.forwardRef<
       const hints = [];
       if (accessibilityHint) hints.push(accessibilityHint);
       if (error) hints.push(`Error: ${error}`);
-      if (required) hints.push('This field is required');
-      return hints.join('. ');
+      if (required) hints.push("This field is required");
+      return hints.join(". ");
     }, [accessibilityHint, error, required]);
 
     // Track field state changes
@@ -178,11 +118,11 @@ export const AccessibleFormField = React.forwardRef<
 
     // Announce focus state to screen readers
     const handleFocus = () => {
-      onFocus?.({ nativeEvent: { text: value || '' } } as any);
+      onFocus?.({ nativeEvent: { text: value || "" } } as any);
     };
 
     const handleBlur = () => {
-      onBlur?.({ nativeEvent: { text: value || '' } } as any);
+      onBlur?.({ nativeEvent: { text: value || "" } } as any);
     };
 
     // Determine input container border color based on error state
@@ -196,35 +136,42 @@ export const AccessibleFormField = React.forwardRef<
 
     return (
       <View style={[styles.container, containerStyle]}>
-        {labelComponent && <View style={styles.labelWrapper}>{labelComponent}</View>}
+        {labelComponent && (
+          <View style={styles.labelWrapper}>{labelComponent}</View>
+        )}
 
         <View
           style={[
             styles.inputContainer,
             inputContainerStyle,
-            { borderColor: inputContainerBorderColor, borderRadius: containerBorderRadius },
+            {
+              borderColor: inputContainerBorderColor,
+              borderRadius: containerBorderRadius,
+            },
             error && styles.inputContainerError,
           ]}
           accessible={false}
         >
-          {iconComponent && <View style={styles.iconWrapper}>{iconComponent}</View>}
+          {iconComponent && (
+            <View style={styles.iconWrapper}>{iconComponent}</View>
+          )}
 
           <TextInput
             ref={ref}
             style={[styles.input, style]}
-            {...(Platform.OS === 'web'
+            {...(Platform.OS === "web"
               ? {
                   // Web: add semantic HTML attributes via react-native-web
-                  'aria-label': computedA11yLabel as any,
-                  'aria-invalid': error ? 'true' : 'false',
-                  'aria-required': required ? 'true' : 'false',
-                  'aria-describedby': error ? `error-${fieldId}` : undefined,
+                  "aria-label": computedA11yLabel as any,
+                  "aria-invalid": error ? "true" : "false",
+                  "aria-required": required ? "true" : "false",
+                  "aria-describedby": error ? `error-${fieldId}` : undefined,
                 }
               : {
                   // Native: use accessibility props
                   accessibilityLabel: computedA11yLabel,
                   accessibilityHint: computedA11yHint,
-                  accessibilityRole: 'none' as AccessibilityRole,
+                  accessibilityRole: "none" as AccessibilityRole,
                 })}
             nativeID={`input-${fieldId}`}
             value={value}
@@ -242,7 +189,7 @@ export const AccessibleFormField = React.forwardRef<
   },
 );
 
-AccessibleFormField.displayName = 'AccessibleFormField';
+AccessibleFormField.displayName = "AccessibleFormField";
 
 const styles = StyleSheet.create({
   container: {
@@ -252,30 +199,30 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderWidth: 2,
     borderRadius: 12,
     paddingHorizontal: 5,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
     minHeight: 53,
     paddingVertical: 2,
   },
   inputContainerError: {
     borderColor: A11yTokens.error.color,
-    backgroundColor: '#FFF5F5',
+    backgroundColor: "#FFF5F5",
   },
   iconWrapper: {
     marginRight: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     minWidth: 24,
     minHeight: 24,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     paddingVertical: 12,
     paddingHorizontal: 5,
   },
@@ -283,15 +230,15 @@ const styles = StyleSheet.create({
     marginTop: 8,
     paddingHorizontal: 0,
     paddingVertical: 6,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderLeftWidth: 0,
     borderRadius: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   errorText: {
     color: A11yTokens.error.color,
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

@@ -17,8 +17,8 @@ import {
 } from "react-native";
 import { z } from "zod";
 
-import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
-import { ThemedText } from "@/presentation/components/ThemedText";
+import { AccessibleFormField } from "@/presentation/components/shared/AccessibleFormField";
+import { ThemedText } from "@/presentation/components/ui/text/ThemedText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
@@ -141,7 +141,11 @@ export default function LoginScreen() {
                   blurOnSubmit={false}
                   error={errors.email?.message}
                   iconComponent={
-                    <Ionicons name="mail-outline" size={20} color={themeColors.icon} />
+                    <Ionicons
+                      name="mail-outline"
+                      size={20}
+                      color={themeColors.icon}
+                    />
                   }
                 />
               )}
@@ -170,15 +174,26 @@ export default function LoginScreen() {
                     blurOnSubmit
                     error={errors.password?.message}
                     iconComponent={
-                      <Ionicons name="lock-closed-outline" size={20} color={themeColors.icon} />
+                      <Ionicons
+                        name="lock-closed-outline"
+                        size={20}
+                        color={themeColors.icon}
+                      />
                     }
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
-                    style={[styles.eyeIcon, { top: Platform.OS === "web" ? 2 : 5 }]}
+                    style={[
+                      styles.eyeIcon,
+                      { top: Platform.OS === "web" ? 2 : 5 },
+                    ]}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={showPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
+                    accessibilityLabel={
+                      showPassword
+                        ? commonStrings.hidePasswordA11y
+                        : commonStrings.showPasswordA11y
+                    }
                     accessibilityHint={commonStrings.togglePasswordHint}
                   >
                     <Ionicons
@@ -192,13 +207,19 @@ export default function LoginScreen() {
             />
 
             {loading ? (
-              <ActivityIndicator size="large" color="#D3D3D3" style={styles.loginButton} />
+              <ActivityIndicator
+                size="large"
+                color="#D3D3D3"
+                style={styles.loginButton}
+              />
             ) : (
               <TouchableOpacity
                 style={styles.loginButton}
                 onPress={handleSubmit(onSubmit)}
               >
-                <Text style={styles.loginButtonText}>{strings.submitButton}</Text>
+                <Text style={styles.loginButtonText}>
+                  {strings.submitButton}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -268,10 +289,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   passwordFieldWrapper: {
-    position: 'relative',
+    position: "relative",
   },
   eyeIcon: {
-    position: 'absolute',
+    position: "absolute",
     right: 16,
     top: 2,
     height: 48,

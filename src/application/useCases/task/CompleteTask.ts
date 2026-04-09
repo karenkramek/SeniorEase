@@ -15,6 +15,7 @@ export class CompleteTask {
     return this.taskRepository.update({
       ...task,
       status: TaskStatus.COMPLETED,
+      completedAt: new Date().toISOString(),
     });
   }
 }

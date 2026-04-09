@@ -1,16 +1,24 @@
 import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { DueDateBadge } from "@/presentation/components/ui/common/DueDateBadge";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { formatDateMedium, getDueDateStatus } from "@/presentation/utils/format";
-import { DueDateBadge } from "@/presentation/components/DueDateBadge";
+import {
+    formatDateMedium,
+    getDueDateStatus,
+} from "@/presentation/utils/format";
 import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Animated, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import {
+    Animated,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
+} from "react-native";
 
 interface TaskCardProps {
   task: Task;
@@ -142,18 +150,35 @@ export function TaskCard({
             {truncateText(task.title, 45)}
           </AccessibleText>
           {(task.dueDate || task.status === TaskStatus.COMPLETED) && (
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                flexWrap: "wrap",
+                marginTop: 2,
+              }}
+            >
               {task.dueDate && task.status !== TaskStatus.COMPLETED && (
                 <AccessibleText
                   type="caption"
-                  style={{ opacity: 0.7, fontSize: 14, color: themeColors.text }}
+                  style={{
+                    opacity: 0.7,
+                    fontSize: 14,
+                    color: themeColors.text,
+                  }}
                   accessibilityLabel={`${taskCardTexts.dueDatePrefix}: ${formatDateMedium(new Date(task.dueDate))}`}
                 >
-                  {taskCardTexts.dueDatePrefix}: {formatDateMedium(new Date(task.dueDate))}
+                  {taskCardTexts.dueDatePrefix}:{" "}
+                  {formatDateMedium(new Date(task.dueDate))}
                 </AccessibleText>
               )}
               <DueDateBadge
-                status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
+                status={
+                  task.status === TaskStatus.COMPLETED
+                    ? "completed"
+                    : getDueDateStatus(task.dueDate)
+                }
               />
             </View>
           )}
@@ -187,7 +212,11 @@ export function TaskCard({
           />
           {!isWebMobile && (
             <AccessibleText
-              style={{ color: themeColors.error, fontWeight: "bold", fontSize: 16 }}
+              style={{
+                color: themeColors.error,
+                fontWeight: "bold",
+                fontSize: 16,
+              }}
             >
               {appTexts.common.deleteAction}
             </AccessibleText>

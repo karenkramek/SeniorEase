@@ -1,10 +1,10 @@
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { DueDateStatus } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View } from "react-native";
-import { AccessibleText } from "./AccessibleText";
 
 export type BadgeStatus = DueDateStatus | "completed";
 
@@ -49,14 +49,8 @@ export function DueDateBadge({ status, size = "sm" }: DueDateBadgeProps) {
     soon: {
       label: strings.soonLabel,
       a11y: strings.soonA11y,
-      color: themeColors.warning,
-      icon: "calendar-outline",
-    },
-    upcoming: {
-      label: strings.upcomingLabel,
-      a11y: strings.upcomingA11y,
       color: themeColors.icon,
-      icon: "calendar",
+      icon: "calendar-outline",
     },
   };
 

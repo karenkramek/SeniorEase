@@ -1,11 +1,11 @@
+import { HomeFooter } from "@/presentation/components/home/HomeFooter";
+import { HomeHeader } from "@/presentation/components/home/HomeHeader";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
 import React from "react";
 import { ScrollView, View, useWindowDimensions } from "react-native";
-import { AccessibleText } from "./AccessibleText";
-import { HomeFooter } from "./HomeFooter";
-import { HomeHeader } from "./HomeHeader";
 
 export function HomePage() {
   const { themeColors } = useTheme();

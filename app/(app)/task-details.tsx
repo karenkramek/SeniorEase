@@ -1,10 +1,11 @@
 import { CompleteTask } from "@/application/useCases/task/CompleteTask";
 import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
-import { AccessibleButton } from "@/presentation/components/AccessibleButton";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { ConfirmModal } from "@/presentation/components/ConfirmModal";
-import { EditTaskModal } from "@/presentation/components/EditTaskModal";
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { DueDateBadge } from "@/presentation/components/ui/common/DueDateBadge";
+import { ConfirmModal } from "@/presentation/components/ui/modals/ConfirmModal";
+import { TaskFormModal } from "@/presentation/components/ui/modals/TaskFormModal";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
@@ -13,8 +14,11 @@ import { usePreferences } from "@/presentation/hooks/usePreferences";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
-import { formatDateLong, getDueDateStatus } from "@/presentation/utils/format";
-import { DueDateBadge } from "@/presentation/components/DueDateBadge";
+import {
+  formatDateLong,
+  formatDateWithTime,
+  getDueDateStatus,
+} from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
@@ -29,7 +33,6 @@ export default function TaskDetailsScreen() {
   const { themeColors } = useTheme();
   const { preferences } = usePreferences();
   const buttonHeight = useButtonHeight();
-
 
   const taskRepository = useTaskRepository();
   const completeTaskUseCase = useMemo(
@@ -181,7 +184,14 @@ export default function TaskDetailsScreen() {
           >
             {strings.dueDateLabel}
           </AccessibleText>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              flexWrap: "wrap",
+            }}
+          >
             <AccessibleText
               style={{
                 color: themeColors.text,
@@ -191,31 +201,79 @@ export default function TaskDetailsScreen() {
             >
               {formatDateLong(new Date(task.dueDate!))}
             </AccessibleText>
-            <DueDateBadge
-              status={task.status === TaskStatus.COMPLETED ? "completed" : getDueDateStatus(task.dueDate)}
-              size="md"
-            />
+            {task.status !== TaskStatus.COMPLETED && (
+              <DueDateBadge status={getDueDateStatus(task.dueDate)} size="md" />
+            )}
           </View>
         </View>
       )}
 
-      {!task.dueDate && task.status === TaskStatus.COMPLETED && (
+      {task.createdAt && (
         <View style={{ marginBottom: Spacing.medium }}>
-          <DueDateBadge status="completed" size="md" />
+          <AccessibleText
+            type="caption"
+            style={{
+              color: themeColors.icon,
+              marginBottom: 4,
+              fontSize: 13 * preferences.fontSizeMultiplier,
+            }}
+            accessibilityLabel="Data de criação da tarefa"
+          >
+            Data de Criação
+          </AccessibleText>
+          <AccessibleText
+            style={{
+              color: themeColors.text,
+              fontSize: 15 * preferences.fontSizeMultiplier,
+            }}
+            accessibilityLabel={`Criada em: ${formatDateWithTime(new Date(task.createdAt))}`}
+          >
+            {formatDateWithTime(new Date(task.createdAt))}
+          </AccessibleText>
         </View>
       )}
 
+      {task.status === TaskStatus.COMPLETED &&
+        (task.completedAt || task.updatedAt) && (
+          <View style={{ marginBottom: Spacing.medium }}>
+            <AccessibleText
+              type="caption"
+              style={{
+                color: themeColors.icon,
+                marginBottom: 4,
+                fontSize: 13 * preferences.fontSizeMultiplier,
+              }}
+              accessibilityLabel="Data de conclusão da tarefa"
+            >
+              Data de Conclusão
+            </AccessibleText>
+            <AccessibleText
+              style={{
+                color: themeColors.text,
+                fontSize: 15 * preferences.fontSizeMultiplier,
+              }}
+              accessibilityLabel={`Concluída em: ${formatDateWithTime(new Date(task.completedAt || task.updatedAt))}`}
+            >
+              {formatDateWithTime(new Date(task.completedAt || task.updatedAt))}
+            </AccessibleText>
+          </View>
+        )}
+
       {task.status !== TaskStatus.COMPLETED ? (
-        <View style={{ flexDirection: "column", gap: Spacing.medium, marginTop: Spacing.medium, overflow: "visible", paddingBottom: Spacing.large, justifyContent: "center", alignItems: "center" }}>
+        <View
+          style={{
+            flexDirection: "column",
+            gap: Spacing.medium,
+            marginTop: Spacing.medium,
+            overflow: "visible",
+            paddingBottom: Spacing.large,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <AccessibleButton
             title={strings.editButton}
-            icon={
-              <Ionicons
-                name="pencil"
-                size={20}
-                color={themeColors.tint}
-              />
-            }
+            icon={<Ionicons name="pencil" size={20} color={themeColors.tint} />}
             onPress={() => setIsEditModalOpen(true)}
             accessibilityLabel={strings.editButtonA11y}
             textColor={themeColors.tint}
@@ -274,7 +332,7 @@ export default function TaskDetailsScreen() {
         onCancel={handleCancel}
       />
 
-      <EditTaskModal
+      <TaskFormModal
         visible={isEditModalOpen}
         task={task}
         onClose={handleEditSuccess}

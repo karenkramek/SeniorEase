@@ -1,5 +1,6 @@
-import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { CreateTaskForm } from "@/presentation/components/CreateTaskForm";
+import { Task } from "@/domain/entities/Task";
+import { TaskForm } from "@/presentation/components/task/TaskForm";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -7,25 +8,32 @@ import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 
-interface CreateTaskModalProps {
+interface TaskFormModalProps {
   visible: boolean;
+  task?: Task | null; // undefined/null = criar, Task = editar
   onClose: () => void;
   onSuccess?: () => void;
 }
 
-export function CreateTaskModal({
+export function TaskFormModal({
   visible,
+  task,
   onClose,
   onSuccess,
-}: CreateTaskModalProps) {
+}: TaskFormModalProps) {
+  const isEditMode = !!task;
   const { themeColors, isWeb } = useTheme();
   const appTexts = useAppStrings();
-  const strings = appTexts.createTask;
+  const strings = isEditMode ? appTexts.editTask : appTexts.createTask;
 
   const handleSuccess = () => {
     onSuccess?.();
     onClose();
   };
+
+  if (isEditMode && !task) {
+    return null;
+  }
 
   return (
     <Modal
@@ -105,7 +113,8 @@ export function CreateTaskModal({
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
             >
-              <CreateTaskForm
+              <TaskForm
+                task={task || undefined}
                 onSuccess={handleSuccess}
                 onCancel={onClose}
                 isModal={true}
@@ -166,7 +175,8 @@ export function CreateTaskModal({
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
-            <CreateTaskForm
+            <TaskForm
+              task={task || undefined}
               onSuccess={handleSuccess}
               onCancel={onClose}
               isModal={true}

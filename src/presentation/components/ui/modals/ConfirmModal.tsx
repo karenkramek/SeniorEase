@@ -1,13 +1,18 @@
-import { AccessibleButton } from "@/presentation/components/AccessibleButton";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { BaseModal } from "@/presentation/components/BaseModal";
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { BaseModal } from "@/presentation/components/ui/modals/BaseModal";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { isWebPlatform } from "@/presentation/theme/colors";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import React from "react";
-import { Platform, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import {
+    Platform,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
+} from "react-native";
 
 interface ConfirmModalProps {
   visible: boolean;
@@ -66,11 +71,19 @@ export function ConfirmModal({
       <AccessibleText type="h2" accessibilityLabel={title}>
         {title}
       </AccessibleText>
-      <AccessibleText accessibilityLabel={message}>
-        {message}
-      </AccessibleText>
+      <AccessibleText accessibilityLabel={message}>{message}</AccessibleText>
 
-      <View style={{ marginTop: 12, gap: 12, flexDirection: shouldStackButtons ? "column" : "row", justifyContent: "center", alignItems: "center", width: "100%", marginHorizontal: "auto" }}>
+      <View
+        style={{
+          marginTop: 12,
+          gap: 12,
+          flexDirection: shouldStackButtons ? "column" : "row",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          marginHorizontal: "auto",
+        }}
+      >
         <AccessibleButton
           ref={confirmButtonRef}
           title={effectiveConfirmText}
@@ -81,7 +94,9 @@ export function ConfirmModal({
             sharedStyles.secondaryButton,
             {
               height: buttonHeight,
-              backgroundColor: isDestructive ? themeColors.error : themeColors.tint,
+              backgroundColor: isDestructive
+                ? themeColors.error
+                : themeColors.tint,
               borderWidth: 0,
               borderColor: "transparent",
               minWidth: 200,

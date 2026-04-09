@@ -1,27 +1,13 @@
 import { useTheme } from "@/presentation/hooks/useTheme";
 import React from "react";
-import { Modal, Platform, TouchableOpacity, View, useWindowDimensions } from "react-native";
+import {
+  Modal,
+  Platform,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-/**
- * BASE MODAL COMPONENT
- *
- * Provides a consistent modal wrapper for all dialogs throughout the project.
- *
- * BUTTON ORDERING CONVENTION:
- * When rendering buttons in the footer, always follow this order:
- * 1. Cancel/Close button (secondary, often transparent)
- * 2. Confirm/Submit button (primary, colored)
- * 3. Delete/Destructive button (if present, error color)
- *
- * Examples:
- * - Cancel → Confirm
- * - Cancel → Create
- * - Cancel → Delete
- * - Cancel → Confirm → Delete
- *
- * This ensures consistent UX across all modals in the application.
- */
 
 interface BaseModalProps {
   visible: boolean;
@@ -31,7 +17,9 @@ interface BaseModalProps {
   footer?: React.ReactNode;
   maxWidth?: number;
   onShow?: () => void;
-  restoreFocusRef?: React.RefObject<React.ElementRef<typeof TouchableOpacity> | null>;
+  restoreFocusRef?: React.RefObject<React.ElementRef<
+    typeof TouchableOpacity
+  > | null>;
 }
 
 export function BaseModal({
@@ -66,7 +54,9 @@ export function BaseModal({
 
   // No mobile APP, deixa espaço para o menu inferior (insets.bottom) + 20px extra
   const isMobileApp = Platform.OS !== "web";
-  const overlayMaxHeight = isMobileApp ? screenHeight - insets.bottom - 20 : screenHeight;
+  const overlayMaxHeight = isMobileApp
+    ? screenHeight - insets.bottom - 20
+    : screenHeight;
 
   return (
     <Modal

@@ -1,8 +1,8 @@
 import { Task } from "@/domain/entities/Task";
-import { AccessibleButton } from "@/presentation/components/AccessibleButton";
-import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
-import { AccessibleText } from "@/presentation/components/AccessibleText";
-import { DatePickerModal } from "@/presentation/components/DatePickerModal";
+import { AccessibleFormField } from "@/presentation/components/shared/AccessibleFormField";
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
+import { DatePickerModal } from "@/presentation/components/ui/modals/DatePickerModal";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useNotification } from "@/presentation/hooks/useNotification";
@@ -10,13 +10,13 @@ import { useTasks } from "@/presentation/hooks/useTasks";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { isWebPlatform } from "@/presentation/theme/colors";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
-  ScrollView,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
+    ScrollView,
+    TouchableOpacity,
+    View,
+    useWindowDimensions,
 } from "react-native";
 
 interface TaskFormProps {
@@ -51,9 +51,7 @@ export function TaskForm({
   const isSmallScreen = screenWidth < 640;
   const shouldStackButtons = !isWeb || isSmallScreen;
   const [title, setTitle] = useState(() => task?.title ?? "");
-  const [description, setDescription] = useState(
-    () => task?.description ?? "",
-  );
+  const [description, setDescription] = useState(() => task?.description ?? "");
   const [dueDate, setDueDate] = useState(() =>
     task?.dueDate ? formatDueDate(task.dueDate) : "",
   );
@@ -73,6 +71,16 @@ export function TaskForm({
 
   // Strings de campos são idênticas em createTask e editTask — usa createTask
   const fieldStrings = appTexts.createTask;
+
+  // Sugestões acadêmicas
+  const academicSuggestions = [
+    "Estudar para prova",
+    "Entregar trabalho",
+    "Ler capítulo do livro",
+    "Revisar anotações",
+    "Participar de grupo de estudos",
+    "Fazer exercícios da matéria",
+  ];
 
   const handleSubmit = async () => {
     setSubmissionError(null);
@@ -119,7 +127,10 @@ export function TaskForm({
       );
       onSuccess?.();
     } catch (error) {
-      console.error(`Falha ao ${isEditMode ? "editar" : "criar"} tarefa`, error);
+      console.error(
+        `Falha ao ${isEditMode ? "editar" : "criar"} tarefa`,
+        error,
+      );
       if (isEditMode && (error as Error).message.includes("concluída")) {
         showNotification(appTexts.editTask.completedTaskError, "error");
         setSubmissionError(appTexts.editTask.completedTaskError);
@@ -143,7 +154,13 @@ export function TaskForm({
     <>
       <View style={{ gap: 16 }}>
         <View>
-          <AccessibleText style={{ fontWeight: "bold", color: themeColors.text, marginBottom: 8 }}>
+          <AccessibleText
+            style={{
+              fontWeight: "bold",
+              color: themeColors.text,
+              marginBottom: 8,
+            }}
+          >
             {fieldStrings.titleLabel}
           </AccessibleText>
           <AccessibleFormField
@@ -166,10 +183,49 @@ export function TaskForm({
               backgroundColor: themeColors.background,
             }}
           />
+
+          {/* Sugestões acadêmicas */}
+          <View
+            style={{
+              flexDirection: "row",
+              flexWrap: "wrap",
+              gap: 8,
+              marginTop: 8,
+            }}
+          >
+            {academicSuggestions.map((suggestion) => (
+              <TouchableOpacity
+                key={suggestion}
+                onPress={() => setTitle(suggestion)}
+                style={{
+                  backgroundColor: themeColors.icon + "10",
+                  borderRadius: 8,
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  marginRight: 6,
+                  marginBottom: 6,
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={`Usar sugestão: ${suggestion}`}
+              >
+                <AccessibleText
+                  style={{ color: themeColors.text, fontSize: 13 }}
+                >
+                  {suggestion}
+                </AccessibleText>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
 
         <View>
-          <AccessibleText style={{ fontWeight: "bold", color: themeColors.text, marginBottom: 8 }}>
+          <AccessibleText
+            style={{
+              fontWeight: "bold",
+              color: themeColors.text,
+              marginBottom: 8,
+            }}
+          >
             {fieldStrings.descriptionLabel}
           </AccessibleText>
           <AccessibleFormField
@@ -183,7 +239,10 @@ export function TaskForm({
             error={submissionError || undefined}
             multiline
             numberOfLines={5}
-            style={{ color: themeColors.text, textAlignVertical: "top" as "top" }}
+            style={{
+              color: themeColors.text,
+              textAlignVertical: "top" as "top",
+            }}
             containerStyle={{ marginBottom: 0 }}
             inputContainerStyle={{
               backgroundColor: themeColors.background,
@@ -196,7 +255,13 @@ export function TaskForm({
         </View>
 
         <View>
-          <AccessibleText style={{ fontWeight: "bold", color: themeColors.text, marginBottom: 8 }}>
+          <AccessibleText
+            style={{
+              fontWeight: "bold",
+              color: themeColors.text,
+              marginBottom: 8,
+            }}
+          >
             {fieldStrings.dueDateLabel}
           </AccessibleText>
           <TouchableOpacity
@@ -207,7 +272,8 @@ export function TaskForm({
             accessibilityHint={`${fieldStrings.dueDateA11yHintSelected}: ${dueDate || fieldStrings.dueDateA11yHintNone}. ${fieldStrings.dueDateA11yHintAction}`}
             style={{
               borderWidth: 2,
-              borderColor: colorScheme === "dark" ? "#FFFFFF" : themeColors.tint,
+              borderColor:
+                colorScheme === "dark" ? "#FFFFFF" : themeColors.tint,
               borderRadius: 12,
               paddingHorizontal: 16,
               paddingVertical: 12,
@@ -219,7 +285,10 @@ export function TaskForm({
             }}
           >
             <AccessibleText
-              style={{ color: dueDate ? themeColors.text : themeColors.icon, fontSize: 16 }}
+              style={{
+                color: dueDate ? themeColors.text : themeColors.icon,
+                fontSize: 16,
+              }}
             >
               {dueDate || fieldStrings.dueDatePlaceholder}
             </AccessibleText>
@@ -252,26 +321,17 @@ export function TaskForm({
         }}
       >
         <AccessibleButton
-          title={isEditMode ? appTexts.editTask.editButton : appTexts.createTask.createButton}
-          icon={
-            isEditMode ? (
-              <MaterialIcons
-                name="edit"
-                size={24}
-                color={themeColors.buttonText}
-                accessibilityLabel="Ícone de editar"
-              />
-            ) : (
-              <MaterialIcons
-                name="add"
-                size={32}
-                color={themeColors.buttonText}
-                accessibilityLabel={appTexts.taskList.addIconA11y}
-              />
-            )
+          title={
+            isEditMode
+              ? appTexts.editTask.editButton
+              : appTexts.createTask.createButton
           }
           onPress={handleSubmit}
-          accessibilityLabel={isEditMode ? appTexts.editTask.editButtonA11y : appTexts.createTask.createButtonA11y}
+          accessibilityLabel={
+            isEditMode
+              ? appTexts.editTask.editButtonA11y
+              : appTexts.createTask.createButtonA11y
+          }
           style={[
             sharedStyles.secondaryButton,
             {

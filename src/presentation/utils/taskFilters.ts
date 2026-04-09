@@ -77,7 +77,7 @@ export function filterTasks({
 // ORDENAÇÃO DE TAREFAS
 // ============================================================================
 
-// Ordena tarefas baseado no critério especificado
+// Ordena tarefas baseado no critério especificado (por data de criação)
 export function sortTasks(
   tasks: Task[],
   sortBy: FilterOptions["sortBy"],
@@ -86,18 +86,18 @@ export function sortTasks(
 
   switch (sortBy) {
     case "date-desc":
+      // Mais recentes primeiro (criadas mais recentemente)
       sorted.sort((a, b) => {
-        if (!a.dueDate || !b.dueDate) return 0;
-        const dateA = new Date(a.dueDate);
-        const dateB = new Date(b.dueDate);
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
         return dateB.getTime() - dateA.getTime();
       });
       break;
     case "date-asc":
+      // Mais antigas primeiro (criadas primeiro)
       sorted.sort((a, b) => {
-        if (!a.dueDate || !b.dueDate) return 0;
-        const dateA = new Date(a.dueDate);
-        const dateB = new Date(b.dueDate);
+        const dateA = new Date(a.createdAt);
+        const dateB = new Date(b.createdAt);
         return dateA.getTime() - dateB.getTime();
       });
       break;

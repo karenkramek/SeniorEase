@@ -1,4 +1,4 @@
-import { AccessibleText } from "@/presentation/components/AccessibleText";
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
@@ -24,19 +24,23 @@ export default function HelpScreen() {
 
   return (
     <ScrollView
-        style={{ backgroundColor: themeColors.background }}
-        contentContainerStyle={[sharedStyles.container, { paddingBottom: 32, paddingTop: insets.top }]}
-        accessibilityLabel={strings.screenLabel}
-      >
-        <View
-          style={[
-            sharedStyles.titleContainer,
-          ]}
-        >
+      style={{ backgroundColor: themeColors.background }}
+      contentContainerStyle={[
+        sharedStyles.container,
+        { paddingBottom: 32, paddingTop: insets.top },
+      ]}
+      accessibilityLabel={strings.screenLabel}
+    >
+      <View style={[sharedStyles.titleContainer]}>
         <AccessibleText
           type="h1"
           accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${strings.title}`}
-          style={{ textAlign: "center", fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32, paddingTop: 24, paddingBottom: 32 }}
+          style={{
+            textAlign: "center",
+            fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32,
+            paddingTop: 24,
+            paddingBottom: 32,
+          }}
         >
           {strings.title}
         </AccessibleText>
@@ -74,16 +78,24 @@ export default function HelpScreen() {
         >
           {strings.guideTitle}
         </AccessibleText>
-        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
+        <AccessibleText
+          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
+        >
           {strings.guideAddTask}
         </AccessibleText>
-        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
+        <AccessibleText
+          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
+        >
           {strings.guideCompleteTask}
         </AccessibleText>
-        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
+        <AccessibleText
+          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
+        >
           {strings.guideFilterTask}
         </AccessibleText>
-        <AccessibleText style={{ fontSize: 16, marginBottom: 8, color: cardText }}>
+        <AccessibleText
+          style={{ fontSize: 16, marginBottom: 8, color: cardText }}
+        >
           {strings.guidePreferences}
         </AccessibleText>
       </View>

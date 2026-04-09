@@ -1,4 +1,4 @@
-import { AccessibleButton } from "@/presentation/components/AccessibleButton";
+import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
 import React from "react";
 import { TouchableOpacity } from "react-native";
 
@@ -32,13 +32,7 @@ export const DestructiveButton = React.forwardRef<
   React.ElementRef<typeof TouchableOpacity>,
   DestructiveButtonProps
 >(function DestructiveButton(
-  {
-    title,
-    onPress,
-    accessibilityLabel,
-    accessibilityHint,
-    disabled,
-  },
+  { title, onPress, accessibilityLabel, accessibilityHint, disabled },
   ref,
 ) {
   return (

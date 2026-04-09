@@ -5,21 +5,21 @@ import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-  ActivityIndicator,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    KeyboardAvoidingView,
+    Platform,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import { z } from "zod";
 
-import { AccessibleFormField } from "@/presentation/components/AccessibleFormField";
-import { ThemedText } from "@/presentation/components/ThemedText";
+import { AccessibleFormField } from "@/presentation/components/shared/AccessibleFormField";
+import { ThemedText } from "@/presentation/components/ui/text/ThemedText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
@@ -56,7 +56,9 @@ export default function RegisterScreen() {
           name: z.string().min(3, strings.nameMinError),
           email: z.string().email(commonStrings.emailInvalidError),
           password: z.string().min(6, commonStrings.passwordMinError),
-          confirmPassword: z.string().min(6, strings.confirmPasswordRequiredError),
+          confirmPassword: z
+            .string()
+            .min(6, strings.confirmPasswordRequiredError),
         })
         .refine((data) => data.password === data.confirmPassword, {
           message: strings.passwordMismatchError,
@@ -89,11 +91,12 @@ export default function RegisterScreen() {
     setLoading(true);
     try {
       await signUp(data.email, data.password, data.name);
-      showAlert(
-        strings.successTitle,
-        strings.successBody,
-        [{ text: commonStrings.ok, onPress: () => router.replace("/(auth)/login") }],
-      );
+      showAlert(strings.successTitle, strings.successBody, [
+        {
+          text: commonStrings.ok,
+          onPress: () => router.replace("/(auth)/login"),
+        },
+      ]);
     } catch (error: any) {
       showAlert(strings.registerErrorTitle, error.message);
     } finally {
@@ -158,7 +161,11 @@ export default function RegisterScreen() {
                   editable={!loading}
                   error={errors.name?.message}
                   iconComponent={
-                    <Ionicons name="person-outline" size={20} color={themeColors.icon} />
+                    <Ionicons
+                      name="person-outline"
+                      size={20}
+                      color={themeColors.icon}
+                    />
                   }
                 />
               )}
@@ -183,7 +190,11 @@ export default function RegisterScreen() {
                   editable={!loading}
                   error={errors.email?.message}
                   iconComponent={
-                    <Ionicons name="mail-outline" size={20} color={themeColors.icon} />
+                    <Ionicons
+                      name="mail-outline"
+                      size={20}
+                      color={themeColors.icon}
+                    />
                   }
                 />
               )}
@@ -208,15 +219,26 @@ export default function RegisterScreen() {
                     editable={!loading}
                     error={errors.password?.message}
                     iconComponent={
-                      <Ionicons name="lock-closed-outline" size={20} color={themeColors.icon} />
+                      <Ionicons
+                        name="lock-closed-outline"
+                        size={20}
+                        color={themeColors.icon}
+                      />
                     }
                   />
                   <TouchableOpacity
                     onPress={() => setShowPassword(!showPassword)}
-                    style={[styles.eyeIcon, { top: Platform.OS === "web" ? 2 : 5 }]}
+                    style={[
+                      styles.eyeIcon,
+                      { top: Platform.OS === "web" ? 2 : 5 },
+                    ]}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={showPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
+                    accessibilityLabel={
+                      showPassword
+                        ? commonStrings.hidePasswordA11y
+                        : commonStrings.showPasswordA11y
+                    }
                     accessibilityHint={commonStrings.togglePasswordHint}
                   >
                     <Ionicons
@@ -248,19 +270,32 @@ export default function RegisterScreen() {
                     editable={!loading}
                     error={errors.confirmPassword?.message}
                     iconComponent={
-                      <Ionicons name="shield-checkmark-outline" size={20} color={themeColors.icon} />
+                      <Ionicons
+                        name="shield-checkmark-outline"
+                        size={20}
+                        color={themeColors.icon}
+                      />
                     }
                   />
                   <TouchableOpacity
                     onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                    style={[styles.eyeIcon, { top: Platform.OS === "web" ? 2 : 5 }]}
+                    style={[
+                      styles.eyeIcon,
+                      { top: Platform.OS === "web" ? 2 : 5 },
+                    ]}
                     accessible
                     accessibilityRole="button"
-                    accessibilityLabel={showConfirmPassword ? commonStrings.hidePasswordA11y : commonStrings.showPasswordA11y}
+                    accessibilityLabel={
+                      showConfirmPassword
+                        ? commonStrings.hidePasswordA11y
+                        : commonStrings.showPasswordA11y
+                    }
                     accessibilityHint={strings.toggleConfirmPasswordHint}
                   >
                     <Ionicons
-                      name={showConfirmPassword ? "eye-outline" : "eye-off-outline"}
+                      name={
+                        showConfirmPassword ? "eye-outline" : "eye-off-outline"
+                      }
                       size={20}
                       color={themeColors.icon}
                     />
@@ -270,13 +305,19 @@ export default function RegisterScreen() {
             />
 
             {loading ? (
-              <ActivityIndicator size="large" color="#D3D3D3" style={styles.registerButton} />
+              <ActivityIndicator
+                size="large"
+                color="#D3D3D3"
+                style={styles.registerButton}
+              />
             ) : (
               <TouchableOpacity
                 style={styles.registerButton}
                 onPress={handleSubmit(onSubmit)}
               >
-                <Text style={styles.registerButtonText}>{strings.submitButton}</Text>
+                <Text style={styles.registerButtonText}>
+                  {strings.submitButton}
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -346,10 +387,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   passwordFieldWrapper: {
-    position: 'relative' as const,
+    position: "relative" as const,
   },
   eyeIcon: {
-    position: 'absolute' as const,
+    position: "absolute" as const,
     right: 16,
     top: 2,
     height: 48,

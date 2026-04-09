@@ -1,5 +1,5 @@
 /// <reference types="jest" />
-import { StepItem } from "@/presentation/components/StepItem";
+import { StepItem } from "@/presentation/components/ui/common/StepItem";
 import { fireEvent, render } from "@testing-library/react-native";
 import React from "react";
 
