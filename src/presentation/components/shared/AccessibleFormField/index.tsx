@@ -85,11 +85,9 @@ export const AccessibleFormField = React.forwardRef<
     const { themeColors, colorScheme } = useTheme();
 
     // Determine default border color based on theme mode
-    // Dark mode: white (#FFFFFF)
-    // Light mode: green (project's tint color)
     const defaultBorderColor =
       borderColorDefault ??
-      (colorScheme === "dark" ? "#FFFFFF" : themeColors.tint);
+      (colorScheme === "dark" ? themeColors.text : themeColors.tint);
 
     // Compute accessibility label with required indicator
     const computedA11yLabel = useMemo(() => {
@@ -131,8 +129,14 @@ export const AccessibleFormField = React.forwardRef<
       : defaultBorderColor;
 
     // Determine border radius - smaller for multiline inputs (textareas)
-    const isMultiline = restProps.multiline || false;
-    const containerBorderRadius = isMultiline ? 12 : 12;
+    const containerBorderRadius = 12;
+
+    // Theme-aware dynamic colors for the form field
+    const inputBgColor =
+      colorScheme === "dark" ? themeColors.background : "#F8F9FA";
+    const inputErrorBgColor =
+      colorScheme === "dark" ? themeColors.background : "#FFF5F5";
+    const inputTextColor = themeColors.text;
 
     return (
       <View style={[styles.container, containerStyle]}>
@@ -147,8 +151,12 @@ export const AccessibleFormField = React.forwardRef<
             {
               borderColor: inputContainerBorderColor,
               borderRadius: containerBorderRadius,
+              backgroundColor: inputBgColor,
             },
-            error && styles.inputContainerError,
+            error && {
+              borderColor: A11yTokens.error.color,
+              backgroundColor: inputErrorBgColor,
+            },
           ]}
           accessible={false}
         >
@@ -158,7 +166,7 @@ export const AccessibleFormField = React.forwardRef<
 
           <TextInput
             ref={ref}
-            style={[styles.input, style]}
+            style={[styles.input, { color: inputTextColor }, style]}
             {...(Platform.OS === "web"
               ? {
                   // Web: add semantic HTML attributes via react-native-web
@@ -204,13 +212,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 12,
     paddingHorizontal: 5,
-    backgroundColor: "#F8F9FA",
     minHeight: 53,
     paddingVertical: 2,
-  },
-  inputContainerError: {
-    borderColor: A11yTokens.error.color,
-    backgroundColor: "#FFF5F5",
   },
   iconWrapper: {
     marginRight: 12,
@@ -222,7 +225,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    color: "#333",
     paddingVertical: 12,
     paddingHorizontal: 5,
   },

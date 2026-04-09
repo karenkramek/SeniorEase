@@ -9,7 +9,8 @@ import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
-import { useTasks } from "@/presentation/hooks/useTasks";
+import { useTaskActions } from "@/presentation/hooks/useTaskActions";
+import { useTaskList } from "@/presentation/hooks/useTaskList";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
@@ -34,14 +35,9 @@ export default function TaskListScreen() {
   const router = useRouter();
   const { themeColors, preferences, isWeb } = useTheme();
   const buttonHeight = useButtonHeight();
-  const {
-    tasks,
-    isLoading,
-    refreshTasks,
-    completeTask,
-    uncompleteTask,
-    deleteTask,
-  } = useTasks();
+  const { tasks, isLoading, refreshTasks } = useTaskList();
+  const { completeTask, uncompleteTask, deleteTask } =
+    useTaskActions(refreshTasks);
 
   const {
     isOpen,

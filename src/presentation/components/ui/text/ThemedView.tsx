@@ -1,6 +1,6 @@
 import { View, type ViewProps } from "react-native";
 
-import { useThemeColor } from "@/presentation/hooks/useThemeColor";
+import { useTheme } from "@/presentation/hooks/useTheme";
 
 export type ThemedViewProps = ViewProps & {
   lightColor?: string;
@@ -18,10 +18,9 @@ export function ThemedView({
   accessibilityLabel?: string;
   accessibilityRole?: string;
 }) {
-  const backgroundColor = useThemeColor(
-    { light: lightColor, dark: darkColor },
-    "background",
-  );
+  const { themeColors, colorScheme } = useTheme();
+  const backgroundColor =
+    (colorScheme === "dark" ? darkColor : lightColor) ?? themeColors.background;
   return (
     <View
       style={[{ backgroundColor }, style]}

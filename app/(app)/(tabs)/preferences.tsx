@@ -5,6 +5,7 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { getColorWithOpacity } from "@/presentation/theme/colors";
 import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
+import { Spacing } from "@/presentation/theme/spacing";
 import { getSwitchColors } from "@/presentation/theme/switchColors";
 import React from "react";
 import { ActivityIndicator, ScrollView, Switch, View } from "react-native";
@@ -76,7 +77,7 @@ export default function PreferencesScreen() {
           sharedStyles.container,
           getWebContentShellStyle(),
           isWeb && { paddingHorizontal: 28, paddingBottom: 32 },
-          { paddingTop: insets.top },
+          { paddingTop: insets.top + Spacing.medium },
         ]}
         accessibilityLabel={strings.screenLabel}
       >
@@ -86,7 +87,7 @@ export default function PreferencesScreen() {
             style={{
               textAlign: "center",
               fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32,
-              paddingTop: 24,
+              paddingTop: 0,
               paddingBottom: 32,
             }}
             accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${strings.title}`}

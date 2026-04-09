@@ -7,17 +7,17 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import {
-    formatDateMedium,
-    getDueDateStatus,
+  formatDateMedium,
+  getDueDateStatus,
 } from "@/presentation/utils/format";
 import { truncateText } from "@/presentation/utils/helpers";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
-    Animated,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  Animated,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 
 interface TaskCardProps {
@@ -154,7 +154,7 @@ export function TaskCard({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 6,
+                gap: 10,
                 flexWrap: "wrap",
                 marginTop: 2,
               }}

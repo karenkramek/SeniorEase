@@ -1,13 +1,9 @@
 import { Preferences } from "@/domain/entities/Preferences";
+import { FirestoreException } from "@/domain/exceptions";
 import { IPreferencesRepository } from "@/domain/repositories/IPreferencesRepository";
-import { auth, db } from "@/lib/firebase";
+import { getCurrentUserId } from "@/infrastructure/utils/getCurrentUserId";
+import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-
-function getCurrentUserId(): string {
-  const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error("Usuário não autenticado.");
-  return uid;
-}
 
 export class PreferencesRepository implements IPreferencesRepository {
   async get(): Promise<Preferences | null> {
@@ -28,9 +24,10 @@ export class PreferencesRepository implements IPreferencesRepository {
       return preferences;
     } catch (error) {
       console.error("Erro ao salvar preferências:", error);
-      throw new Error("Erro ao salvar preferências no Firestore", {
-        cause: error,
-      });
+      throw new FirestoreException(
+        "Erro ao salvar preferências no Firestore",
+        error,
+      );
     }
   }
 }

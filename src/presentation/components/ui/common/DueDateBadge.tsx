@@ -73,6 +73,7 @@ export function DueDateBadge({ status, size = "sm" }: DueDateBadgeProps) {
         paddingHorizontal: size === "sm" ? 6 : 8,
         paddingVertical: size === "sm" ? 2 : 4,
         alignSelf: "flex-start",
+        flexShrink: 0,
       }}
     >
       <Ionicons
@@ -87,6 +88,7 @@ export function DueDateBadge({ status, size = "sm" }: DueDateBadgeProps) {
           fontSize,
           fontWeight: "600",
         }}
+        numberOfLines={1}
         accessibilityElementsHidden
       >
         {config.label}

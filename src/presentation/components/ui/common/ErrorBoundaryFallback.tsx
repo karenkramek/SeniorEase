@@ -1,7 +1,12 @@
 import { getStrings } from "@/presentation/i18n/strings";
+import { A11yTokens } from "@/presentation/theme/a11y-tokens";
+import { isWebPlatform, resolveThemeColors } from "@/presentation/theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+
+// Resolve em nível de módulo — seguro mesmo quando contextos estão corrompidos
+const fallbackColors = resolveThemeColors("light", false, isWebPlatform());
 
 interface ErrorBoundaryFallbackProps {
   error: Error;
@@ -18,14 +23,14 @@ export function ErrorBoundaryFallback({ retry }: ErrorBoundaryFallbackProps) {
         justifyContent: "center",
         alignItems: "center",
         padding: 32,
-        backgroundColor: "#ffffff",
+        backgroundColor: fallbackColors.background,
       }}
       accessibilityLiveRegion="assertive"
     >
       <Ionicons
         name="alert-circle-outline"
         size={72}
-        color="#ff3b30"
+        color={A11yTokens.error.color}
         accessibilityElementsHidden
       />
 
@@ -33,7 +38,7 @@ export function ErrorBoundaryFallback({ retry }: ErrorBoundaryFallbackProps) {
         style={{
           fontSize: 24,
           fontWeight: "bold",
-          color: "#1c1c1e",
+          color: fallbackColors.text,
           textAlign: "center",
           marginTop: 24,
           marginBottom: 12,
@@ -46,7 +51,7 @@ export function ErrorBoundaryFallback({ retry }: ErrorBoundaryFallbackProps) {
       <Text
         style={{
           fontSize: 17,
-          color: "#636366",
+          color: fallbackColors.icon,
           textAlign: "center",
           lineHeight: 26,
           marginBottom: 40,
@@ -59,7 +64,7 @@ export function ErrorBoundaryFallback({ retry }: ErrorBoundaryFallbackProps) {
       <TouchableOpacity
         onPress={retry}
         style={{
-          backgroundColor: "#007aff",
+          backgroundColor: fallbackColors.tint,
           paddingVertical: 16,
           paddingHorizontal: 40,
           borderRadius: 12,

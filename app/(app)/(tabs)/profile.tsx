@@ -24,7 +24,10 @@ export default function ProfileScreen() {
     <View
       style={[
         sharedStyles.container,
-        { backgroundColor: themeColors.background, paddingTop: insets.top },
+        {
+          backgroundColor: themeColors.background,
+          paddingTop: insets.top + Spacing.medium,
+        },
       ]}
     >
       <View style={[sharedStyles.titleContainer]}>
@@ -33,7 +36,7 @@ export default function ProfileScreen() {
           style={{
             textAlign: "center",
             fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32,
-            paddingTop: 24,
+            paddingTop: 0,
             paddingBottom: 32,
           }}
           accessibilityLabel={`${commonStrings.titleA11yPrefix}: ${appTexts.navigation.profileTabTitle}`}

@@ -149,7 +149,7 @@ export const ptBRStrings = {
   },
   authRegister: {
     formTitle: "Crie sua conta",
-    nameFieldHint: "Digite seu nome completo com no mínimo 3 caracteres",
+    nameFieldHint: "Digite seu nome e sobrenome",
     emailFieldHint: "Digite um e-mail válido para criar sua conta",
     passwordFieldHint: "Digite uma senha com no mínimo 6 caracteres",
     confirmPasswordPlaceholder: "Confirme a senha",
@@ -158,11 +158,13 @@ export const ptBRStrings = {
     toggleConfirmPasswordHint: "Alternar visibilidade da confirmação de senha",
     submitButton: "Cadastrar",
     loginLink: "Já tem uma conta? Faça login",
-    successTitle: "Cadastro Realizado!",
+    successTitle: "Bem Vindo!",
     successBody:
-      "Sua conta foi criada com sucesso. Você será redirecionado para o login.",
+      "Sua conta foi criada com sucesso. Crie tarefas e personalize sua experiência.",
     registerErrorTitle: "Erro no Cadastro",
+    emailAlreadyInUseError: "Este e-mail já está cadastrado.",
     nameMinError: "O nome deve ter pelo menos 3 caracteres.",
+    nameFullError: "Informe nome e sobrenome.",
     confirmPasswordRequiredError: "A confirmação de senha é necessária.",
     passwordMismatchError: "As senhas não coincidem.",
   },
@@ -231,26 +233,21 @@ export const ptBRStrings = {
   },
   help: {
     screenLabel: "Tela de ajuda",
-    title: "Ajuda e Dicas",
-    intro: "Dúvidas sobre o app? Veja como usar:",
-    guideTitle: "Como usar o SeniorEase",
-    guideAddTask: "• Adicione tarefas com o botão Nova Tarefa.",
-    guideCompleteTask: "• Complete tarefas.",
-    guideFilterTask:
-      "• Filtre tarefas para ver as mais importantes ou pendentes.",
-    guidePreferences:
-      "• Personalize o app nas preferências: fonte, contraste, espaçamento.",
-    a11yTitle: "Recursos de acessibilidade",
-    a11yFontContrast: "• Fonte grande e alto contraste: ative em Preferências.",
-    a11yConfirmations:
-      "• Confirmações extras: evite ações acidentais ao excluir ou concluir.",
-    a11yWebKeyboard:
-      "• Web: use Tab para navegar, Enter ou Espaço para acionar botões.",
-    a11yMobileReader:
-      "• Mobile: VoiceOver (iOS) e TalkBack (Android) leem labels e estados.",
-    a11yAnnouncements:
-      "• Notificações e mensagens de erro são anunciadas com prioridade de acessibilidade.",
-    footer: "Qualquer dúvida, estamos aqui para ajudar!",
+    title: "Ajuda",
+    addTaskTitle: "Adicionar Tarefa",
+    addTaskDescription: "Toque em Adicionar Tarefa, informe o título e salve.",
+    editTaskTitle: "Editar Tarefa",
+    editTaskDescription:
+      "Toque em uma tarefa e selecione Editar Tarefa para alterar os dados.",
+    filterTaskTitle: "Filtrar Tarefas",
+    filterTaskDescription:
+      "Use os filtros para exibir tarefas pendentes, concluídas, próximas, vencidas ou todas.",
+    completeTaskTitle: "Concluir Tarefa",
+    completeTaskDescription:
+      "Toque no círculo ao lado esquerdo da tarefa para marcá-la como concluída.",
+    preferencesTitle: "Preferências",
+    preferencesDescription:
+      "Use as preferências para personalizar o tema, fonte, alto contraste e deixar o SeniorEase do seu jeito.",
   },
   errorBoundary: {
     title: "Algo deu errado",

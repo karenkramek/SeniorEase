@@ -1,16 +1,12 @@
-import { CompleteTask } from "@/application/useCases/task/CompleteTask";
-import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
 import { DueDateBadge } from "@/presentation/components/ui/common/DueDateBadge";
 import { ConfirmModal } from "@/presentation/components/ui/modals/ConfirmModal";
 import { TaskFormModal } from "@/presentation/components/ui/modals/TaskFormModal";
 import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
-import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
-import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
-import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
+import { useTaskDetails } from "@/presentation/hooks/useTaskDetails";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -21,96 +17,30 @@ import {
 } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import { ActivityIndicator, ScrollView, View } from "react-native";
 
 export default function TaskDetailsScreen() {
-  const appTexts = useAppStrings();
-  const strings = appTexts.taskDetails;
-  const commonStrings = appTexts.common;
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
   const router = useRouter();
   const { themeColors } = useTheme();
   const { preferences } = usePreferences();
   const buttonHeight = useButtonHeight();
 
-  const taskRepository = useTaskRepository();
-  const completeTaskUseCase = useMemo(
-    () => new CompleteTask(taskRepository),
-    [taskRepository],
-  );
-
   const {
-    isOpen,
-    options,
-    handleConfirm,
-    handleCancel,
-    showConfirmation,
-    showSuccess,
-    showError,
-  } = useConfirmationFlow();
-
-  const [task, setTask] = useState<Task | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  useEffect(() => {
-    const load = async () => {
-      if (!taskId) return;
-      const found = await taskRepository.findById(taskId);
-      setTask(found);
-      setLoading(false);
-    };
-    load();
-  }, [taskId, taskRepository]);
-
-  const handleCompleteTask = async () => {
-    if (!task) return;
-
-    if (preferences.confirmOnComplete) {
-      showConfirmation({
-        title: appTexts.taskList.confirmCompleteTitle,
-        message: appTexts.taskList.confirmCompleteMessage,
-        confirmText: appTexts.taskList.confirmCompleteAction,
-        cancelText: commonStrings.cancel,
-        iconName: "checkmark-circle",
-        onConfirm: async () => {
-          try {
-            await completeTaskUseCase.execute(task.id);
-            showSuccess({
-              message: appTexts.taskList.taskCompleted,
-              duration: 6000,
-            });
-            setTimeout(() => router.back(), 1000);
-          } catch (_error) {
-            console.log(_error);
-            showError(strings.completeError);
-          }
-        },
-      });
-    } else {
-      try {
-        await completeTaskUseCase.execute(task.id);
-        showSuccess({
-          message: appTexts.taskList.taskCompleted,
-          duration: 6000,
-        });
-        setTimeout(() => router.back(), 1000);
-      } catch (_error) {
-        console.log(_error);
-        showError(strings.completeError);
-      }
-    }
-  };
-
-  const handleEditSuccess = async () => {
-    setIsEditModalOpen(false);
-    // Recarregar os dados da tarefa
-    if (taskId) {
-      const updated = await taskRepository.findById(taskId);
-      setTask(updated);
-    }
-  };
+    task,
+    loading,
+    isEditModalOpen,
+    confirmationFlow,
+    handleCompleteTask,
+    handleEditSuccess,
+    openEditModal,
+    strings,
+    commonStrings,
+  } = useTaskDetails({
+    taskId: taskId ?? null,
+    onCompleted: () => router.back(),
+  });
 
   const containerStyle = { flex: 1, backgroundColor: themeColors.background };
 
@@ -188,7 +118,7 @@ export default function TaskDetailsScreen() {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: 8,
+              gap: 10,
               flexWrap: "wrap",
             }}
           >
@@ -272,22 +202,6 @@ export default function TaskDetailsScreen() {
           }}
         >
           <AccessibleButton
-            title={strings.editButton}
-            icon={<Ionicons name="pencil" size={20} color={themeColors.tint} />}
-            onPress={() => setIsEditModalOpen(true)}
-            accessibilityLabel={strings.editButtonA11y}
-            textColor={themeColors.tint}
-            style={[
-              sharedStyles.createButton,
-              {
-                height: buttonHeight,
-                borderColor: themeColors.tint,
-                borderWidth: 1.5,
-                backgroundColor: "transparent",
-              },
-            ]}
-          />
-          <AccessibleButton
             title={strings.completeButton}
             icon={
               <Ionicons
@@ -307,6 +221,22 @@ export default function TaskDetailsScreen() {
               },
             ]}
           />
+          <AccessibleButton
+            title={strings.editButton}
+            icon={<Ionicons name="pencil" size={20} color={themeColors.tint} />}
+            onPress={openEditModal}
+            accessibilityLabel={strings.editButtonA11y}
+            textColor={themeColors.tint}
+            style={[
+              sharedStyles.createButton,
+              {
+                height: buttonHeight,
+                borderColor: themeColors.tint,
+                borderWidth: 1.5,
+                backgroundColor: "transparent",
+              },
+            ]}
+          />
         </View>
       ) : (
         <AccessibleText
@@ -322,14 +252,14 @@ export default function TaskDetailsScreen() {
       )}
 
       <ConfirmModal
-        visible={isOpen}
-        title={options?.title ?? ""}
-        message={options?.message ?? ""}
-        confirmText={options?.confirmText}
-        cancelText={options?.cancelText}
-        isDestructive={options?.isDangerous}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
+        visible={confirmationFlow.isOpen}
+        title={confirmationFlow.options?.title ?? ""}
+        message={confirmationFlow.options?.message ?? ""}
+        confirmText={confirmationFlow.options?.confirmText}
+        cancelText={confirmationFlow.options?.cancelText}
+        isDestructive={confirmationFlow.options?.isDangerous}
+        onConfirm={confirmationFlow.handleConfirm}
+        onCancel={confirmationFlow.handleCancel}
       />
 
       <TaskFormModal

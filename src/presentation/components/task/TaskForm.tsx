@@ -6,17 +6,17 @@ import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
 import { useNotification } from "@/presentation/hooks/useNotification";
-import { useTasks } from "@/presentation/hooks/useTasks";
+import { useTaskActions } from "@/presentation/hooks/useTaskActions";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { isWebPlatform } from "@/presentation/theme/colors";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
-    ScrollView,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 
 interface TaskFormProps {
@@ -42,7 +42,7 @@ export function TaskForm({
   const isEditMode = !!task;
   const appTexts = useAppStrings();
   const { themeColors, colorScheme } = useTheme();
-  const { createTask, editTask } = useTasks();
+  const { createTask, editTask } = useTaskActions();
   const { showNotification } = useNotification();
   const buttonHeight = useButtonHeight();
   const { width: screenWidth } = useWindowDimensions();
@@ -236,7 +236,6 @@ export function TaskForm({
             placeholderTextColor={themeColors.icon}
             value={description}
             onChangeText={setDescription}
-            error={submissionError || undefined}
             multiline
             numberOfLines={5}
             style={{
@@ -308,6 +307,18 @@ export function TaskForm({
         onDateSelect={setDueDate}
         selectedDate={dueDate}
       />
+
+      {submissionError && (
+        <AccessibleText
+          style={{
+            color: themeColors.error,
+            marginTop: 8,
+            textAlign: "center",
+          }}
+        >
+          {submissionError}
+        </AccessibleText>
+      )}
 
       <View
         style={{

@@ -1,5 +1,3 @@
-import { CompleteTask } from "@/application/useCases/task/CompleteTask";
-import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
 import { AccessibleButton } from "@/presentation/components/ui/buttons/AccessibleButton";
 import { DueDateBadge } from "@/presentation/components/ui/common/DueDateBadge";
@@ -7,11 +5,9 @@ import { BaseModal } from "@/presentation/components/ui/modals/BaseModal";
 import { ConfirmModal } from "@/presentation/components/ui/modals/ConfirmModal";
 import { TaskFormModal } from "@/presentation/components/ui/modals/TaskFormModal";
 import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
-import { useTaskRepository } from "@/presentation/contexts/TaskRepositoryContext";
-import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useButtonHeight } from "@/presentation/hooks/useButtonHeight";
-import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
 import { usePreferences } from "@/presentation/hooks/usePreferences";
+import { useTaskDetails } from "@/presentation/hooks/useTaskDetails";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
@@ -21,7 +17,7 @@ import {
   getDueDateStatus,
 } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   ScrollView,
@@ -45,101 +41,36 @@ export function TaskDetailsModal({
   onTaskCompleted,
   onTaskEdited,
 }: TaskDetailsModalProps) {
-  const appTexts = useAppStrings();
-  const strings = appTexts.taskDetails;
-  const commonStrings = appTexts.common;
   const { themeColors } = useTheme();
   const { width: windowWidth } = useWindowDimensions();
   const { preferences } = usePreferences();
   const buttonHeight = useButtonHeight();
 
-  // Responsive: < 640px (sm breakpoint) — modal é web-only
   const isSmallScreen = windowWidth < 640;
   const shouldStackButtons = isSmallScreen;
 
-  const taskRepository = useTaskRepository();
-  const completeTaskUseCase = useMemo(
-    () => new CompleteTask(taskRepository),
-    [taskRepository],
-  );
-
   const {
-    isOpen,
-    options,
-    handleConfirm,
-    handleCancel,
-    showConfirmation,
-    showSuccess,
-    showError,
-  } = useConfirmationFlow();
-
-  const [task, setTask] = useState<Task | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (!visible || !taskId) return;
-    const load = async () => {
-      setLoading(true);
-      const found = await taskRepository.findById(taskId);
-      setTask(found);
-      setLoading(false);
-    };
-    load();
-  }, [taskId, visible, taskRepository]);
-
-  const handleCompleteTask = async () => {
-    if (!task) return;
-
-    if (preferences?.confirmOnComplete) {
-      showConfirmation({
-        title: appTexts.taskList.confirmCompleteTitle,
-        message: appTexts.taskList.confirmCompleteMessage,
-        confirmText: appTexts.taskList.confirmCompleteAction,
-        cancelText: commonStrings.cancel,
-        iconName: "checkmark-circle",
-        onConfirm: async () => {
-          try {
-            await completeTaskUseCase.execute(task.id);
-            showSuccess({
-              message: appTexts.taskList.taskCompleted,
-              duration: 6000,
-            });
-            setTimeout(() => {
-              onTaskCompleted?.();
-              onClose();
-            }, 1000);
-          } catch (_error) {
-            console.log(_error);
-            showError(strings.completeError);
-          }
-        },
-      });
-    } else {
-      try {
-        await completeTaskUseCase.execute(task.id);
-        showSuccess({
-          message: appTexts.taskList.taskCompleted,
-          duration: 6000,
-        });
-        setTimeout(() => {
-          onTaskCompleted?.();
-          onClose();
-        }, 1000);
-      } catch (_error) {
-        console.log(_error);
-        showError(strings.completeError);
-      }
-    }
-  };
+    task,
+    loading,
+    isEditModalOpen,
+    confirmationFlow,
+    handleCompleteTask,
+    handleEditSuccess: baseHandleEditSuccess,
+    openEditModal,
+    strings,
+    commonStrings,
+  } = useTaskDetails({
+    taskId,
+    enabled: visible,
+    onCompleted: () => {
+      onTaskCompleted?.();
+      onClose();
+    },
+  });
 
   const handleEditSuccess = async () => {
-    setIsEditModalOpen(false);
-    if (taskId) {
-      const updated = await taskRepository.findById(taskId);
-      setTask(updated);
-      onTaskEdited?.();
-    }
+    await baseHandleEditSuccess();
+    onTaskEdited?.();
   };
 
   const header = task ? (
@@ -255,7 +186,7 @@ export function TaskDetailsModal({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                gap: 8,
+                gap: 10,
                 flexWrap: "wrap",
               }}
             >
@@ -373,7 +304,7 @@ export function TaskDetailsModal({
                 icon={
                   <Ionicons name="pencil" size={20} color={themeColors.tint} />
                 }
-                onPress={() => setIsEditModalOpen(true)}
+                onPress={openEditModal}
                 accessibilityLabel={strings.editButtonA11y}
                 textColor={themeColors.tint}
                 style={[
@@ -415,14 +346,14 @@ export function TaskDetailsModal({
       </BaseModal>
 
       <ConfirmModal
-        visible={isOpen}
-        title={options?.title ?? ""}
-        message={options?.message ?? ""}
-        confirmText={options?.confirmText}
-        cancelText={options?.cancelText}
-        isDestructive={options?.isDangerous}
-        onConfirm={handleConfirm}
-        onCancel={handleCancel}
+        visible={confirmationFlow.isOpen}
+        title={confirmationFlow.options?.title ?? ""}
+        message={confirmationFlow.options?.message ?? ""}
+        confirmText={confirmationFlow.options?.confirmText}
+        cancelText={confirmationFlow.options?.cancelText}
+        isDestructive={confirmationFlow.options?.isDangerous}
+        onConfirm={confirmationFlow.handleConfirm}
+        onCancel={confirmationFlow.handleCancel}
       />
 
       <TaskFormModal

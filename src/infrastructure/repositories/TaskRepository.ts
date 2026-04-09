@@ -1,29 +1,28 @@
 import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
+import {
+  FirestoreException,
+  TaskPermissionException,
+} from "@/domain/exceptions";
 import { ITaskRepository } from "@/domain/repositories/ITaskRepository";
 import { TaskMapper } from "@/infrastructure/mappers/TaskMapper";
-import { auth, db } from "@/lib/firebase";
+import { getCurrentUserId } from "@/infrastructure/utils/getCurrentUserId";
+import { db } from "@/lib/firebase";
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDoc,
-    getDocs,
-    orderBy,
-    query,
-    serverTimestamp,
-    updateDoc,
-    where,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  orderBy,
+  query,
+  serverTimestamp,
+  updateDoc,
+  where,
 } from "firebase/firestore";
 
 const TASKS_COLLECTION = "tasks";
-
-function getCurrentUserId(): string {
-  const uid = auth.currentUser?.uid;
-  if (!uid) throw new Error("Usuário não autenticado.");
-  return uid;
-}
 
 export class TaskRepository implements ITaskRepository {
   async create(
@@ -49,7 +48,7 @@ export class TaskRepository implements ITaskRepository {
       };
     } catch (error) {
       console.error("Erro ao criar tarefa:", error);
-      throw new Error("Erro ao criar tarefa no Firestore", { cause: error });
+      throw new FirestoreException("Erro ao criar tarefa no Firestore", error);
     }
   }
 
@@ -68,7 +67,7 @@ export class TaskRepository implements ITaskRepository {
       );
     } catch (error) {
       console.error("Erro ao buscar tarefas:", error);
-      throw new Error("Erro ao buscar tarefas do Firestore");
+      throw new FirestoreException("Erro ao buscar tarefas do Firestore");
     }
   }
 
@@ -83,7 +82,7 @@ export class TaskRepository implements ITaskRepository {
       return null;
     } catch (error) {
       console.error("Erro ao buscar tarefa por ID:", error);
-      throw new Error("Erro ao buscar tarefa do Firestore", { cause: error });
+      throw new FirestoreException("Erro ao buscar tarefa do Firestore", error);
     }
   }
 
@@ -102,13 +101,16 @@ export class TaskRepository implements ITaskRepository {
       );
     } catch (error) {
       console.error("Erro ao buscar tarefas por status:", error);
-      throw new Error("Erro ao buscar tarefas do Firestore", { cause: error });
+      throw new FirestoreException(
+        "Erro ao buscar tarefas do Firestore",
+        error,
+      );
     }
   }
 
   async update(task: Task): Promise<Task> {
     try {
-      getCurrentUserId(); // garante autenticação
+      getCurrentUserId();
       const taskRef = doc(db, TASKS_COLLECTION, task.id);
       const taskToSave = TaskMapper.toFirestore(task);
       await updateDoc(taskRef, {
@@ -118,9 +120,10 @@ export class TaskRepository implements ITaskRepository {
       return task;
     } catch (error) {
       console.error("Erro ao atualizar tarefa:", error);
-      throw new Error("Erro ao atualizar tarefa no Firestore", {
-        cause: error,
-      });
+      throw new FirestoreException(
+        "Erro ao atualizar tarefa no Firestore",
+        error,
+      );
     }
   }
 
@@ -134,9 +137,10 @@ export class TaskRepository implements ITaskRepository {
       });
     } catch (error) {
       console.error("Erro ao atualizar status da tarefa:", error);
-      throw new Error("Erro ao atualizar status da tarefa no Firestore", {
-        cause: error,
-      });
+      throw new FirestoreException(
+        "Erro ao atualizar status da tarefa no Firestore",
+        error,
+      );
     }
   }
 
@@ -147,18 +151,18 @@ export class TaskRepository implements ITaskRepository {
       // Verifica ownership antes de deletar
       const docSnap = await getDoc(taskRef);
       if (!docSnap.exists() || docSnap.data().userId !== uid) {
-        throw new Error("Tarefa não encontrada ou sem permissão.");
+        throw new TaskPermissionException();
       }
       await deleteDoc(taskRef);
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message === "Tarefa não encontrada ou sem permissão."
-      ) {
+      if (error instanceof TaskPermissionException) {
         throw error;
       }
       console.error("Erro ao deletar tarefa:", error);
-      throw new Error("Erro ao deletar tarefa no Firestore", { cause: error });
+      throw new FirestoreException(
+        "Erro ao deletar tarefa no Firestore",
+        error,
+      );
     }
   }
 }

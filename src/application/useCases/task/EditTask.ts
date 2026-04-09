@@ -1,5 +1,9 @@
 import { Task } from "@/domain/entities/Task";
 import { TaskStatus } from "@/domain/enums/TaskStatus";
+import {
+  TaskCompletedException,
+  TaskNotFoundException,
+} from "@/domain/exceptions";
 import { ITaskRepository } from "@/domain/repositories/ITaskRepository";
 
 type EditTaskInput = {
@@ -13,15 +17,13 @@ export class EditTask {
   constructor(private taskRepository: ITaskRepository) {}
 
   async execute(input: EditTaskInput): Promise<Task> {
-    // Buscar tarefa existente para manter as propriedades que não estão sendo editadas
     const existingTask = await this.taskRepository.findById(input.id);
     if (!existingTask) {
-      throw new Error("Tarefa não encontrada.");
+      throw new TaskNotFoundException();
     }
 
-    // Não permitir edição de tarefa completa
     if (existingTask.status === TaskStatus.COMPLETED) {
-      throw new Error("Não é possível editar uma tarefa concluída.");
+      throw new TaskCompletedException();
     }
 
     const taskToUpdate: Task = {

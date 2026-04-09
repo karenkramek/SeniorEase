@@ -1,6 +1,6 @@
 import { StyleSheet, Text, type TextProps } from "react-native";
 
-import { useThemeColor } from "@/presentation/hooks/useThemeColor";
+import { useTheme } from "@/presentation/hooks/useTheme";
 import { getUiFontFamily } from "@/presentation/theme/typography";
 
 export type ThemedTextProps = TextProps & {
@@ -21,8 +21,10 @@ export function ThemedText({
   accessibilityLabel?: string;
   accessibilityRole?: string;
 }) {
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, "text");
-  const linkColor = useThemeColor({}, "tint");
+  const { themeColors, colorScheme } = useTheme();
+  const color =
+    (colorScheme === "dark" ? darkColor : lightColor) ?? themeColors.text;
+  const linkColor = themeColors.tint;
   const fontFamily = getUiFontFamily();
 
   return (
