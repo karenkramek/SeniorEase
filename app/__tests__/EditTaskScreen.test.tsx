@@ -147,27 +147,39 @@ describe("EditTaskScreen", () => {
   });
 
   it("pré-preenche os campos com os dados da tarefa carregada", async () => {
-    const { getByDisplayValue } = render(<EditTaskScreen />);
+    const { getByTestId } = render(<EditTaskScreen />);
 
-    await waitFor(() => {
-      expect(getByDisplayValue("Consulta médica")).toBeTruthy();
-    });
-    expect(getByDisplayValue("Levar exames")).toBeTruthy();
+    await waitFor(
+      () => {
+        expect(getByTestId("title-input")).toHaveProp(
+          "value",
+          "Consulta médica",
+        );
+      },
+      { timeout: 3000 },
+    );
+    expect(getByTestId("description-input")).toHaveProp(
+      "value",
+      "Levar exames",
+    );
   });
 
   it("salva a tarefa editada e exibe notificação de sucesso", async () => {
     mockEditTask.mockResolvedValueOnce(undefined);
 
-    const { getByDisplayValue, getAllByLabelText } = render(<EditTaskScreen />);
+    const { getByTestId, getAllByLabelText } = render(<EditTaskScreen />);
 
-    await waitFor(() => {
-      expect(getByDisplayValue("Consulta médica")).toBeTruthy();
-    });
-
-    fireEvent.changeText(
-      getByDisplayValue("Consulta médica"),
-      "Consulta revisada",
+    await waitFor(
+      () => {
+        expect(getByTestId("title-input")).toHaveProp(
+          "value",
+          "Consulta médica",
+        );
+      },
+      { timeout: 3000 },
     );
+
+    fireEvent.changeText(getByTestId("title-input"), "Consulta revisada");
     fireEvent.press(
       getAllByLabelText("Botão para salvar alterações da tarefa")[0],
     );
@@ -193,15 +205,21 @@ describe("EditTaskScreen", () => {
   });
 
   it("exibe erro ao tentar salvar com título vazio", async () => {
-    const { getByDisplayValue, getAllByLabelText, findByText } = render(
+    const { getByTestId, getAllByLabelText, findByText } = render(
       <EditTaskScreen />,
     );
 
-    await waitFor(() => {
-      expect(getByDisplayValue("Consulta médica")).toBeTruthy();
-    });
+    await waitFor(
+      () => {
+        expect(getByTestId("title-input")).toHaveProp(
+          "value",
+          "Consulta médica",
+        );
+      },
+      { timeout: 3000 },
+    );
 
-    fireEvent.changeText(getByDisplayValue("Consulta médica"), "");
+    fireEvent.changeText(getByTestId("title-input"), "");
     fireEvent.press(
       getAllByLabelText("Botão para salvar alterações da tarefa")[0],
     );

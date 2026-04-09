@@ -165,6 +165,7 @@ export function TaskForm({
           </AccessibleText>
           <AccessibleFormField
             fieldId="taskTitle"
+            testID="title-input"
             accessibilityLabel={fieldStrings.titleFieldLabel}
             accessibilityHint={fieldStrings.titleFieldA11yHint}
             required
@@ -230,6 +231,7 @@ export function TaskForm({
           </AccessibleText>
           <AccessibleFormField
             fieldId="taskDescription"
+            testID="description-input"
             accessibilityLabel={fieldStrings.descriptionFieldA11yLabel}
             accessibilityHint={fieldStrings.descriptionFieldA11yHint}
             placeholder={fieldStrings.descriptionPlaceholder}
