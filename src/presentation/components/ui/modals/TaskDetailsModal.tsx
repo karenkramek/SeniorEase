@@ -100,7 +100,12 @@ export function TaskDetailsModal({
         accessibilityRole="button"
         accessibilityLabel={commonStrings.close}
         hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
-        style={{ minWidth: 24, minHeight: 24 }}
+        style={{
+          minWidth: 44,
+          minHeight: 44,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
       >
         <Ionicons
           name="close"
@@ -276,6 +281,7 @@ export function TaskDetailsModal({
                 overflow: "visible",
                 justifyContent: "center",
                 alignItems: "center",
+                width: "100%",
                 marginHorizontal: "auto",
               }}
             >
@@ -296,6 +302,13 @@ export function TaskDetailsModal({
                     height: buttonHeight,
                     borderWidth: 1.5,
                     borderColor: "transparent",
+                    ...(shouldStackButtons
+                      ? {
+                          width: "100%",
+                          minWidth: 0,
+                          maxWidth: "100%",
+                        }
+                      : {}),
                   },
                 ]}
               />
@@ -314,6 +327,13 @@ export function TaskDetailsModal({
                     borderColor: themeColors.tint,
                     borderWidth: 1.5,
                     backgroundColor: "transparent",
+                    ...(shouldStackButtons
+                      ? {
+                          width: "100%",
+                          minWidth: 0,
+                          maxWidth: "100%",
+                        }
+                      : {}),
                   },
                 ]}
               />

@@ -3,6 +3,7 @@ import { useTheme } from "@/presentation/hooks/useTheme";
 import { useRouter } from "expo-router";
 import React from "react";
 import { KeyboardAvoidingView, Platform } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function CreateTaskScreen() {
   const { themeColors } = useTheme();
@@ -24,15 +25,21 @@ export default function CreateTaskScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    <SafeAreaView
+      edges={["bottom"]}
       style={[{ flex: 1 }, { backgroundColor: themeColors.background }]}
     >
-      <TaskForm
-        onSuccess={handleSuccess}
-        onCancel={handleCancel}
-        showScrollView={true}
-      />
-    </KeyboardAvoidingView>
+      <KeyboardAvoidingView
+        enabled={Platform.OS === "ios"}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={[{ flex: 1 }, { backgroundColor: themeColors.background }]}
+      >
+        <TaskForm
+          onSuccess={handleSuccess}
+          onCancel={handleCancel}
+          showScrollView={true}
+        />
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

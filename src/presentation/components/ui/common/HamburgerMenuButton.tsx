@@ -27,7 +27,11 @@ export function HamburgerMenuButton({
       accessibilityState={{ expanded: isOpen }}
       style={({ pressed }) => ({
         opacity: pressed ? 0.6 : 1,
-        padding: 8,
+        padding: 10,
+        minWidth: 44,
+        minHeight: 44,
+        justifyContent: "center",
+        alignItems: "center",
       })}
     >
       <Ionicons

@@ -22,6 +22,7 @@ import React, { useMemo } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   ScrollView,
   TouchableOpacity,
   View,
@@ -216,6 +217,7 @@ export default function TaskListScreen() {
     paddingTop: insets.top + Spacing.medium,
     ...getWebContentShellStyle(),
   };
+  const isNativeMobile = Platform.OS !== "web";
 
   useFocusEffect(
     React.useCallback(() => {
@@ -371,7 +373,14 @@ export default function TaskListScreen() {
             accessibilityLabel={strings.listLabel}
           />
         )}
-        <View style={{ marginTop: 5, marginBottom: 5, alignItems: "center" }}>
+        <View
+          style={{
+            marginTop: 5,
+            marginBottom: 5,
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
           <AccessibleButton
             title={appTexts.navigation.createTaskHeaderTitle}
             icon={
@@ -382,7 +391,19 @@ export default function TaskListScreen() {
                 accessibilityLabel={strings.addIconA11y}
               />
             }
-            style={[sharedStyles.createButton, { height: buttonHeight }]}
+            style={[
+              sharedStyles.createButton,
+              {
+                height: buttonHeight,
+                ...(isNativeMobile
+                  ? {
+                      width: "100%",
+                      minWidth: 0,
+                      maxWidth: "100%",
+                    }
+                  : {}),
+              },
+            ]}
             accessibilityLabel={strings.newTaskButtonA11y}
             onPress={() => {
               if (isWeb) {

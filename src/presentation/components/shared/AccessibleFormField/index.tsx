@@ -82,7 +82,7 @@ export const AccessibleFormField = React.forwardRef<
     ref,
   ) => {
     // Get theme to determine border color based on dark/light mode
-    const { themeColors, colorScheme } = useTheme();
+    const { themeColors, colorScheme, preferences } = useTheme();
 
     // Determine default border color based on theme mode
     const defaultBorderColor =
@@ -132,10 +132,16 @@ export const AccessibleFormField = React.forwardRef<
     const containerBorderRadius = 12;
 
     // Theme-aware dynamic colors for the form field
-    const inputBgColor =
-      colorScheme === "dark" ? themeColors.background : "#F8F9FA";
-    const inputErrorBgColor =
-      colorScheme === "dark" ? themeColors.background : "#FFF5F5";
+    const inputBgColor = preferences.isHighContrast
+      ? themeColors.background
+      : colorScheme === "dark"
+        ? themeColors.background
+        : "#F8F9FA";
+    const inputErrorBgColor = preferences.isHighContrast
+      ? themeColors.background
+      : colorScheme === "dark"
+        ? themeColors.background
+        : "#FFF5F5";
     const inputTextColor = themeColors.text;
 
     return (
@@ -219,8 +225,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
     alignItems: "center",
     justifyContent: "center",
-    minWidth: 24,
-    minHeight: 24,
+    minWidth: 44,
+    minHeight: 44,
+    paddingLeft: 10,
   },
   input: {
     flex: 1,

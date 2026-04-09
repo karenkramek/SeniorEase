@@ -14,6 +14,7 @@ import {
     Text,
     View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface AuthLayoutProps {
   /** Título dentro do card de formulário */
@@ -38,7 +39,8 @@ export function AuthLayout({
   onNavigateHome,
   appTitle,
 }: AuthLayoutProps) {
-  const { themeColors } = useTheme();
+  const { themeColors, preferences } = useTheme();
+  const insets = useSafeAreaInsets();
   const windowWidth = Dimensions.get("window").width;
   const isDesktop = windowWidth >= 768;
 
@@ -49,9 +51,15 @@ export function AuthLayout({
     >
       <StatusBar style="light" backgroundColor={themeColors.tint} />
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={[
+          styles.scrollContainer,
+          {
+            paddingTop: insets.top + 20,
+            paddingBottom: insets.bottom + 20,
+          },
+        ]}
         keyboardShouldPersistTaps="handled"
-        scrollEnabled={false}
+        scrollEnabled
         style={{ backgroundColor: themeColors.tint }}
       >
         <View
@@ -68,18 +76,48 @@ export function AuthLayout({
               accessibilityRole="link"
               accessibilityLabel={`Ir para ${appTitle}`}
             >
-              <Ionicons name="finger-print" size={60} color="#FFFFFF" />
-              <Text style={styles.title}>{appTitle}</Text>
+              <Ionicons
+                name="finger-print"
+                size={60}
+                color={themeColors.buttonText}
+              />
+              <Text style={[styles.title, { color: themeColors.buttonText }]}>
+                {appTitle}
+              </Text>
             </Pressable>
           ) : (
             <View style={styles.header}>
-              <Ionicons name="finger-print" size={60} color="#FFFFFF" />
-              <Text style={styles.title}>{appTitle}</Text>
+              <Ionicons
+                name="finger-print"
+                size={60}
+                color={themeColors.buttonText}
+              />
+              <Text style={[styles.title, { color: themeColors.buttonText }]}>
+                {appTitle}
+              </Text>
             </View>
           )}
 
-          <View style={styles.form}>
-            <Text style={styles.formTitle}>{formTitle}</Text>
+          <View
+            style={[
+              styles.form,
+              {
+                backgroundColor: themeColors.background,
+                borderColor: themeColors.icon + "30",
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.formTitle,
+                {
+                  color: themeColors.text,
+                  fontSize: 24 * preferences.fontSizeMultiplier,
+                },
+              ]}
+            >
+              {formTitle}
+            </Text>
             {children}
           </View>
 
@@ -159,8 +197,8 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   form: {
-    backgroundColor: "#FFFFFF",
     borderRadius: 12,
+    borderWidth: 1,
     padding: 24,
     marginBottom: 20,
   },

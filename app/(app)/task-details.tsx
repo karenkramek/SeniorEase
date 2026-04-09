@@ -198,7 +198,8 @@ export default function TaskDetailsScreen() {
             overflow: "visible",
             paddingBottom: Spacing.large,
             justifyContent: "center",
-            alignItems: "center",
+            alignItems: "stretch",
+            width: "100%",
           }}
         >
           <AccessibleButton
@@ -218,6 +219,10 @@ export default function TaskDetailsScreen() {
                 height: buttonHeight,
                 borderWidth: 1.5,
                 borderColor: "transparent",
+                width: "100%",
+                minWidth: 0,
+                maxWidth: "100%",
+                alignSelf: "stretch",
               },
             ]}
           />
@@ -234,6 +239,10 @@ export default function TaskDetailsScreen() {
                 borderColor: themeColors.tint,
                 borderWidth: 1.5,
                 backgroundColor: "transparent",
+                width: "100%",
+                minWidth: 0,
+                maxWidth: "100%",
+                alignSelf: "stretch",
               },
             ]}
           />

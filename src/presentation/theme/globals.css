@@ -4,51 +4,100 @@
 
 /* Customizações adicionais se necessário */
 @layer base {
-   * {
-      @apply border-border;
-   }
+  * {
+    @apply border-border;
+  }
+
+  /**
+    * WCAG 2.2 AA: Focus Visible Styles (2.4.7)
+    * Ensures keyboard navigation is visible for all interactive elements
+    * Minimum contrast: 3:1 against both light and dark backgrounds
+    */
+
+  /* Buttons and links */
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid #0f766e;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: more) {
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 4px solid #000;
+      outline-offset: 3px;
+    }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline-color: #06b6d4;
+    }
+  }
+
+  /* Remove default browser outlines to avoid double outlines */
+  button:focus,
+  a:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: none;
+  }
 }
 
 @layer components {
-   .btn-primary {
-      @apply bg-primary hover:bg-opacity-90 text-white font-bold py-md px-lg rounded-lg transition;
-   }
+  .btn-primary {
+    @apply bg-primary hover:bg-opacity-90 text-white font-bold py-md px-lg rounded-lg transition;
+  }
 
-   .btn-secondary {
-      @apply bg-secondary hover:bg-opacity-90 text-white font-bold py-md px-lg rounded-lg transition;
-   }
+  .btn-secondary {
+    @apply bg-secondary hover:bg-opacity-90 text-white font-bold py-md px-lg rounded-lg transition;
+  }
 
-   .card {
-      @apply bg-surface rounded-lg shadow-md p-md;
-   }
+  .card {
+    @apply bg-surface rounded-lg shadow-md p-md;
+  }
 
-   .container-web {
-      @apply w-full max-w-6xl mx-auto;
-   }
+  .container-web {
+    @apply w-full max-w-6xl mx-auto;
+  }
 
-   /* Responsive menu utilities */
-   .menu-drawer-overlay {
-      @apply fixed inset-0 bg-black/50 z-40 md:hidden;
-   }
+  /* Responsive menu utilities */
+  .menu-drawer-overlay {
+    @apply fixed inset-0 bg-black/50 z-40 md:hidden;
+  }
 
-   .menu-drawer {
-      @apply fixed left-0 top-0 z-50 w-64 h-screen bg-white transition-transform duration-300 md:hidden;
-   }
+  .menu-drawer {
+    @apply fixed left-0 top-0 z-50 w-64 h-screen bg-white transition-transform duration-300 md:hidden;
+  }
 
-   .sidebar-lg {
-      @apply hidden lg:flex;
-   }
+  .sidebar-lg {
+    @apply hidden lg:flex;
+  }
 
-   .hamburger-md {
-      @apply flex md:hidden;
-   }
+  .hamburger-md {
+    @apply flex md:hidden;
+  }
 }
 
 /* Media query styles for sidebar/hamburger */
 @media (max-width: 1023px) {
-   /* Sidebar tetap escondido em telas menores que lg */
+  /* Sidebar tetap escondido em telas menores que lg */
 }
 
 @media (min-width: 1024px) {
-   /* Sidebar visível em telas lg+ */
+  /* Sidebar visível em telas lg+ */
 }
