@@ -12,15 +12,14 @@ SeniorEase: aplicativo acessível para gestão de tarefas, com foco em pessoas i
 ## ⚡ Acesso Rápido
 
 - 🌐 [Versão web em produção](https://senior-ease-wheat.vercel.app/)
-- 🎬 [Vídeo de demonstração](LINK_DO_VIDEO_AQUI)
-- 🤖 [APK Android (download)](LINK_DO_APK_AQUI)
+- 🎬 [Vídeo de demonstração](https://drive.google.com/file/d/12XzweH44k5KaEFHH-QxSvP7Sn-F9Jgl5/view?usp=sharing)
+- 🤖 [APK Android (download)](https://expo.dev/artifacts/eas/cw5FBKS8qm6KWBYtQD8tA6.apk)
 
 ---
 
 ## 📋 Gestão do Projeto
 
 - 📊 [Trello (Fase 5)](https://trello.com/b/Gap1rbA6/fase-5)
-- 📹 [Vídeo de apresentação (Fase 5)](LINK_DO_VIDEO_APRESENTACAO_AQUI)
 
 ---
 
