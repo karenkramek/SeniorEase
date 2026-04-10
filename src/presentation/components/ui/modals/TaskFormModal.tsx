@@ -3,10 +3,17 @@ import { TaskForm } from "@/presentation/components/task/TaskForm";
 import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebCompactViewport } from "@/presentation/theme/breakpoints";
 import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  Modal,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface TaskFormModalProps {
@@ -24,6 +31,7 @@ export function TaskFormModal({
 }: TaskFormModalProps) {
   const isEditMode = !!task;
   const { themeColors, isWeb, colorScheme, preferences } = useTheme();
+  const { height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const bottomSafeSpace = Math.max(
     insets.bottom,
@@ -31,6 +39,7 @@ export function TaskFormModal({
   );
   const appTexts = useAppStrings();
   const strings = isEditMode ? appTexts.editTask : appTexts.createTask;
+  const isCompactWeb = isWebCompactViewport(isWeb, screenHeight);
 
   const modalBackdropColor = preferences.isHighContrast
     ? "rgba(255,255,255,0.30)"
@@ -59,12 +68,18 @@ export function TaskFormModal({
       {isWeb ? (
         // WEB: Modal centrado com overlay
         <View
+          {...({
+            role: "dialog",
+            "aria-modal": "true",
+            "aria-label": strings.screenLabel,
+          } as any)}
           style={{
             flex: 1,
-            justifyContent: "center",
+            justifyContent: isCompactWeb ? "flex-start" : "center",
             alignItems: "center",
             backgroundColor: modalBackdropColor,
-            padding: 20,
+            paddingHorizontal: 12,
+            paddingVertical: isCompactWeb ? 8 : 20,
           }}
         >
           <View
@@ -73,7 +88,7 @@ export function TaskFormModal({
               borderRadius: 12,
               borderWidth: preferences.isHighContrast ? 2 : 1,
               borderColor: themeColors.icon,
-              maxHeight: "90%",
+              maxHeight: isCompactWeb ? screenHeight - 16 : "90%",
               width: "100%",
               maxWidth: 600,
               flexDirection: "column",
@@ -85,8 +100,8 @@ export function TaskFormModal({
                 flexDirection: "row",
                 justifyContent: "space-between",
                 alignItems: "center",
-                paddingHorizontal: 20,
-                paddingVertical: 16,
+                paddingHorizontal: isCompactWeb ? 14 : 20,
+                paddingVertical: isCompactWeb ? 10 : 16,
                 borderBottomWidth: 1,
                 borderBottomColor: themeColors.icon + "20",
               }}
@@ -108,6 +123,12 @@ export function TaskFormModal({
                 accessibilityRole="button"
                 accessibilityLabel={appTexts.common.close}
                 hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+                style={{
+                  minWidth: 44,
+                  minHeight: 44,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
                 <Ionicons
                   name="close"
@@ -121,11 +142,11 @@ export function TaskFormModal({
             {/* Formulário */}
             <ScrollView
               contentContainerStyle={{
-                padding: 20,
-                paddingBottom: 32,
+                padding: isCompactWeb ? 14 : 20,
+                paddingBottom: isCompactWeb ? 16 : 32,
               }}
               keyboardShouldPersistTaps="always"
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator
             >
               <TaskForm
                 task={task || undefined}
@@ -170,6 +191,12 @@ export function TaskFormModal({
               accessibilityRole="button"
               accessibilityLabel={appTexts.common.close}
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
+              style={{
+                minWidth: 44,
+                minHeight: 44,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
               <Ionicons
                 name="close"

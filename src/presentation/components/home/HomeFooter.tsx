@@ -6,7 +6,11 @@ import React from "react";
 import { View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export function HomeFooter() {
+interface HomeFooterProps {
+  compact?: boolean;
+}
+
+export function HomeFooter({ compact = false }: HomeFooterProps) {
   const { themeColors } = useTheme();
   const insets = useSafeAreaInsets();
   const { homepage } = useAppStrings();
@@ -31,8 +35,9 @@ export function HomeFooter() {
         backgroundColor: themeColors.tint,
         borderTopWidth: 1,
         borderTopColor: themeColors.icon,
-        paddingTop: Spacing.large,
-        paddingBottom: Spacing.large + insets.bottom,
+        paddingTop: compact ? Spacing.small : Spacing.large,
+        paddingBottom:
+          (compact ? Spacing.small : Spacing.large) + insets.bottom,
         paddingHorizontal: getPaddingHorizontal(),
       }}
     >

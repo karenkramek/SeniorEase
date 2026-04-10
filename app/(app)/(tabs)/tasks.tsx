@@ -12,27 +12,27 @@ import { useConfirmationFlow } from "@/presentation/hooks/useConfirmationFlow";
 import { useTaskActions } from "@/presentation/hooks/useTaskActions";
 import { useTaskList } from "@/presentation/hooks/useTaskList";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebCompactViewport } from "@/presentation/theme/breakpoints";
 import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { sharedStyles } from "@/presentation/theme/sharedStyles";
 import { Spacing } from "@/presentation/theme/spacing";
 import { filterTasks, sortTasks } from "@/presentation/utils/taskFilters";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useFocusEffect, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import React, { useMemo } from "react";
 import {
-  ActivityIndicator,
   FlatList,
   Platform,
   ScrollView,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TaskListScreen() {
   const appTexts = useAppStrings();
   const strings = appTexts.taskList;
-  const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
   const router = useRouter();
   const { themeColors, preferences, isWeb } = useTheme();
   const buttonHeight = useButtonHeight();
@@ -213,69 +213,110 @@ export default function TaskListScreen() {
   };
   const contentColumnStyle = {
     flex: 1,
-    padding: Spacing.medium,
-    paddingTop: insets.top + Spacing.medium,
+    padding: isWebCompactViewport(isWeb, screenHeight)
+      ? Spacing.small
+      : Spacing.medium,
+    paddingTop: isWebCompactViewport(isWeb, screenHeight)
+      ? Spacing.small
+      : Spacing.medium,
     ...getWebContentShellStyle(),
   };
   const isNativeMobile = Platform.OS !== "web";
+  const isCompactWeb = isWebCompactViewport(isWeb, screenHeight);
+  const showFixedWebCreateButton = isWeb && !isCompactWeb;
 
-  useFocusEffect(
-    React.useCallback(() => {
-      // Só atualiza se já houver um usuário autenticado resolvido
-      refreshTasks();
-    }, [refreshTasks]),
+  const renderCreateButton = (insideFixedBar = false) => (
+    <View
+      style={{
+        marginTop: insideFixedBar ? 0 : isCompactWeb ? Spacing.small : 5,
+        marginBottom: insideFixedBar ? 0 : isNativeMobile ? 5 : 5,
+        alignItems: "center",
+        width: "100%",
+      }}
+    >
+      <AccessibleButton
+        title={appTexts.navigation.createTaskHeaderTitle}
+        icon={
+          <MaterialIcons
+            name="add"
+            size={32}
+            color={themeColors.buttonText}
+            accessibilityLabel={strings.addIconA11y}
+          />
+        }
+        style={[
+          sharedStyles.createButton,
+          {
+            height: buttonHeight,
+            ...(isNativeMobile || isCompactWeb
+              ? {
+                  width: "100%",
+                  minWidth: 0,
+                  maxWidth: "100%",
+                }
+              : {}),
+          },
+        ]}
+        accessibilityLabel={strings.newTaskButtonA11y}
+        onPress={() => {
+          if (isWeb) {
+            setIsCreateModalOpen(true);
+          } else {
+            router.push("/create-task");
+          }
+        }}
+      />
+    </View>
   );
-
-  if (isLoading && tasks.length === 0) {
-    return (
-      <View style={outerScreenStyle}>
-        <View style={[contentColumnStyle, sharedStyles.loader]}>
-          <ActivityIndicator size="large" color={themeColors.tint} />
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={outerScreenStyle}>
       <View style={contentColumnStyle}>
-        <View style={sharedStyles.titleContainer}>
-          <AccessibleText
-            type="h1"
-            style={{
-              textAlign: "center",
-              fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32,
-              paddingTop: 0,
-              paddingBottom: 0,
-            }}
-          >
-            {appTexts.navigation.tasksTabTitle}
-          </AccessibleText>
-        </View>
-
-        {/* Barra de filtros */}
-        <View style={{ marginTop: Spacing.medium, marginBottom: 4 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 6,
-              marginBottom: Spacing.small,
-            }}
-          >
-            <Ionicons
-              name="funnel-outline"
-              size={isWeb ? 18 : 15}
-              color={themeColors.icon}
-              accessibilityElementsHidden
-            />
+        {!isCompactWeb && (
+          <View style={sharedStyles.titleContainer}>
             <AccessibleText
-              type="caption"
-              style={{ color: themeColors.icon, letterSpacing: 0.4 }}
+              type="h1"
+              style={{
+                textAlign: "center",
+                fontSize: preferences.fontSizeMultiplier === 1 ? 24 : 32,
+                paddingTop: 0,
+                paddingBottom: 0,
+              }}
             >
-              {strings.filterByLabel}
+              {appTexts.navigation.tasksTabTitle}
             </AccessibleText>
           </View>
+        )}
+
+        <View
+          style={{
+            marginTop: isCompactWeb ? Spacing.small : Spacing.medium,
+            marginBottom: isCompactWeb ? 2 : 4,
+          }}
+        >
+          {!isCompactWeb && (
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 6,
+                marginBottom: Spacing.small,
+              }}
+            >
+              <Ionicons
+                name="funnel-outline"
+                size={isWeb ? 18 : 15}
+                color={themeColors.icon}
+                accessibilityElementsHidden
+              />
+              <AccessibleText
+                type="caption"
+                style={{ color: themeColors.icon, letterSpacing: 0.4 }}
+              >
+                {strings.filterByLabel}
+              </AccessibleText>
+            </View>
+          )}
 
           <ScrollView
             horizontal
@@ -293,9 +334,9 @@ export default function TaskListScreen() {
                   style={{
                     flexDirection: "row",
                     alignItems: "center",
-                    gap: 7,
-                    paddingVertical: 10,
-                    paddingHorizontal: 18,
+                    gap: isCompactWeb ? 5 : 7,
+                    paddingVertical: isCompactWeb ? 8 : 10,
+                    paddingHorizontal: isCompactWeb ? 12 : 18,
                     borderRadius: 12,
                     borderWidth: 1.5,
                     borderColor: isActive
@@ -316,7 +357,7 @@ export default function TaskListScreen() {
                 >
                   <Ionicons
                     name={f.icon}
-                    size={18}
+                    size={isCompactWeb ? 16 : 18}
                     color={isActive ? themeColors.buttonText : themeColors.icon}
                     accessibilityElementsHidden
                   />
@@ -326,7 +367,9 @@ export default function TaskListScreen() {
                         ? themeColors.buttonText
                         : themeColors.text,
                       fontWeight: isActive ? "700" : "400",
-                      fontSize: 14 * preferences.fontSizeMultiplier,
+                      fontSize:
+                        (isCompactWeb ? 13 : 14) *
+                        preferences.fontSizeMultiplier,
                     }}
                     accessibilityLabel={f.label}
                   >
@@ -339,81 +382,53 @@ export default function TaskListScreen() {
         </View>
 
         <View style={{ height: 16 }} />
-        {filteredTasks.length === 0 ? (
-          <View style={sharedStyles.emptyContainer}>
-            <AccessibleText accessibilityLabel={strings.noTasks}>
-              {strings.noTasks}
-            </AccessibleText>
-          </View>
-        ) : (
-          <FlatList
-            data={filteredTasks}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <TaskCard
-                task={item}
-                onToggleComplete={handleToggleComplete}
-                onDelete={handleDelete}
-                onPress={(taskId) => {
-                  if (isWeb) {
-                    setTaskDetailsModalId(taskId);
-                  } else {
-                    router.push({
-                      pathname: "/task-details",
-                      params: { taskId },
-                    });
-                  }
-                }}
-              />
-            )}
-            onRefresh={refreshTasks}
-            refreshing={isLoading}
-            contentContainerStyle={sharedStyles.list}
-            showsVerticalScrollIndicator={false}
-            accessibilityLabel={strings.listLabel}
-          />
-        )}
-        <View
-          style={{
-            marginTop: 5,
-            marginBottom: 5,
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <AccessibleButton
-            title={appTexts.navigation.createTaskHeaderTitle}
-            icon={
-              <MaterialIcons
-                name="add"
-                size={32}
-                color={themeColors.buttonText}
-                accessibilityLabel={strings.addIconA11y}
-              />
-            }
-            style={[
-              sharedStyles.createButton,
-              {
-                height: buttonHeight,
-                ...(isNativeMobile
-                  ? {
-                      width: "100%",
-                      minWidth: 0,
-                      maxWidth: "100%",
+        <View style={{ flex: 1, minHeight: 0 }}>
+          {filteredTasks.length === 0 ? (
+            <View style={sharedStyles.emptyContainer}>
+              <AccessibleText accessibilityLabel={strings.noTasks}>
+                {strings.noTasks}
+              </AccessibleText>
+              {isCompactWeb && renderCreateButton()}
+            </View>
+          ) : (
+            <FlatList
+              data={filteredTasks}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TaskCard
+                  task={item}
+                  onToggleComplete={handleToggleComplete}
+                  onDelete={handleDelete}
+                  onPress={(taskId) => {
+                    if (isWeb) {
+                      setTaskDetailsModalId(taskId);
+                    } else {
+                      router.push({
+                        pathname: "/task-details",
+                        params: { taskId },
+                      });
                     }
-                  : {}),
-              },
-            ]}
-            accessibilityLabel={strings.newTaskButtonA11y}
-            onPress={() => {
-              if (isWeb) {
-                setIsCreateModalOpen(true);
-              } else {
-                router.push("/create-task");
-              }
-            }}
-          />
+                  }}
+                />
+              )}
+              style={{ flex: 1, minHeight: 0 }}
+              onRefresh={refreshTasks}
+              refreshing={isLoading}
+              contentContainerStyle={[
+                sharedStyles.list,
+                {
+                  paddingBottom: showFixedWebCreateButton
+                    ? buttonHeight + Spacing.xlarge
+                    : 8,
+                },
+              ]}
+              showsVerticalScrollIndicator={false}
+              accessibilityLabel={strings.listLabel}
+            />
+          )}
         </View>
+
+        {isNativeMobile && renderCreateButton()}
 
         <ConfirmModal
           visible={isOpen}
@@ -440,6 +455,32 @@ export default function TaskListScreen() {
           onTaskEdited={() => refreshTasks()}
         />
       </View>
+
+      {showFixedWebCreateButton && (
+        <View
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: themeColors.background,
+            borderTopWidth: 1,
+            borderTopColor: themeColors.icon + "30",
+            paddingHorizontal: Spacing.medium,
+            paddingTop: Spacing.small,
+            paddingBottom: Spacing.small,
+          }}
+          pointerEvents="box-none"
+        >
+          <View
+            style={{
+              ...getWebContentShellStyle(),
+            }}
+          >
+            {renderCreateButton(true)}
+          </View>
+        </View>
+      )}
     </View>
   );
 }

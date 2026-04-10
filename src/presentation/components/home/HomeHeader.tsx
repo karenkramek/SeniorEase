@@ -9,7 +9,10 @@ import React from "react";
 import { Platform, Pressable, View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export function HomeHeader() {
+interface HomeHeaderProps {
+  compact?: boolean;
+}
+export function HomeHeader({ compact = false }: HomeHeaderProps) {
   const { themeColors } = useTheme();
   const insets = useSafeAreaInsets();
   const { common, homepage } = useAppStrings();
@@ -44,8 +47,8 @@ export function HomeHeader() {
         backgroundColor: themeColors.tint,
         borderBottomWidth: 1,
         borderBottomColor: themeColors.icon,
-        paddingTop: insets.top + Spacing.medium,
-        paddingBottom: Spacing.medium,
+        paddingTop: insets.top + (compact ? Spacing.small : Spacing.medium),
+        paddingBottom: compact ? Spacing.small : Spacing.medium,
         paddingHorizontal: getPaddingHorizontal(),
       }}
     >
@@ -57,7 +60,7 @@ export function HomeHeader() {
           maxWidth: 1200,
           width: "100%",
           alignSelf: "center",
-          gap: isMobile ? Spacing.medium : 0,
+          gap: isMobile ? (compact ? Spacing.small : Spacing.medium) : 0,
         }}
       >
         {/* Logo with Icon */}
@@ -80,6 +83,7 @@ export function HomeHeader() {
                 color: "#ffffff",
                 fontWeight: "700",
                 textAlign: "left",
+                fontSize: compact ? 20 : undefined,
               }}
               accessibilityLabel={common.appTitle}
             >
@@ -114,7 +118,7 @@ export function HomeHeader() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-            gap: Spacing.large,
+            gap: compact ? Spacing.medium : Spacing.large,
             justifyContent: isMobile ? "center" : "flex-end",
             width: isMobile ? "100%" : "auto",
           }}

@@ -11,10 +11,10 @@ import { formatDate } from "@/presentation/utils/format";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-    FlatList,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  FlatList,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 
 interface DatePickerModalProps {
@@ -265,6 +265,7 @@ export function DatePickerModal({
       visible={visible}
       onClose={onClose}
       maxWidth={450}
+      dialogLabel={datePicker.title}
       header={header}
       footer={footer}
     >

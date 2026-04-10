@@ -3,14 +3,16 @@ import { HomeHeader } from "@/presentation/components/home/HomeHeader";
 import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebCompactViewport } from "@/presentation/theme/breakpoints";
 import { Spacing } from "@/presentation/theme/spacing";
 import React from "react";
 import { ScrollView, View, useWindowDimensions } from "react-native";
 
 export function HomePage() {
-  const { themeColors } = useTheme();
+  const { themeColors, isWeb } = useTheme();
   const { homepage } = useAppStrings();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+  const isCompactViewport = isWebCompactViewport(isWeb, screenHeight);
 
   // Responsive padding based on screen size
   const getPaddingHorizontal = () => {
@@ -26,7 +28,7 @@ export function HomePage() {
         backgroundColor: themeColors.background,
       }}
     >
-      <HomeHeader />
+      <HomeHeader compact={isCompactViewport} />
 
       <ScrollView
         style={{
@@ -35,10 +37,10 @@ export function HomePage() {
         }}
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: "center",
+          justifyContent: isCompactViewport ? "flex-start" : "center",
           alignItems: "center",
           paddingHorizontal: getPaddingHorizontal(),
-          paddingVertical: Spacing.xlarge,
+          paddingVertical: isCompactViewport ? Spacing.large : Spacing.xlarge,
         }}
       >
         <View
@@ -77,7 +79,7 @@ export function HomePage() {
         </View>
       </ScrollView>
 
-      <HomeFooter />
+      <HomeFooter compact={isCompactViewport} />
     </View>
   );
 }

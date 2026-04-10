@@ -1,11 +1,13 @@
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebCompactViewport } from "@/presentation/theme/breakpoints";
 import React from "react";
 import {
-    Modal,
-    Platform,
-    TouchableOpacity,
-    View,
-    useWindowDimensions,
+  Modal,
+  Platform,
+  ScrollView,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -16,6 +18,7 @@ interface BaseModalProps {
   header?: React.ReactNode;
   footer?: React.ReactNode;
   maxWidth?: number;
+  dialogLabel?: string;
   onShow?: () => void;
   restoreFocusRef?: React.RefObject<React.ElementRef<
     typeof TouchableOpacity
@@ -29,6 +32,7 @@ export function BaseModal({
   header,
   footer,
   maxWidth = 520,
+  dialogLabel,
   onShow,
   restoreFocusRef,
 }: BaseModalProps) {
@@ -63,6 +67,18 @@ export function BaseModal({
   const overlayMaxHeight = isMobileApp
     ? screenHeight - insets.bottom - 20
     : screenHeight;
+  const isCompactWeb = isWebCompactViewport(
+    Platform.OS === "web",
+    screenHeight,
+  );
+  const webDialogProps =
+    Platform.OS === "web"
+      ? ({
+          role: "dialog",
+          "aria-modal": "true",
+          "aria-label": dialogLabel,
+        } as const)
+      : {};
 
   return (
     <Modal
@@ -76,38 +92,50 @@ export function BaseModal({
       <View
         style={{
           flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
           backgroundColor: modalBackdropColor,
           maxHeight: overlayMaxHeight,
         }}
       >
-        <View
-          style={{
-            width: "100%",
-            maxWidth,
-            borderRadius: 12,
-            padding: 24,
-            backgroundColor: themeColors.background,
-            borderWidth: preferences.isHighContrast ? 2 : 1,
-            borderColor: themeColors.icon,
-            gap: 12,
-            marginHorizontal: 20,
+        <ScrollView
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: isCompactWeb ? "flex-start" : "center",
+            alignItems: "center",
+            paddingVertical: isCompactWeb ? 8 : 20,
+            paddingHorizontal: 12,
           }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
-          {header}
-          {header && (
-            <View
-              style={{
-                height: 1,
-                backgroundColor: themeColors.icon + "30",
-                marginHorizontal: -24,
-              }}
-            />
-          )}
-          {children}
-          {footer}
-        </View>
+          <View
+            {...(webDialogProps as any)}
+            style={{
+              width: "100%",
+              maxWidth,
+              borderRadius: 12,
+              padding: isCompactWeb ? 16 : 24,
+              backgroundColor: themeColors.background,
+              borderWidth: preferences.isHighContrast ? 2 : 1,
+              borderColor: themeColors.icon,
+              gap: 12,
+              marginHorizontal: 20,
+              maxHeight: Platform.OS === "web" ? screenHeight - 24 : undefined,
+            }}
+          >
+            {header}
+            {header && (
+              <View
+                style={{
+                  height: 1,
+                  backgroundColor: themeColors.icon + "30",
+                  marginHorizontal: isCompactWeb ? -16 : -24,
+                }}
+              />
+            )}
+            {children}
+            {footer}
+          </View>
+        </ScrollView>
       </View>
     </Modal>
   );

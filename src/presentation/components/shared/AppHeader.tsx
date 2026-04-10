@@ -4,9 +4,11 @@ import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useAuth } from "@/presentation/hooks/useAuth";
 import { useTheme } from "@/presentation/hooks/useTheme";
+import { isWebCompactViewport } from "@/presentation/theme/breakpoints";
 import { getWebContentShellStyle } from "@/presentation/theme/platformLayout";
 import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter, useSegments } from "expo-router";
 import React from "react";
 import { View, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,14 +20,18 @@ interface AppHeaderProps {
 
 export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
   const { user, signOut } = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
   const { themeColors, isWeb } = useTheme();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { common, navigation, profile } = useAppStrings();
 
   // Breakpoints
   const isSmallScreen = screenWidth < 640; // Mobile web
   const showHamburgerMenu = screenWidth < 1024; // Tablet e mobile web
+  const isCompactViewport = isWebCompactViewport(isWeb, screenHeight);
+  const isTasksTab = (segments as string[]).includes("tasks");
 
   const userName =
     user?.name || user?.email?.split("@")[0] || profile.userLabel;
@@ -44,8 +50,12 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
           justifyContent: isWeb ? "space-between" : "flex-start",
           alignItems: "center",
           paddingHorizontal: Spacing.large,
-          paddingVertical: Spacing.medium,
-          paddingTop: !isWeb ? insets.top + Spacing.medium : Spacing.medium,
+          paddingVertical: isCompactViewport ? Spacing.small : Spacing.medium,
+          paddingTop: !isWeb
+            ? insets.top + Spacing.medium
+            : isCompactViewport
+              ? Spacing.small
+              : Spacing.medium,
           ...getWebContentShellStyle(),
         }}
       >
@@ -74,6 +84,7 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
             style={{
               color: themeColors.tint,
               fontWeight: "700",
+              fontSize: isCompactViewport ? 22 : undefined,
             }}
             accessibilityLabel={common.appTitle}
           >
@@ -87,11 +98,31 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
             style={{
               flexDirection: "row",
               alignItems: "center",
-              gap: Spacing.small,
+              gap: isCompactViewport ? 6 : Spacing.small,
             }}
           >
+            {isCompactViewport && isTasksTab && (
+              <AccessibleButton
+                title={navigation.createTaskHeaderTitle}
+                onPress={() => router.push("/create-task")}
+                accessibilityLabel={navigation.createTaskHeaderTitle}
+                icon={
+                  <Ionicons
+                    name="add"
+                    size={18}
+                    color={themeColors.buttonText}
+                  />
+                }
+                style={{
+                  backgroundColor: themeColors.tint,
+                  paddingHorizontal: Spacing.small,
+                  paddingVertical: Spacing.small,
+                }}
+              />
+            )}
+
             {/* Ícone do usuário - escondido em mobile */}
-            {!isSmallScreen && (
+            {!isSmallScreen && !isCompactViewport && (
               <Ionicons
                 name="person-circle-outline"
                 size={32}
@@ -101,7 +132,7 @@ export function AppHeader({ menuOpen = false, onMenuToggle }: AppHeaderProps) {
             )}
 
             {/* Nome do usuário - escondido em mobile */}
-            {!isSmallScreen && (
+            {!isSmallScreen && !isCompactViewport && (
               <AccessibleText
                 type="bodyCompact"
                 style={{

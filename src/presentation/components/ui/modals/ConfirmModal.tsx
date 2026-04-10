@@ -60,6 +60,7 @@ export function ConfirmModal({
       onClose={onCancel}
       restoreFocusRef={restoreFocusRef}
       maxWidth={450}
+      dialogLabel={title}
       onShow={() => {
         if (Platform.OS === "web") {
           setTimeout(() => {

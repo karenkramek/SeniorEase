@@ -59,7 +59,7 @@ export default function HelpScreen() {
           getWebContentShellStyle(),
           isWeb && { paddingHorizontal: 28, paddingBottom: 32 },
           {
-            paddingTop: insets.top + Spacing.medium,
+            paddingTop: Spacing.medium,
             paddingBottom: insets.bottom + Spacing.large,
           },
         ]}
