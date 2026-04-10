@@ -77,7 +77,7 @@ export default function PreferencesScreen() {
           sharedStyles.container,
           getWebContentShellStyle(),
           isWeb && { paddingHorizontal: 28, paddingBottom: 32 },
-          { paddingTop: insets.top + Spacing.medium },
+          { paddingTop: Spacing.medium },
         ]}
         accessibilityLabel={strings.screenLabel}
       >

@@ -1,3 +1,4 @@
+import { AccessibleText } from "@/presentation/components/ui/text/AccessibleText";
 import { useAppStrings } from "@/presentation/hooks/useAppStrings";
 import { useTheme } from "@/presentation/hooks/useTheme";
 import { getColorWithOpacity } from "@/presentation/theme/colors";
@@ -7,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 import type { Href } from "expo-router";
 import { useRouter, useSegments } from "expo-router";
 import React from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 const TAB_SEGMENTS = ["tasks", "preferences", "help", "profile"] as const;
 type TabSegment = (typeof TAB_SEGMENTS)[number];
@@ -15,7 +16,11 @@ type TabSegment = (typeof TAB_SEGMENTS)[number];
 const TAB_ITEMS: {
   segment: TabSegment;
   href: Href;
-  titleKey: "tasksTabTitle" | "preferencesTabTitle" | "helpTabTitle" | "profileTabTitle";
+  titleKey:
+    | "tasksTabTitle"
+    | "preferencesTabTitle"
+    | "helpTabTitle"
+    | "profileTabTitle";
   a11yKey:
     | "tasksTabA11y"
     | "preferencesTabA11y"
@@ -72,9 +77,10 @@ export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
   const segments = useSegments();
   const appTexts = useAppStrings();
   const nav = appTexts.navigation;
-  const { themeColors } = useTheme();
+  const { themeColors, preferences } = useTheme();
   const active = getActiveTabSegment(segments as string[]);
   const webFont = getUiFontFamily();
+  const navScale = preferences.fontSizeMultiplier;
 
   const handleNavigation = (href: Href) => {
     router.push(href);
@@ -100,7 +106,7 @@ export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
             accessibilityState={{ selected: isActive }}
             style={({ pressed }) => ({
               paddingHorizontal: 12,
-              paddingVertical: 10,
+              paddingVertical: Math.max(10, Math.round(10 * navScale)),
               borderRadius: 12,
               backgroundColor: isActive
                 ? getColorWithOpacity(themeColors.tint, 0.1)
@@ -109,22 +115,24 @@ export function NavigationMenu({ onNavigate }: NavigationMenuProps) {
                   : "transparent",
             })}
           >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 10 }}
+            >
               <Ionicons
                 name={getNavigationIcon(item.iconKey, isActive)}
-                size={24}
+                size={Math.max(24, Math.round(24 * navScale))}
                 color={isActive ? themeColors.tint : themeColors.icon}
               />
-              <Text
+              <AccessibleText
                 style={{
-                  fontSize: 14,
+                  fontSize: 14 * navScale,
                   fontFamily: webFont,
                   color: isActive ? themeColors.tint : themeColors.text,
                   fontWeight: isActive ? "600" : "400",
                 }}
               >
                 {label}
-              </Text>
+              </AccessibleText>
             </View>
           </Pressable>
         );

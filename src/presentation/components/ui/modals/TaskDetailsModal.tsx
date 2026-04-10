@@ -361,6 +361,7 @@ export function TaskDetailsModal({
         onClose={onClose}
         header={header}
         maxWidth={600}
+        dialogLabel={task?.title ?? strings.notFound}
       >
         {renderContent()}
       </BaseModal>

@@ -9,7 +9,6 @@ import { Spacing } from "@/presentation/theme/spacing";
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import { View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const appTexts = useAppStrings();
@@ -18,7 +17,6 @@ export default function ProfileScreen() {
   const { user, signOut } = useAuth();
   const { themeColors, preferences } = useTheme();
   const buttonHeight = useButtonHeight();
-  const insets = useSafeAreaInsets();
 
   return (
     <View
@@ -26,7 +24,7 @@ export default function ProfileScreen() {
         sharedStyles.container,
         {
           backgroundColor: themeColors.background,
-          paddingTop: insets.top + Spacing.medium,
+          paddingTop: Spacing.medium,
         },
       ]}
     >
